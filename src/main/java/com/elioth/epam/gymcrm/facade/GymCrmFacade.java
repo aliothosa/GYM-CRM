@@ -7,6 +7,7 @@ import com.elioth.epam.gymcrm.domain.TrainingType;
 import com.elioth.epam.gymcrm.service.TraineeService;
 import com.elioth.epam.gymcrm.service.TrainerService;
 import com.elioth.epam.gymcrm.service.TrainingService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -20,11 +21,8 @@ public class GymCrmFacade {
     private final TrainerService trainerService;
     private final TrainingService trainingService;
 
-    public GymCrmFacade(
-            TraineeService traineeService,
-            TrainerService trainerService,
-            TrainingService trainingService
-    ) {
+    @Autowired
+    public GymCrmFacade(TraineeService traineeService, TrainerService trainerService, TrainingService trainingService) {
         this.traineeService = traineeService;
         this.trainerService = trainerService;
         this.trainingService = trainingService;
@@ -35,27 +33,27 @@ public class GymCrmFacade {
     // =========================
 
     public Trainee createTraineeProfile(Trainee trainee) {
-        throw new UnsupportedOperationException("TODO");
+        return traineeService.createProfile(trainee);
     }
 
     public Trainee updateTraineeProfile(Trainee trainee) {
-        throw new UnsupportedOperationException("TODO");
+        return traineeService.updateProfile(trainee);
     }
 
     public void deleteTraineeProfile(UUID traineeId) {
-        throw new UnsupportedOperationException("TODO");
+        traineeService.deleteProfile(traineeId);
     }
 
     public Trainee getTraineeProfileById(UUID traineeId) {
-        throw new UnsupportedOperationException("TODO");
+        return traineeService.getProfileById(traineeId);
     }
 
     public List<Trainee> getAllTraineeProfiles() {
-        throw new UnsupportedOperationException("TODO");
+        return traineeService.getAllProfiles();
     }
 
     public Trainee getTraineeProfileByUsername(String username) {
-        throw new UnsupportedOperationException("TODO");
+        return traineeService.getProfileByUsername(username);
     }
 
     // =========================
@@ -63,31 +61,31 @@ public class GymCrmFacade {
     // =========================
 
     public Trainer createTrainerProfile(Trainer trainer) {
-        throw new UnsupportedOperationException("TODO");
+        return trainerService.createProfile(trainer);
     }
 
     public Trainer updateTrainerProfile(Trainer trainer) {
-        throw new UnsupportedOperationException("TODO");
+        return trainerService.updateProfile(trainer);
     }
 
     public void deleteTrainerProfile(UUID trainerId) {
-        throw new UnsupportedOperationException("TODO");
+        trainerService.deleteProfile(trainerId);
     }
 
     public Trainer getTrainerProfileById(UUID trainerId) {
-        throw new UnsupportedOperationException("TODO");
+        return trainerService.getProfileById(trainerId);
     }
 
     public List<Trainer> getAllTrainerProfiles() {
-        throw new UnsupportedOperationException("TODO");
+        return trainerService.getAllProfiles();
     }
 
     public Trainer getTrainerProfileByUsername(String username) {
-        throw new UnsupportedOperationException("TODO");
+        return trainerService.getProfileByUsername(username);
     }
 
     public List<Trainer> findTrainersBySpecialization(TrainingType specialization) {
-        throw new UnsupportedOperationException("TODO");
+        return trainerService.findBySpecialization(specialization);
     }
 
     // =========================
@@ -95,38 +93,38 @@ public class GymCrmFacade {
     // =========================
 
     public Training createTraining(Training training) {
-        throw new UnsupportedOperationException("TODO");
+        return trainingService.createTraining(training);
     }
 
     public Training updateTraining(Training training) {
-        throw new UnsupportedOperationException("TODO");
+        return trainingService.updateTraining(training);
     }
 
     public void deleteTraining(long trainingId) {
-        throw new UnsupportedOperationException("TODO");
+        trainingService.deleteTraining(trainingId);
     }
 
     public Training getTrainingById(long trainingId) {
-        throw new UnsupportedOperationException("TODO");
+        return trainingService.getTrainingById(trainingId);
     }
 
     public List<Training> getAllTrainings() {
-        throw new UnsupportedOperationException("TODO");
+        return trainingService.getAllTrainings();
     }
 
     public List<Training> getTrainingsByTraineeId(UUID traineeId) {
-        throw new UnsupportedOperationException("TODO");
+        return trainingService.getTrainingsByTraineeId(traineeId);
     }
 
     public List<Training> getTrainingsByTrainerId(UUID trainerId) {
-        throw new UnsupportedOperationException("TODO");
+        return trainingService.getTrainingsByTrainerId(trainerId);
     }
 
     public List<Training> getTrainingsByType(TrainingType type) {
-        throw new UnsupportedOperationException("TODO");
+        return trainingService.getTrainingsByType(type);
     }
 
     public List<Training> getTrainingsByDateBetween(Date from, Date to) {
-        throw new UnsupportedOperationException("TODO");
+        return trainingService.getTrainingsByDateBetween(from, to);
     }
 }
