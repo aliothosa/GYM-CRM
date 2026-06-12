@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: GYM-CRM
+
+storage:
+  init:
+    file: classpath:initial-storage.json
