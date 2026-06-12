@@ -28,7 +28,7 @@ public class Utils {
         if  (userCount == 0) {
             return String.format("%s.%s", user.getFirstName(), user.getLastName());
         }
-        return String.format("%s.%s_%d", user.getFirstName(), user.getLastName(),  userCount);
+        return String.format("%s.%s%d", user.getFirstName(), user.getLastName(), userCount);
     }
 
 

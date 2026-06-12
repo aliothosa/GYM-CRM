@@ -33,11 +33,11 @@ public class TraineeDaoImpl implements TraineeDao {
 
     @Override
     public Trainee update(Trainee entity) {
-        if (!storage.getData().containsKey(entity.getId())) {
+        if (storage.getData().containsKey(entity.getId())) {
             storage.getData().put(entity.getId(), entity);
             return entity;
         }
-        return storage.getData().get(entity.getId());
+        return null;
     }
 
     @Override

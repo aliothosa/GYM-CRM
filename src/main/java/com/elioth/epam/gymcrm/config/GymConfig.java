@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
 @Configuration
-@ComponentScan("com.elioth.epam.gycrm")
+@ComponentScan("com.elioth.epam.gymcrm")
 @PropertySource(value = "classpath:application.yaml")
 public class GymConfig {
 
