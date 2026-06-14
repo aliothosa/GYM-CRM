@@ -1,0 +1,34 @@
+{
+  "trainees": [
+    {
+      "id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "firstName": "Test",
+      "lastName": "Trainee",
+      "username": "Test.Trainee",
+      "password": "testPass01",
+      "active": true
+    }
+  ],
+  "trainers": [
+    {
+      "id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "firstName": "Test",
+      "lastName": "Trainer",
+      "username": "Test.Trainer",
+      "password": "testPass02",
+      "active": true,
+      "specialization": "AEROBIC"
+    }
+  ],
+  "trainings": [
+    {
+      "id": 100,
+      "traineeId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "trainerId": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "type": "AEROBIC",
+      "name": "Test Training Session",
+      "date": "2026-01-15",
+      "durationInMinutes": 30
+    }
+  ]
+}
