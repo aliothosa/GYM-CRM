@@ -1,11 +1,22 @@
 package com.elioth.epam.gymcrm.domain;
 
-import lombok.ToString;
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@ToString
-public enum TrainingType {
-    AEROBIC,
-    WEIGHT,
-    RESISTANCE,
-    MOBILITY
+
+@Getter
+@Setter
+@NoArgsConstructor
+@Entity
+@Table(name = "training_types")
+public class TrainingType {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long trainingTypeId;
+
+    @Column(nullable = false, unique = true)
+    private String trainingTypeName;
 }

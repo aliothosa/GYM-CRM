@@ -5,6 +5,9 @@ import com.elioth.epam.gymcrm.dao.TrainerDao;
 import com.elioth.epam.gymcrm.domain.Trainee;
 import com.elioth.epam.gymcrm.exception.EntityNotFoundException;
 import com.elioth.epam.gymcrm.exception.InvalidEntityException;
+import com.elioth.epam.gymcrm.repository.TraineeRepository;
+import com.elioth.epam.gymcrm.repository.TrainerRepository;
+import com.elioth.epam.gymcrm.repository.UserRepository;
 import com.elioth.epam.gymcrm.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,10 +22,11 @@ public class TraineeService {
 
     private static final Logger LOG = LoggerFactory.getLogger(TraineeService.class);
 
-    private TraineeDao dao;
+    private TrainerRepository traineeRepository;
+    private UserRepository userRepository;
 
     @Autowired
-    public void setDao(TraineeDao dao){
+    public void setTrainerRepository(TraineeRepository trainerRepository) {
         this.dao = dao;
     }
 
