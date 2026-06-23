@@ -53,10 +53,10 @@ public class TrainingMapper {
                 trainerUser.getFirstName(),
                 trainerUser.getLastName(),
                 trainingType.getTrainingTypeId(),
-                trainingType.getName(),
+                trainingType.getTrainingTypeName(),
                 training.getName(),
                 training.getDate(),
-                Long.valueOf(training.getDurationInMinutes())
+                training.getDurationInMinutes()
         );
     }
 }

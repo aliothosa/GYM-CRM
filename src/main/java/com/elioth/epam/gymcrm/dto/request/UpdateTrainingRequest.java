@@ -1,4 +1,9 @@
 package com.elioth.epam.gymcrm.dto.request;
 
-public record UpdateTrainingRequest() {
-}
+import java.time.LocalDate;
+
+public record UpdateTrainingRequest(
+    String name,
+    LocalDate date,
+    long duration
+) {}

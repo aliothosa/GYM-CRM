@@ -20,7 +20,7 @@ public class TraineeMapper {
     }
 
     public void updateEntity(Trainee trainee, UpdateTraineeRequest request) {
-        trainee.setBirthDate(request.birthDay());
+        trainee.setBirthDate(request.birthDate());
         trainee.setAddress(request.address());
     }
 

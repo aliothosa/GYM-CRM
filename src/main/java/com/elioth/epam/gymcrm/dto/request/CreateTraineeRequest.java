@@ -4,5 +4,9 @@ import com.elioth.epam.gymcrm.domain.Address;
 
 import java.time.LocalDate;
 
-public record TraineeRequest(String firstName, String lastName, LocalDate birthDate, Address address) {
-}
+public record CreateTraineeRequest(
+        String firstName,
+        String lastName,
+        LocalDate birthDate,
+        Address address
+){}

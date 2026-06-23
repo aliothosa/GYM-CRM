@@ -1,4 +1,6 @@
 package com.elioth.epam.gymcrm.dto.request;
 
-public record ChanguePasswordRequest() {
-}
+public record ChangePasswordRequest(
+       String oldPassword,
+       String newPassword
+) {}
