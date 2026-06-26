@@ -10,7 +10,7 @@ public record TraineeResponse(
         String firstName,
         String lastName,
         String username,
-        boolean active,
+        Boolean active,
         LocalDate birthDate,
         Address address
 ) {}

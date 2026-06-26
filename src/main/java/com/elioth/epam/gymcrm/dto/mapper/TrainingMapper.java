@@ -25,22 +25,35 @@ public class TrainingMapper {
         training.setType(trainingType);
         training.setName(request.trainingName());
         training.setDate(request.trainingDate());
-        training.setDurationInMinutes(Math.toIntExact(request.duration()));
+        training.setDurationInMinutes(request.duration());
         return training;
     }
 
     public static void updateEntity(Training training, UpdateTrainingRequest request) {
         training.setName(request.name());
         training.setDate(request.date());
-        training.setDurationInMinutes(Math.toIntExact(request.duration()));
+        training.setDurationInMinutes(request.duration());
     }
 
     public static TrainingResponse toResponse(Training training) {
+        if (training == null) {
+            return null;
+        }
+
         Trainee trainee = training.getTrainee();
         Trainer trainer = training.getTrainer();
         TrainingType trainingType = training.getType();
+
+        if (trainee == null || trainer == null || trainingType == null) {
+            throw new IllegalStateException("Training must have trainee, trainer, and training type");
+        }
+
         User traineeUser = trainee.getUser();
         User trainerUser = trainer.getUser();
+
+        if (traineeUser == null || trainerUser == null) {
+            throw new IllegalStateException("Training participants must have associated users");
+        }
 
         return new TrainingResponse(
                 training.getTrainingId(),

@@ -10,6 +10,7 @@ import com.elioth.epam.gymcrm.dto.request.UpdateTrainingRequest;
 import com.elioth.epam.gymcrm.dto.response.TrainingResponse;
 import com.elioth.epam.gymcrm.exception.EntityNotFoundException;
 import com.elioth.epam.gymcrm.exception.InvalidEntityException;
+import com.elioth.epam.gymcrm.exception.InvalidRequestException;
 import com.elioth.epam.gymcrm.repository.TraineeRepository;
 import com.elioth.epam.gymcrm.repository.TrainerRepository;
 import com.elioth.epam.gymcrm.repository.TrainingRepository;
@@ -32,6 +33,7 @@ public class TrainingService {
     private TrainerRepository trainerRepository;
     private TrainingRepository trainingRepository;
     private TrainingTypeRepository trainingTypeRepository;
+    private AuthService authService;
 
     @Autowired
     public void setTrainingRepository(TrainingRepository trainingRepository) {
@@ -53,28 +55,28 @@ public class TrainingService {
         this.trainingTypeRepository = trainingTypeRepository;
     }
 
+    @Autowired
+    public void setAuthService(AuthService authService) {
+        this.authService = authService;
+    }
+
     @Transactional
-    public TrainingResponse createTraining(CreateTrainingRequest request) {
-        LOG.info("Creating training");
+    public TrainingResponse createTraining(String trainerUsername, String password, CreateTrainingRequest request) {
+        LOG.info("Creating training for trainer username: {}", trainerUsername);
 
         validateCreateRequest(request);
 
+        Trainer authenticatedTrainer = authService.authenticateTrainer(trainerUsername, password);
         Trainee fetchedTrainee = findTraineeByIdOrThrow(request.traineeId());
         Trainer fetchedTrainer = findTrainerByIdOrThrow(request.trainerId());
         TrainingType fetchedTrainingType = findTrainingTypeByIdOrThrow(request.trainingTypeId());
 
-        Training training = new Training();
+        if (!authenticatedTrainer.getTrainerId().equals(fetchedTrainer.getTrainerId())) {
+            throw new InvalidRequestException("Authenticated trainer must match the training trainer");
+        }
 
-        training.setTrainee(fetchedTrainee);
-        training.setTrainer(fetchedTrainer);
-        training.setType(fetchedTrainingType);
-
-        training.setName(request.trainingName());
-        training.setDate(request.trainingDate());
-        training.setDurationInMinutes(request.duration());
-
+        Training training = TrainingMapper.toEntity(request, fetchedTrainee, fetchedTrainer, fetchedTrainingType);
         Training savedTraining = trainingRepository.save(training);
-
 
         LOG.info("Created training with id: {}", savedTraining.getTrainingId());
 
@@ -82,137 +84,163 @@ public class TrainingService {
     }
 
     @Transactional
-    public TrainingResponse updateTraining(long id, UpdateTrainingRequest request) {
-        LOG.info("Updating training with id: {}", id);
+    public TrainingResponse updateTraining(String trainerUsername, String password, Long id, UpdateTrainingRequest request) {
+        LOG.info("Updating training with id: {} for trainer username: {}", id, trainerUsername);
 
         validateUpdateRequest(request);
 
+        Trainer authenticatedTrainer = authService.authenticateTrainer(trainerUsername, password);
         Training fetchedTraining = findTrainingByIdOrThrow(id);
 
-        fetchedTraining.setName(request.name());
-        fetchedTraining.setDate(request.date());
-        fetchedTraining.setDurationInMinutes(request.duration());
+        if (!authenticatedTrainer.getTrainerId().equals(fetchedTraining.getTrainer().getTrainerId())) {
+            throw new InvalidRequestException("Authenticated trainer cannot update this training");
+        }
 
-        LOG.info("Updated training with id: {}", fetchedTraining.getTrainingId());
+        TrainingMapper.updateEntity(fetchedTraining, request);
 
         return TrainingMapper.toResponse(fetchedTraining);
     }
 
-    public void deleteTraining(long trainingId) {
-        LOG.info("Deleting training with id: {}", trainingId);
+    @Transactional
+    public void deleteTraining(String trainerUsername, String password, Long trainingId) {
+        LOG.info("Deleting training with id: {} for trainer username: {}", trainingId, trainerUsername);
 
-        trainingRepository.deleteById(trainingId);
-
-    }
-
-    public TrainingResponse getTrainingById(long trainingId) {
-        LOG.info("Getting training by id: {}", trainingId);
-
+        Trainer authenticatedTrainer = authService.authenticateTrainer(trainerUsername, password);
         Training fetchedTraining = findTrainingByIdOrThrow(trainingId);
 
+        if (!authenticatedTrainer.getTrainerId().equals(fetchedTraining.getTrainer().getTrainerId())) {
+            throw new InvalidRequestException("Authenticated trainer cannot delete this training");
+        }
+
+        trainingRepository.delete(fetchedTraining);
+    }
+
+    @Transactional(readOnly = true)
+    public TrainingResponse getTrainingById(String trainerUsername, String password, Long trainingId) {
+        LOG.info("Getting training by id: {} for trainer username: {}", trainingId, trainerUsername);
+
+        Trainer authenticatedTrainer = authService.authenticateTrainer(trainerUsername, password);
+        Training fetchedTraining = findTrainingByIdOrThrow(trainingId);
+
+        if (!authenticatedTrainer.getTrainerId().equals(fetchedTraining.getTrainer().getTrainerId())) {
+            throw new InvalidRequestException("Authenticated trainer cannot access this training");
+        }
+
         return TrainingMapper.toResponse(fetchedTraining);
     }
 
-    public List<TrainingResponse> getTrainingsByTraineeId(long traineeId) {
-        LOG.info("Getting trainings by trainee id: {}", traineeId);
+    @Transactional(readOnly = true)
+    public List<TrainingResponse> getTrainingsByTraineeUsernameAndCriteria(
+            String username,
+            String password,
+            LocalDate from,
+            LocalDate to,
+            String trainerName,
+            String trainingTypeName
+    ) {
+        LOG.info(
+                "Getting trainings for trainee username: {} with criteria fromDate={}, toDate={}, trainerName={}, trainingType={}",
+                username,
+                from,
+                to,
+                trainerName,
+                trainingTypeName
+        );
 
-        return trainingRepository.findAllByTraineeTraineeId(traineeId).stream()
-                .map(TrainingMapper::toResponse)
-                .toList();
-    }
+        authService.authenticateTrainee(username, password);
 
-    public List<TrainingResponse> getTrainingsByTrainerId(long trainerId) {
-        LOG.info("Getting trainings by trainer id: {}", trainerId);
-
-        return trainingRepository.findAllByTrainerTrainerId(trainerId).stream()
-                .map(TrainingMapper::toResponse)
-                .toList();
-    }
-
-    public List<TrainingResponse> getTrainingsByTypeName(String trainingTypeName) {
-        LOG.info("Getting trainings by type: {}", trainingTypeName);
-
-        return trainingRepository.findAllByTypeName(trainingTypeName.toUpperCase())
+        return trainingRepository.findByTraineeUsernameAndCriteria(
+                        username,
+                        from,
+                        to,
+                        trainerName,
+                        trainingTypeName != null ? trainingTypeName.toUpperCase() : null
+                )
                 .stream()
                 .map(TrainingMapper::toResponse)
                 .toList();
     }
 
-    public List<TrainingResponse> getTrainingsByDateBetween(LocalDate from, LocalDate to) {
-        LOG.info("Getting trainings between dates: {} and {}", from, to);
+    @Transactional(readOnly = true)
+    public List<TrainingResponse> getTrainingsByTrainerUsernameAndCriteria(
+            String username,
+            String password,
+            LocalDate from,
+            LocalDate to,
+            String traineeName
+    ) {
+        LOG.info(
+                "Getting trainings for trainer username: {} with criteria fromDate={}, toDate={}, traineeName={}",
+                username,
+                from,
+                to,
+                traineeName
+        );
 
-        return trainingRepository.findAllByDateBetween(from, to).stream()
-                .map(TrainingMapper::toResponse)
-                .toList();
-    }
+        authService.authenticateTrainer(username, password);
 
-    public List<TrainingResponse> GetTrainingsByTraineeUsernameAndCriteria(String username, LocalDate from, LocalDate to) {
-        LOG.info("Getting all trainings for trainee with username: {} and dates between {} and {}",  username, from, to);
-
-        return trainingRepository.findAllByDateBetweenAndTraineeUserUsername(from, to, username)
+        return trainingRepository.findByTrainerUsernameAndCriteria(username, from, to, traineeName)
                 .stream()
                 .map(TrainingMapper::toResponse)
                 .toList();
     }
 
-    public List<TrainingResponse> GetTrainingsByTrainerUsernameAndCriteria(String username, LocalDate from, LocalDate to) {
-        LOG.info("Getting all trainings for trainer with username: {} and dates between {} and {}",  username, from, to);
-
-        return trainingRepository.findAllByDateBetweenAndTrainerUserUsername(from, to, username)
-                .stream()
-                .map(TrainingMapper::toResponse)
-                .toList();
-    }
-
-    // #################### utils ##########################
-
-    public void validateCreateRequest(CreateTrainingRequest request) {
-        if (request == null)
+    private void validateCreateRequest(CreateTrainingRequest request) {
+        if (request == null) {
             throw new InvalidEntityException("Request cannot be null");
-
-        if (request.trainingName() == null || request.trainingName().isBlank())
+        }
+        if (request.traineeId() == null) {
+            throw new InvalidEntityException("Trainee id cannot be null");
+        }
+        if (request.trainerId() == null) {
+            throw new InvalidEntityException("Trainer id cannot be null");
+        }
+        if (request.trainingTypeId() == null) {
+            throw new InvalidEntityException("Training type id cannot be null");
+        }
+        if (request.trainingName() == null || request.trainingName().isBlank()) {
             throw new InvalidEntityException("Training name cannot be empty");
-        if (request.trainingDate() == null)
+        }
+        if (request.trainingDate() == null) {
             throw new InvalidEntityException("Training date cannot be null");
-        if (request.duration() <= 0)
+        }
+        if (request.duration() == null || request.duration() <= 0) {
             throw new InvalidEntityException("Training duration must be greater than 0");
+        }
     }
 
-    public void validateUpdateRequest(UpdateTrainingRequest request) {
-        if (request == null)
+    private void validateUpdateRequest(UpdateTrainingRequest request) {
+        if (request == null) {
             throw new InvalidEntityException("Request cannot be null");
-
-        if (request.name() == null || request.name().isBlank())
+        }
+        if (request.name() == null || request.name().isBlank()) {
             throw new InvalidEntityException("Training name cannot be empty");
-        if (request.duration() <= 0)
+        }
+        if (request.duration() == null || request.duration() <= 0) {
             throw new InvalidEntityException("Training duration must be greater than 0");
-        if (request.date() == null)
+        }
+        if (request.date() == null) {
             throw new InvalidEntityException("Training date cannot be null");
+        }
     }
 
-    public void validateTrainingTypeName(String trainingTypeName) {
-        if (trainingTypeName == null || trainingTypeName.isBlank())
-            throw new InvalidEntityException("Training type name cannot be empty");
-    }
-
-    public Training findTrainingByIdOrThrow(long id) {
+    private Training findTrainingByIdOrThrow(Long id) {
         return trainingRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Training with id " + id + " not found"));
     }
 
-    public Trainee findTraineeByIdOrThrow(long id) {
+    private Trainee findTraineeByIdOrThrow(Long id) {
         return traineeRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Trainee with id " + id + " not found"));
     }
 
-    public Trainer findTrainerByIdOrThrow(long id) {
+    private Trainer findTrainerByIdOrThrow(Long id) {
         return trainerRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Trainer with id " + id + " not found"));
     }
 
-    public TrainingType findTrainingTypeByIdOrThrow(long id) {
+    private TrainingType findTrainingTypeByIdOrThrow(Long id) {
         return trainingTypeRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Training type with id " + id + " not found"));
     }
-
 }

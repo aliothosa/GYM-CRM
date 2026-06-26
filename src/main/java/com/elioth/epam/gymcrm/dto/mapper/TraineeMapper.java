@@ -1,6 +1,9 @@
 package com.elioth.epam.gymcrm.dto.mapper;
 
 import com.elioth.epam.gymcrm.domain.Trainee;
+import com.elioth.epam.gymcrm.domain.Trainer;
+import com.elioth.epam.gymcrm.domain.Training;
+import com.elioth.epam.gymcrm.domain.TrainingType;
 import com.elioth.epam.gymcrm.domain.User;
 import com.elioth.epam.gymcrm.dto.request.CreateTraineeRequest;
 import com.elioth.epam.gymcrm.dto.request.UpdateTraineeRequest;
@@ -25,7 +28,14 @@ public class TraineeMapper {
     }
 
     public static TraineeResponse toResponse(Trainee trainee) {
+        if (trainee == null) {
+            return null;
+        }
+
         User user = trainee.getUser();
+        if (user == null) {
+            throw new IllegalStateException("Trainee must have an associated user");
+        }
 
         return new TraineeResponse(
                 trainee.getTraineeId(),
@@ -33,14 +43,21 @@ public class TraineeMapper {
                 user.getFirstName(),
                 user.getLastName(),
                 user.getUsername(),
-                user.isActive(),
+                user.getActive(),
                 trainee.getBirthDate(),
                 trainee.getAddress()
         );
     }
 
     public static CreatedTraineeResponse toCreatedResponse(Trainee trainee) {
+        if (trainee == null) {
+            return null;
+        }
+
         User user = trainee.getUser();
+        if (user == null) {
+            throw new IllegalStateException("Trainee must have an associated user");
+        }
 
         return new CreatedTraineeResponse(
                 trainee.getTraineeId(),

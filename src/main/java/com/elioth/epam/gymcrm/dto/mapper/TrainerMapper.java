@@ -22,7 +22,15 @@ public class TrainerMapper {
     }
 
     public static TrainerResponse toResponse(Trainer trainer) {
+        if (trainer == null) {
+            return null;
+        }
+
         User user = trainer.getUser();
+        if (user == null) {
+            throw new IllegalStateException("Trainer must have an associated user");
+        }
+
         TrainingType specialization = trainer.getSpecialization();
 
         return new TrainerResponse(
@@ -31,14 +39,21 @@ public class TrainerMapper {
                 user.getFirstName(),
                 user.getLastName(),
                 user.getUsername(),
-                user.isActive(),
-                specialization.getId(),
-                specialization.getName()
+                user.getActive(),
+                specialization != null ? specialization.getId() : null,
+                specialization != null ? specialization.getName() : null
         );
     }
 
     public static CreatedTrainerResponse toCreatedResponse(Trainer trainer) {
+        if (trainer == null) {
+            return null;
+        }
+
         User user = trainer.getUser();
+        if (user == null) {
+            throw new IllegalStateException("Trainer must have an associated user");
+        }
 
         return new CreatedTrainerResponse(
                 trainer.getTrainerId(),

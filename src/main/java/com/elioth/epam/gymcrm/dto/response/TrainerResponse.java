@@ -6,7 +6,7 @@ public record TrainerResponse(
         String firstName,
         String lastName,
         String username,
-        boolean active,
+        Boolean active,
         Long trainingTypeId,
         String trainingTypeName
 ) {}
