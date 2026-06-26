@@ -15,12 +15,12 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "trainers")
-public class Trainer{
+public class Trainer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "trainer_id")
-    private long trainerId;
+    private Long trainerId;
 
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, optional = false)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
@@ -34,5 +34,4 @@ public class Trainer{
 
     @ManyToMany(mappedBy = "trainers")
     private List<Trainee> trainees = new ArrayList<>();
-
 }
