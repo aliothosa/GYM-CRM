@@ -15,8 +15,8 @@ import lombok.Setter;
 public class TrainingType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long trainingTypeId;
+    private long id;
 
     @Column(nullable = false, unique = true)
-    private String trainingTypeName;
+    private String name;
 }

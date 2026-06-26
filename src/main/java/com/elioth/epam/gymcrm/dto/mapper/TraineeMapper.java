@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TraineeMapper {
 
-    public Trainee toEntity(CreateTraineeRequest request, User user) {
+    public static Trainee toEntity(CreateTraineeRequest request, User user) {
         Trainee trainee = new Trainee();
         trainee.setUser(user);
         trainee.setBirthDate(request.birthDate());
@@ -19,12 +19,12 @@ public class TraineeMapper {
         return trainee;
     }
 
-    public void updateEntity(Trainee trainee, UpdateTraineeRequest request) {
+    public static void updateEntity(Trainee trainee, UpdateTraineeRequest request) {
         trainee.setBirthDate(request.birthDate());
         trainee.setAddress(request.address());
     }
 
-    public TraineeResponse toResponse(Trainee trainee) {
+    public static TraineeResponse toResponse(Trainee trainee) {
         User user = trainee.getUser();
 
         return new TraineeResponse(
@@ -39,7 +39,7 @@ public class TraineeMapper {
         );
     }
 
-    public CreatedTraineeResponse toCreatedResponse(Trainee trainee) {
+    public static CreatedTraineeResponse toCreatedResponse(Trainee trainee) {
         User user = trainee.getUser();
 
         return new CreatedTraineeResponse(

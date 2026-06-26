@@ -10,18 +10,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class TrainerMapper {
 
-    public Trainer toEntity(User user, TrainingType specialization) {
+    public static Trainer toEntity(User user, TrainingType specialization) {
         Trainer trainer = new Trainer();
         trainer.setUser(user);
         trainer.setSpecialization(specialization);
         return trainer;
     }
 
-    public void updateEntity(Trainer trainer, TrainingType specialization) {
+    public static void updateEntity(Trainer trainer, TrainingType specialization) {
         trainer.setSpecialization(specialization);
     }
 
-    public TrainerResponse toResponse(Trainer trainer) {
+    public static TrainerResponse toResponse(Trainer trainer) {
         User user = trainer.getUser();
         TrainingType specialization = trainer.getSpecialization();
 
@@ -32,12 +32,12 @@ public class TrainerMapper {
                 user.getLastName(),
                 user.getUsername(),
                 user.isActive(),
-                specialization.getTrainingTypeId(),
+                specialization.getId(),
                 specialization.getName()
         );
     }
 
-    public CreatedTrainerResponse toCreatedResponse(Trainer trainer) {
+    public static CreatedTrainerResponse toCreatedResponse(Trainer trainer) {
         User user = trainer.getUser();
 
         return new CreatedTrainerResponse(

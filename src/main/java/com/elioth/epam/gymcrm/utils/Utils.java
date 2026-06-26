@@ -32,6 +32,13 @@ public class Utils {
         return String.format("%s.%s%d", user.getFirstName(), user.getLastName(), userCount);
     }
 
+    public static String usernameGenerator(String firstName, String lastName, long userCount) {
+        if  (userCount == 0) {
+            return String.format("%s.%s", firstName, lastName);
+        }
+        return String.format("%s.%s%d", firstName, lastName, userCount);
+    }
+
 
     public static long sameNameUserCount (User user, Stream<? extends User> stream){
         return stream
@@ -41,29 +48,5 @@ public class Utils {
                 .count();
     }
 
-    public static void validateUserForCreate(User user) {
-        if (user == null) {
-            throw new InvalidEntityException("Trainee cannot be null");
-        }
 
-        validateRequiredUserFields(user);
-    }
-
-    public static void validateRequiredUserFields(User user) {
-        if (user.getFirstName() == null || user.getFirstName().isBlank()) {
-            throw new InvalidEntityException("First name is required");
-        }
-
-        if (user.getLastName() == null || user.getLastName().isBlank()) {
-            throw new InvalidEntityException("Last name is required");
-        }
-    }
-
-    public static void validateUserForUpdate(User user){
-        if (user == null) {
-            throw new InvalidEntityException("Trainee cannot be null");
-        }
-
-        validateRequiredUserFields(user);
-    }
 }

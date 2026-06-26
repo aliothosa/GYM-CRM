@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TrainingMapper {
 
-    public Training toEntity(
+    public static Training toEntity(
             CreateTrainingRequest request,
             Trainee trainee,
             Trainer trainer,
@@ -29,13 +29,13 @@ public class TrainingMapper {
         return training;
     }
 
-    public void updateEntity(Training training, UpdateTrainingRequest request) {
+    public static void updateEntity(Training training, UpdateTrainingRequest request) {
         training.setName(request.name());
         training.setDate(request.date());
         training.setDurationInMinutes(Math.toIntExact(request.duration()));
     }
 
-    public TrainingResponse toResponse(Training training) {
+    public static TrainingResponse toResponse(Training training) {
         Trainee trainee = training.getTrainee();
         Trainer trainer = training.getTrainer();
         TrainingType trainingType = training.getType();
@@ -52,8 +52,8 @@ public class TrainingMapper {
                 trainerUser.getUsername(),
                 trainerUser.getFirstName(),
                 trainerUser.getLastName(),
-                trainingType.getTrainingTypeId(),
-                trainingType.getTrainingTypeName(),
+                trainingType.getId(),
+                trainingType.getName(),
                 training.getName(),
                 training.getDate(),
                 training.getDurationInMinutes()
