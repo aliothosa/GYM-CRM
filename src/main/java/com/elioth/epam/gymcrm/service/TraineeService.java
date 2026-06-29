@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -32,7 +33,6 @@ public class TraineeService {
     private TraineeRepository traineeRepository;
     private TrainerRepository trainerRepository;
     private UserRepository userRepository;
-    private AuthService authService;
 
     @Autowired
     public void setTraineeRepository(TraineeRepository traineeRepository) {
@@ -47,11 +47,6 @@ public class TraineeService {
     @Autowired
     public void setTrainerRepository(TrainerRepository trainerRepository) {
         this.trainerRepository = trainerRepository;
-    }
-
-    @Autowired
-    public void setAuthService(AuthService authService) {
-        this.authService = authService;
     }
 
     @Transactional
@@ -84,12 +79,12 @@ public class TraineeService {
     }
 
     @Transactional
-    public TraineeResponse updateProfile(String username, String password, UpdateTraineeRequest request) {
-        LOG.info("Updating trainee profile for username: {}", username);
+    public TraineeResponse updateProfile(Long traineeId, UpdateTraineeRequest request) {
+        LOG.info("Updating trainee profile with id: {}", traineeId);
 
         validateUpdateRequest(request);
 
-        Trainee fetchedTrainee = authService.authenticateTrainee(username, password);
+        Trainee fetchedTrainee = findTraineeByIdOrThrow(traineeId);
 
         fetchedTrainee.getUser().setFirstName(request.firstName());
         fetchedTrainee.getUser().setLastName(request.lastName());
@@ -100,28 +95,34 @@ public class TraineeService {
     }
 
     @Transactional
-    public void deleteProfileByUsername(String username, String password) {
-        LOG.info("Deleting trainee profile by username: {}", username);
+    public void deleteProfile(Long traineeId) {
+        LOG.info("Deleting trainee profile with id: {}", traineeId);
 
-        Trainee fetchedTrainee = authService.authenticateTrainee(username, password);
+        Trainee fetchedTrainee = findTraineeByIdOrThrow(traineeId);
         traineeRepository.delete(fetchedTrainee);
     }
 
     @Transactional(readOnly = true)
-    public TraineeResponse getProfileByUsername(String username, String password) {
+    public TraineeResponse getProfileById(Long traineeId) {
+        LOG.info("Getting trainee profile by id: {}", traineeId);
+
+        return TraineeMapper.toResponse(findTraineeByIdOrThrow(traineeId));
+    }
+
+    @Transactional(readOnly = true)
+    public TraineeResponse getProfileByUsername(String username) {
         LOG.info("Getting trainee profile by username: {}", username);
 
-        Trainee fetchedTrainee = authService.authenticateTrainee(username, password);
-        return TraineeMapper.toResponse(fetchedTrainee);
+        return TraineeMapper.toResponse(findTraineeByUsernameOrThrow(username));
     }
 
     @Transactional
-    public TraineeResponse changePassword(String username, ChangePasswordRequest request) {
-        LOG.info("Changing trainee password for username: {}", username);
+    public TraineeResponse changePassword(Long traineeId, ChangePasswordRequest request) {
+        LOG.info("Changing trainee password for id: {}", traineeId);
 
         validateChangePasswordRequest(request);
 
-        Trainee fetchedTrainee = authService.authenticateTrainee(username, request.oldPassword());
+        Trainee fetchedTrainee = findTraineeByIdOrThrow(traineeId);
         checkOldPassword(fetchedTrainee.getUser(), request.oldPassword());
         fetchedTrainee.getUser().setPassword(request.newPassword());
 
@@ -129,14 +130,14 @@ public class TraineeService {
     }
 
     @Transactional
-    public void updateTrainersToTrainee(String username, String password, List<Long> trainerIds) {
+    public void updateTrainersToTrainee(Long traineeId, List<Long> trainerIds) {
         if (trainerIds == null) {
             throw new InvalidRequestException("Trainer list cannot be null");
         }
 
-        LOG.info("Updating trainers list for trainee with username: {}", username);
+        LOG.info("Updating trainers list for trainee with id: {}", traineeId);
 
-        Trainee fetchedTrainee = authService.authenticateTrainee(username, password);
+        Trainee fetchedTrainee = findTraineeByIdOrThrow(traineeId);
         List<Trainer> fetchedTrainers = trainerRepository.findAllById(trainerIds);
 
         if (fetchedTrainers.size() != trainerIds.size()) {
@@ -148,10 +149,10 @@ public class TraineeService {
     }
 
     @Transactional
-    public void activate(String username, String password) {
-        LOG.info("Activating trainee profile for username: {}", username);
+    public void activate(Long traineeId) {
+        LOG.info("Activating trainee profile with id: {}", traineeId);
 
-        Trainee fetchedTrainee = authService.authenticateTrainee(username, password);
+        Trainee fetchedTrainee = findTraineeByIdOrThrow(traineeId);
 
         if (Boolean.TRUE.equals(fetchedTrainee.getUser().getActive())) {
             throw new InvalidRequestException("Trainee is already active.");
@@ -161,10 +162,10 @@ public class TraineeService {
     }
 
     @Transactional
-    public void deactivate(String username, String password) {
-        LOG.info("Deactivating trainee profile for username: {}", username);
+    public void deactivate(Long traineeId) {
+        LOG.info("Deactivating trainee profile with id: {}", traineeId);
 
-        Trainee fetchedTrainee = authService.authenticateTrainee(username, password);
+        Trainee fetchedTrainee = findTraineeByIdOrThrow(traineeId);
 
         if (!Boolean.TRUE.equals(fetchedTrainee.getUser().getActive())) {
             throw new InvalidRequestException("Trainee is already deactivated.");
@@ -173,10 +174,17 @@ public class TraineeService {
         fetchedTrainee.getUser().setActive(false);
     }
 
-    @Transactional(readOnly = true)
-    public TraineeResponse authenticate(String username, String password) {
-        Trainee fetchedTrainee = authService.authenticateTrainee(username, password);
-        return TraineeMapper.toResponse(fetchedTrainee);
+    private Trainee findTraineeByIdOrThrow(Long traineeId) {
+        return traineeRepository.findById(traineeId)
+                .orElseThrow(() -> new EntityNotFoundException("Trainee not found"));
+    }
+
+    private Trainee findTraineeByUsernameOrThrow(String username) {
+        if (username == null || username.isBlank()) {
+            throw new InvalidRequestException("Invalid username");
+        }
+        return traineeRepository.findByUserUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("Trainee not found"));
     }
 
     private void validateChangePasswordRequest(ChangePasswordRequest request) {

@@ -33,7 +33,6 @@ public class TrainerService {
     private TrainerRepository trainerRepository;
     private UserRepository userRepository;
     private TrainingTypeRepository trainingTypeRepository;
-    private AuthService authService;
 
     @Autowired
     public void setTrainerRepository(TrainerRepository trainerRepository) {
@@ -48,11 +47,6 @@ public class TrainerService {
     @Autowired
     public void setTrainingTypeRepository(TrainingTypeRepository trainingTypeRepository) {
         this.trainingTypeRepository = trainingTypeRepository;
-    }
-
-    @Autowired
-    public void setAuthService(AuthService authService) {
-        this.authService = authService;
     }
 
     @Transactional
@@ -85,12 +79,12 @@ public class TrainerService {
     }
 
     @Transactional
-    public TrainerResponse updateProfile(String username, String password, UpdateTrainerRequest request) {
-        LOG.info("Updating trainer profile for username: {}", username);
+    public TrainerResponse updateProfile(Long trainerId, UpdateTrainerRequest request) {
+        LOG.info("Updating trainer profile with id: {}", trainerId);
 
         validateUpdateRequest(request);
 
-        Trainer fetchedTrainer = authService.authenticateTrainer(username, password);
+        Trainer fetchedTrainer = findTrainerByIdOrThrow(trainerId);
         TrainingType trainingType = findTrainingTypeOrThrow(request.trainingTypeId());
 
         fetchedTrainer.getUser().setFirstName(request.firstName());
@@ -101,20 +95,26 @@ public class TrainerService {
     }
 
     @Transactional(readOnly = true)
-    public TrainerResponse getProfileByUsername(String username, String password) {
+    public TrainerResponse getProfileById(Long trainerId) {
+        LOG.info("Getting trainer profile by id: {}", trainerId);
+
+        return TrainerMapper.toResponse(findTrainerByIdOrThrow(trainerId));
+    }
+
+    @Transactional(readOnly = true)
+    public TrainerResponse getProfileByUsername(String username) {
         LOG.info("Getting trainer profile by username: {}", username);
 
-        Trainer fetchedTrainer = authService.authenticateTrainer(username, password);
-        return TrainerMapper.toResponse(fetchedTrainer);
+        return TrainerMapper.toResponse(findTrainerByUsernameOrThrow(username));
     }
 
     @Transactional
-    public TrainerResponse changePassword(String username, ChangePasswordRequest request) {
-        LOG.info("Changing trainer password for username: {}", username);
+    public TrainerResponse changePassword(Long trainerId, ChangePasswordRequest request) {
+        LOG.info("Changing trainer password for id: {}", trainerId);
 
         validateChangePasswordRequest(request);
 
-        Trainer fetchedTrainer = authService.authenticateTrainer(username, request.oldPassword());
+        Trainer fetchedTrainer = findTrainerByIdOrThrow(trainerId);
         checkOldPassword(fetchedTrainer.getUser(), request.oldPassword());
         fetchedTrainer.getUser().setPassword(request.newPassword());
 
@@ -122,10 +122,8 @@ public class TrainerService {
     }
 
     @Transactional(readOnly = true)
-    public List<TrainerResponse> findBySpecializationName(String username, String password, String name) {
+    public List<TrainerResponse> findBySpecializationName(String name) {
         LOG.info("Getting trainers by specialization: {}", name);
-
-        authService.authenticateTrainer(username, password);
 
         if (name == null || name.isBlank()) {
             throw new InvalidRequestException("Specialization name cannot be empty");
@@ -137,10 +135,12 @@ public class TrainerService {
     }
 
     @Transactional(readOnly = true)
-    public List<TrainerResponse> getTrainersNotAssignedToTrainee(String traineeUsername, String password) {
+    public List<TrainerResponse> getTrainersNotAssignedToTrainee(String traineeUsername) {
         LOG.info("Getting all trainers not assigned to trainee with username: {}", traineeUsername);
 
-        authService.authenticateTrainee(traineeUsername, password);
+        if (traineeUsername == null || traineeUsername.isBlank()) {
+            throw new InvalidRequestException("Invalid trainee username");
+        }
 
         return trainerRepository.findTrainersNotAssignedToTrainee(traineeUsername).stream()
                 .map(TrainerMapper::toResponse)
@@ -148,10 +148,10 @@ public class TrainerService {
     }
 
     @Transactional
-    public void activate(String username, String password) {
-        LOG.info("Activating trainer profile for username: {}", username);
+    public void activate(Long trainerId) {
+        LOG.info("Activating trainer profile with id: {}", trainerId);
 
-        Trainer fetchedTrainer = authService.authenticateTrainer(username, password);
+        Trainer fetchedTrainer = findTrainerByIdOrThrow(trainerId);
 
         if (Boolean.TRUE.equals(fetchedTrainer.getUser().getActive())) {
             throw new InvalidRequestException("Trainer is already active.");
@@ -161,10 +161,10 @@ public class TrainerService {
     }
 
     @Transactional
-    public void deactivate(String username, String password) {
-        LOG.info("Deactivating trainer profile for username: {}", username);
+    public void deactivate(Long trainerId) {
+        LOG.info("Deactivating trainer profile with id: {}", trainerId);
 
-        Trainer fetchedTrainer = authService.authenticateTrainer(username, password);
+        Trainer fetchedTrainer = findTrainerByIdOrThrow(trainerId);
 
         if (!Boolean.TRUE.equals(fetchedTrainer.getUser().getActive())) {
             throw new InvalidRequestException("Trainer is already deactivated.");
@@ -173,10 +173,17 @@ public class TrainerService {
         fetchedTrainer.getUser().setActive(false);
     }
 
-    @Transactional(readOnly = true)
-    public TrainerResponse authenticate(String username, String password) {
-        Trainer fetchedTrainer = authService.authenticateTrainer(username, password);
-        return TrainerMapper.toResponse(fetchedTrainer);
+    private Trainer findTrainerByIdOrThrow(Long trainerId) {
+        return trainerRepository.findById(trainerId)
+                .orElseThrow(() -> new EntityNotFoundException("Trainer not found"));
+    }
+
+    private Trainer findTrainerByUsernameOrThrow(String username) {
+        if (username == null || username.isBlank()) {
+            throw new InvalidRequestException("Invalid username");
+        }
+        return trainerRepository.findByUserUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("Trainer not found"));
     }
 
     private void validateChangePasswordRequest(ChangePasswordRequest request) {

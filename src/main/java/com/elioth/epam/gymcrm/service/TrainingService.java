@@ -33,7 +33,6 @@ public class TrainingService {
     private TrainerRepository trainerRepository;
     private TrainingRepository trainingRepository;
     private TrainingTypeRepository trainingTypeRepository;
-    private AuthService authService;
 
     @Autowired
     public void setTrainingRepository(TrainingRepository trainingRepository) {
@@ -55,25 +54,19 @@ public class TrainingService {
         this.trainingTypeRepository = trainingTypeRepository;
     }
 
-    @Autowired
-    public void setAuthService(AuthService authService) {
-        this.authService = authService;
-    }
-
     @Transactional
-    public TrainingResponse createTraining(String trainerUsername, String password, CreateTrainingRequest request) {
-        LOG.info("Creating training for trainer username: {}", trainerUsername);
+    public TrainingResponse createTraining(Long trainerId, CreateTrainingRequest request) {
+        LOG.info("Creating training for trainer id: {}", trainerId);
 
         validateCreateRequest(request);
 
-        Trainer authenticatedTrainer = authService.authenticateTrainer(trainerUsername, password);
+        if (!trainerId.equals(request.trainerId())) {
+            throw new InvalidRequestException("Trainer id must match the authenticated trainer");
+        }
+
         Trainee fetchedTrainee = findTraineeByIdOrThrow(request.traineeId());
         Trainer fetchedTrainer = findTrainerByIdOrThrow(request.trainerId());
         TrainingType fetchedTrainingType = findTrainingTypeByIdOrThrow(request.trainingTypeId());
-
-        if (!authenticatedTrainer.getTrainerId().equals(fetchedTrainer.getTrainerId())) {
-            throw new InvalidRequestException("Authenticated trainer must match the training trainer");
-        }
 
         Training training = TrainingMapper.toEntity(request, fetchedTrainee, fetchedTrainer, fetchedTrainingType);
         Training savedTraining = trainingRepository.save(training);
@@ -84,17 +77,13 @@ public class TrainingService {
     }
 
     @Transactional
-    public TrainingResponse updateTraining(String trainerUsername, String password, Long id, UpdateTrainingRequest request) {
-        LOG.info("Updating training with id: {} for trainer username: {}", id, trainerUsername);
+    public TrainingResponse updateTraining(Long trainerId, Long trainingId, UpdateTrainingRequest request) {
+        LOG.info("Updating training with id: {} for trainer id: {}", trainingId, trainerId);
 
         validateUpdateRequest(request);
 
-        Trainer authenticatedTrainer = authService.authenticateTrainer(trainerUsername, password);
-        Training fetchedTraining = findTrainingByIdOrThrow(id);
-
-        if (!authenticatedTrainer.getTrainerId().equals(fetchedTraining.getTrainer().getTrainerId())) {
-            throw new InvalidRequestException("Authenticated trainer cannot update this training");
-        }
+        Training fetchedTraining = findTrainingByIdOrThrow(trainingId);
+        assertTrainingOwnedByTrainer(fetchedTraining, trainerId);
 
         TrainingMapper.updateEntity(fetchedTraining, request);
 
@@ -102,37 +91,28 @@ public class TrainingService {
     }
 
     @Transactional
-    public void deleteTraining(String trainerUsername, String password, Long trainingId) {
-        LOG.info("Deleting training with id: {} for trainer username: {}", trainingId, trainerUsername);
+    public void deleteTraining(Long trainerId, Long trainingId) {
+        LOG.info("Deleting training with id: {} for trainer id: {}", trainingId, trainerId);
 
-        Trainer authenticatedTrainer = authService.authenticateTrainer(trainerUsername, password);
         Training fetchedTraining = findTrainingByIdOrThrow(trainingId);
-
-        if (!authenticatedTrainer.getTrainerId().equals(fetchedTraining.getTrainer().getTrainerId())) {
-            throw new InvalidRequestException("Authenticated trainer cannot delete this training");
-        }
+        assertTrainingOwnedByTrainer(fetchedTraining, trainerId);
 
         trainingRepository.delete(fetchedTraining);
     }
 
     @Transactional(readOnly = true)
-    public TrainingResponse getTrainingById(String trainerUsername, String password, Long trainingId) {
-        LOG.info("Getting training by id: {} for trainer username: {}", trainingId, trainerUsername);
+    public TrainingResponse getTrainingById(Long trainerId, Long trainingId) {
+        LOG.info("Getting training by id: {} for trainer id: {}", trainingId, trainerId);
 
-        Trainer authenticatedTrainer = authService.authenticateTrainer(trainerUsername, password);
         Training fetchedTraining = findTrainingByIdOrThrow(trainingId);
-
-        if (!authenticatedTrainer.getTrainerId().equals(fetchedTraining.getTrainer().getTrainerId())) {
-            throw new InvalidRequestException("Authenticated trainer cannot access this training");
-        }
+        assertTrainingOwnedByTrainer(fetchedTraining, trainerId);
 
         return TrainingMapper.toResponse(fetchedTraining);
     }
 
     @Transactional(readOnly = true)
     public List<TrainingResponse> getTrainingsByTraineeUsernameAndCriteria(
-            String username,
-            String password,
+            String traineeUsername,
             LocalDate from,
             LocalDate to,
             String trainerName,
@@ -140,17 +120,15 @@ public class TrainingService {
     ) {
         LOG.info(
                 "Getting trainings for trainee username: {} with criteria fromDate={}, toDate={}, trainerName={}, trainingType={}",
-                username,
+                traineeUsername,
                 from,
                 to,
                 trainerName,
                 trainingTypeName
         );
 
-        authService.authenticateTrainee(username, password);
-
         return trainingRepository.findByTraineeUsernameAndCriteria(
-                        username,
+                        traineeUsername,
                         from,
                         to,
                         trainerName,
@@ -163,26 +141,29 @@ public class TrainingService {
 
     @Transactional(readOnly = true)
     public List<TrainingResponse> getTrainingsByTrainerUsernameAndCriteria(
-            String username,
-            String password,
+            String trainerUsername,
             LocalDate from,
             LocalDate to,
             String traineeName
     ) {
         LOG.info(
                 "Getting trainings for trainer username: {} with criteria fromDate={}, toDate={}, traineeName={}",
-                username,
+                trainerUsername,
                 from,
                 to,
                 traineeName
         );
 
-        authService.authenticateTrainer(username, password);
-
-        return trainingRepository.findByTrainerUsernameAndCriteria(username, from, to, traineeName)
+        return trainingRepository.findByTrainerUsernameAndCriteria(trainerUsername, from, to, traineeName)
                 .stream()
                 .map(TrainingMapper::toResponse)
                 .toList();
+    }
+
+    private void assertTrainingOwnedByTrainer(Training training, Long trainerId) {
+        if (!trainerId.equals(training.getTrainer().getTrainerId())) {
+            throw new InvalidRequestException("Trainer cannot access this training");
+        }
     }
 
     private void validateCreateRequest(CreateTrainingRequest request) {
