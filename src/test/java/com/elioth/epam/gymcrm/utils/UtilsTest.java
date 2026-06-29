@@ -1,10 +1,12 @@
 package com.elioth.epam.gymcrm.utils;
 
 import com.elioth.epam.gymcrm.domain.User;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -58,6 +60,30 @@ class UtilsTest {
 
         assertTrue(passwords.stream().distinct().count() > 1,
                 "Expected at least some variation in generated passwords");
+    }
+
+    @Test
+    @Disabled("Practice skeleton")
+    void shouldCountUsersWithSameFirstAndLastName() {
+        // Arrange
+        // TODO: User target = buildUser("John", "Smith")
+        // TODO: Stream with one matching and one non-matching User
+
+        // Act
+        // TODO: long count = Utils.sameNameUserCount(target, stream)
+
+        // Assert
+        // TODO: assertEquals(1L, count)
+    }
+
+    @Test
+    @Disabled("Practice skeleton")
+    void shouldReturnZeroWhenNoMatchingNamesExist() {
+        // Arrange
+        // TODO: empty stream or non-matching users
+
+        // Act & Assert
+        // TODO: assertEquals(0L, Utils.sameNameUserCount(...))
     }
 
     private User buildUser(String firstName, String lastName) {
