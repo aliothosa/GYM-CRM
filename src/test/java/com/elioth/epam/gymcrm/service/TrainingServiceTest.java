@@ -1,20 +1,48 @@
 package com.elioth.epam.gymcrm.service;
 
+import com.elioth.epam.gymcrm.domain.Trainee;
+import com.elioth.epam.gymcrm.domain.Trainer;
+import com.elioth.epam.gymcrm.domain.Training;
+import com.elioth.epam.gymcrm.domain.TrainingType;
+import com.elioth.epam.gymcrm.domain.User;
+import com.elioth.epam.gymcrm.dto.request.CreateTrainingRequest;
+import com.elioth.epam.gymcrm.dto.request.UpdateTrainingRequest;
+import com.elioth.epam.gymcrm.dto.response.TrainingResponse;
+import com.elioth.epam.gymcrm.exception.EntityNotFoundException;
+import com.elioth.epam.gymcrm.exception.InvalidEntityException;
+import com.elioth.epam.gymcrm.exception.InvalidRequestException;
 import com.elioth.epam.gymcrm.repository.TraineeRepository;
 import com.elioth.epam.gymcrm.repository.TrainerRepository;
 import com.elioth.epam.gymcrm.repository.TrainingRepository;
 import com.elioth.epam.gymcrm.repository.TrainingTypeRepository;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 @ExtendWith(MockitoExtension.class)
-@Disabled("Practice skeleton - implement one test at a time, then remove @Disabled from class")
 class TrainingServiceTest {
+
+    private static final Long TRAINER_ID = 1L;
+    private static final Long OTHER_TRAINER_ID = 2L;
+    private static final Long TRAINEE_ID = 10L;
+    private static final Long TRAINING_ID = 100L;
+    private static final Long TRAINING_TYPE_ID = 5L;
 
     @Mock
     private TraineeRepository traineeRepository;
@@ -42,254 +70,351 @@ class TrainingServiceTest {
     // --- createTraining ---
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldCreateTrainingWhenRequestIsValidAndTrainerIdMatches() {
-        // Arrange
-        // TODO: define authenticated trainerId
-        // TODO: create valid CreateTrainingRequest with matching trainerId
-        // TODO: create Trainee, Trainer, TrainingType entities
-        // TODO: mock traineeRepository.findById(traineeId) -> Optional.of(trainee)
-        // TODO: mock trainerRepository.findById(trainerId) -> Optional.of(trainer)
-        // TODO: mock trainingTypeRepository.findById(trainingTypeId) -> Optional.of(trainingType)
-        // TODO: mock trainingRepository.save(...) -> saved Training
+        CreateTrainingRequest request = validCreateRequest();
+        Trainee trainee = buildTrainee(TRAINEE_ID, "Emily.Davis", "Emily", "Davis");
+        Trainer trainer = buildTrainer(TRAINER_ID, "John.Doe", "John", "Doe");
+        TrainingType trainingType = buildTrainingType(TRAINING_TYPE_ID, "YOGA");
+        when(traineeRepository.findById(TRAINEE_ID)).thenReturn(Optional.of(trainee));
+        when(trainerRepository.findById(TRAINER_ID)).thenReturn(Optional.of(trainer));
+        when(trainingTypeRepository.findById(TRAINING_TYPE_ID)).thenReturn(Optional.of(trainingType));
+        when(trainingRepository.save(any(Training.class))).thenAnswer(invocation -> {
+            Training training = invocation.getArgument(0);
+            training.setTrainingId(TRAINING_ID);
+            return training;
+        });
 
-        // Act
-        // TODO: TrainingResponse response = trainingService.createTraining(trainerId, request)
+        TrainingResponse response = trainingService.createTraining(TRAINER_ID, request);
 
-        // Assert
-        // TODO: assert response is not null
-        // TODO: verify trainingRepository.save(...) was called once
+        assertNotNull(response);
+        assertEquals(TRAINING_ID, response.trainingId());
+        assertEquals("Morning Yoga", response.trainingName());
+        assertEquals(TRAINEE_ID, response.traineeId());
+        assertEquals(TRAINER_ID, response.trainerId());
+
+        ArgumentCaptor<Training> captor = ArgumentCaptor.forClass(Training.class);
+        verify(trainingRepository).save(captor.capture());
+        Training saved = captor.getValue();
+        assertEquals(trainee, saved.getTrainee());
+        assertEquals(trainer, saved.getTrainer());
+        assertEquals(trainingType, saved.getType());
+        assertEquals("Morning Yoga", saved.getName());
+        assertEquals(request.trainingDate(), saved.getDate());
+        assertEquals(60L, saved.getDurationInMinutes());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldThrowInvalidEntityExceptionWhenCreateRequestIsInvalid() {
-        // Arrange
-        // TODO: define authenticated trainerId
-        // TODO: create invalid CreateTrainingRequest (e.g. null trainingName or duration <= 0)
+        CreateTrainingRequest request = new CreateTrainingRequest(
+                TRAINEE_ID,
+                TRAINER_ID,
+                TRAINING_TYPE_ID,
+                " ",
+                LocalDate.of(2024, 6, 1),
+                60L
+        );
 
-        // Act & Assert
-        // TODO: assertThrows(InvalidEntityException.class, () -> trainingService.createTraining(trainerId, request))
+        InvalidEntityException exception = assertThrows(
+                InvalidEntityException.class,
+                () -> trainingService.createTraining(TRAINER_ID, request)
+        );
+        assertEquals("Training name cannot be empty", exception.getMessage());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldThrowInvalidRequestExceptionWhenAuthenticatedTrainerIdDoesNotMatchRequestTrainerId() {
-        // Arrange
-        // TODO: define authenticated trainerId (e.g. 1L)
-        // TODO: create CreateTrainingRequest with different trainerId (e.g. 2L)
+        CreateTrainingRequest request = validCreateRequest();
 
-        // Act & Assert
-        // TODO: assertThrows(InvalidRequestException.class, () -> trainingService.createTraining(trainerId, request))
+        InvalidRequestException exception = assertThrows(
+                InvalidRequestException.class,
+                () -> trainingService.createTraining(OTHER_TRAINER_ID, request)
+        );
+        assertEquals("Trainer id must match the authenticated trainer", exception.getMessage());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldThrowEntityNotFoundExceptionWhenTraineeNotFoundOnCreate() {
-        // Arrange
-        // TODO: define authenticated trainerId matching request.trainerId()
-        // TODO: create valid CreateTrainingRequest
-        // TODO: mock traineeRepository.findById(traineeId) -> Optional.empty()
+        CreateTrainingRequest request = validCreateRequest();
+        when(traineeRepository.findById(TRAINEE_ID)).thenReturn(Optional.empty());
 
-        // Act & Assert
-        // TODO: assertThrows(EntityNotFoundException.class, () -> trainingService.createTraining(trainerId, request))
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> trainingService.createTraining(TRAINER_ID, request)
+        );
+        assertEquals("Trainee with id 10 not found", exception.getMessage());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldThrowEntityNotFoundExceptionWhenTrainerNotFoundOnCreate() {
-        // Arrange
-        // TODO: define authenticated trainerId matching request.trainerId()
-        // TODO: create valid CreateTrainingRequest
-        // TODO: mock traineeRepository.findById(traineeId) -> Optional.of(trainee)
-        // TODO: mock trainerRepository.findById(trainerId) -> Optional.empty()
+        CreateTrainingRequest request = validCreateRequest();
+        Trainee trainee = buildTrainee(TRAINEE_ID, "Emily.Davis", "Emily", "Davis");
+        when(traineeRepository.findById(TRAINEE_ID)).thenReturn(Optional.of(trainee));
+        when(trainerRepository.findById(TRAINER_ID)).thenReturn(Optional.empty());
 
-        // Act & Assert
-        // TODO: assertThrows(EntityNotFoundException.class, () -> trainingService.createTraining(trainerId, request))
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> trainingService.createTraining(TRAINER_ID, request)
+        );
+        assertEquals("Trainer with id 1 not found", exception.getMessage());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldThrowEntityNotFoundExceptionWhenTrainingTypeNotFoundOnCreate() {
-        // Arrange
-        // TODO: define authenticated trainerId matching request.trainerId()
-        // TODO: create valid CreateTrainingRequest
-        // TODO: mock traineeRepository.findById(traineeId) -> Optional.of(trainee)
-        // TODO: mock trainerRepository.findById(trainerId) -> Optional.of(trainer)
-        // TODO: mock trainingTypeRepository.findById(trainingTypeId) -> Optional.empty()
+        CreateTrainingRequest request = validCreateRequest();
+        Trainee trainee = buildTrainee(TRAINEE_ID, "Emily.Davis", "Emily", "Davis");
+        Trainer trainer = buildTrainer(TRAINER_ID, "John.Doe", "John", "Doe");
+        when(traineeRepository.findById(TRAINEE_ID)).thenReturn(Optional.of(trainee));
+        when(trainerRepository.findById(TRAINER_ID)).thenReturn(Optional.of(trainer));
+        when(trainingTypeRepository.findById(TRAINING_TYPE_ID)).thenReturn(Optional.empty());
 
-        // Act & Assert
-        // TODO: assertThrows(EntityNotFoundException.class, () -> trainingService.createTraining(trainerId, request))
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> trainingService.createTraining(TRAINER_ID, request)
+        );
+        assertEquals("Training type with id 5 not found", exception.getMessage());
     }
 
     // --- updateTraining ---
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldUpdateTrainingWhenRequestIsValidAndTrainerOwnsTraining() {
-        // Arrange
-        // TODO: define authenticated trainerId and trainingId
-        // TODO: create valid UpdateTrainingRequest
-        // TODO: create Training owned by trainerId
-        // TODO: mock trainingRepository.findById(trainingId) -> Optional.of(training)
+        UpdateTrainingRequest request = validUpdateRequest();
+        Training training = buildTraining(TRAINING_ID, TRAINER_ID);
+        when(trainingRepository.findById(TRAINING_ID)).thenReturn(Optional.of(training));
 
-        // Act
-        // TODO: TrainingResponse response = trainingService.updateTraining(trainerId, trainingId, request)
+        TrainingResponse response = trainingService.updateTraining(TRAINER_ID, TRAINING_ID, request);
 
-        // Assert
-        // TODO: assert response fields match updated values
+        assertEquals(TRAINING_ID, response.trainingId());
+        assertEquals("Evening Cardio", response.trainingName());
+        assertEquals(request.date(), response.trainingDate());
+        assertEquals(90L, response.duration());
+        assertEquals("Evening Cardio", training.getName());
+        assertEquals(request.date(), training.getDate());
+        assertEquals(90L, training.getDurationInMinutes());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldThrowInvalidEntityExceptionWhenUpdateRequestIsInvalid() {
-        // Arrange
-        // TODO: define authenticated trainerId and trainingId
-
-        // Act & Assert
-        // TODO: assertThrows(InvalidEntityException.class, () -> trainingService.updateTraining(trainerId, trainingId, null))
+        InvalidEntityException exception = assertThrows(
+                InvalidEntityException.class,
+                () -> trainingService.updateTraining(TRAINER_ID, TRAINING_ID, null)
+        );
+        assertEquals("Request cannot be null", exception.getMessage());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldThrowEntityNotFoundExceptionWhenUpdatingNonExistentTraining() {
-        // Arrange
-        // TODO: define authenticated trainerId and trainingId
-        // TODO: create valid UpdateTrainingRequest
-        // TODO: mock trainingRepository.findById(trainingId) -> Optional.empty()
+        UpdateTrainingRequest request = validUpdateRequest();
+        when(trainingRepository.findById(TRAINING_ID)).thenReturn(Optional.empty());
 
-        // Act & Assert
-        // TODO: assertThrows(EntityNotFoundException.class, () -> trainingService.updateTraining(trainerId, trainingId, request))
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> trainingService.updateTraining(TRAINER_ID, TRAINING_ID, request)
+        );
+        assertEquals("Training with id 100 not found", exception.getMessage());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldThrowInvalidRequestExceptionWhenUpdatingTrainingNotOwnedByAuthenticatedTrainer() {
-        // Arrange
-        // TODO: define authenticated trainerId (e.g. 1L)
-        // TODO: create Training owned by different trainer (e.g. trainerId 2L)
-        // TODO: create valid UpdateTrainingRequest
-        // TODO: mock trainingRepository.findById(trainingId) -> Optional.of(training)
+        UpdateTrainingRequest request = validUpdateRequest();
+        Training training = buildTraining(TRAINING_ID, OTHER_TRAINER_ID);
+        when(trainingRepository.findById(TRAINING_ID)).thenReturn(Optional.of(training));
 
-        // Act & Assert
-        // TODO: assertThrows(InvalidRequestException.class, () -> trainingService.updateTraining(trainerId, trainingId, request))
+        InvalidRequestException exception = assertThrows(
+                InvalidRequestException.class,
+                () -> trainingService.updateTraining(TRAINER_ID, TRAINING_ID, request)
+        );
+        assertEquals("Trainer cannot access this training", exception.getMessage());
     }
 
     // --- deleteTraining ---
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldDeleteTrainingWhenTrainerOwnsTraining() {
-        // Arrange
-        // TODO: define authenticated trainerId and trainingId
-        // TODO: create Training owned by trainerId
-        // TODO: mock trainingRepository.findById(trainingId) -> Optional.of(training)
+        Training training = buildTraining(TRAINING_ID, TRAINER_ID);
+        when(trainingRepository.findById(TRAINING_ID)).thenReturn(Optional.of(training));
 
-        // Act
-        // TODO: trainingService.deleteTraining(trainerId, trainingId)
+        trainingService.deleteTraining(TRAINER_ID, TRAINING_ID);
 
-        // Assert
-        // TODO: verify trainingRepository.delete(training) was called once
+        verify(trainingRepository).delete(training);
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldThrowEntityNotFoundExceptionWhenDeletingNonExistentTraining() {
-        // Arrange
-        // TODO: define authenticated trainerId and trainingId
-        // TODO: mock trainingRepository.findById(trainingId) -> Optional.empty()
+        when(trainingRepository.findById(TRAINING_ID)).thenReturn(Optional.empty());
 
-        // Act & Assert
-        // TODO: assertThrows(EntityNotFoundException.class, () -> trainingService.deleteTraining(trainerId, trainingId))
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> trainingService.deleteTraining(TRAINER_ID, TRAINING_ID)
+        );
+        assertEquals("Training with id 100 not found", exception.getMessage());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldThrowInvalidRequestExceptionWhenDeletingTrainingNotOwnedByAuthenticatedTrainer() {
-        // Arrange
-        // TODO: define authenticated trainerId (e.g. 1L)
-        // TODO: create Training owned by different trainer (e.g. trainerId 2L)
-        // TODO: mock trainingRepository.findById(trainingId) -> Optional.of(training)
+        Training training = buildTraining(TRAINING_ID, OTHER_TRAINER_ID);
+        when(trainingRepository.findById(TRAINING_ID)).thenReturn(Optional.of(training));
 
-        // Act & Assert
-        // TODO: assertThrows(InvalidRequestException.class, () -> trainingService.deleteTraining(trainerId, trainingId))
+        InvalidRequestException exception = assertThrows(
+                InvalidRequestException.class,
+                () -> trainingService.deleteTraining(TRAINER_ID, TRAINING_ID)
+        );
+        assertEquals("Trainer cannot access this training", exception.getMessage());
     }
 
     // --- getTrainingById ---
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldGetTrainingByIdWhenTrainerOwnsTraining() {
-        // Arrange
-        // TODO: define authenticated trainerId and trainingId
-        // TODO: create Training owned by trainerId
-        // TODO: mock trainingRepository.findById(trainingId) -> Optional.of(training)
+        Training training = buildTraining(TRAINING_ID, TRAINER_ID);
+        when(trainingRepository.findById(TRAINING_ID)).thenReturn(Optional.of(training));
 
-        // Act
-        // TODO: TrainingResponse response = trainingService.getTrainingById(trainerId, trainingId)
+        TrainingResponse response = trainingService.getTrainingById(TRAINER_ID, TRAINING_ID);
 
-        // Assert
-        // TODO: assert response id matches trainingId
+        assertEquals(TRAINING_ID, response.trainingId());
+        assertEquals("Morning Yoga", response.trainingName());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldThrowEntityNotFoundExceptionWhenGettingNonExistentTraining() {
-        // Arrange
-        // TODO: define authenticated trainerId and trainingId
-        // TODO: mock trainingRepository.findById(trainingId) -> Optional.empty()
+        when(trainingRepository.findById(TRAINING_ID)).thenReturn(Optional.empty());
 
-        // Act & Assert
-        // TODO: assertThrows(EntityNotFoundException.class, () -> trainingService.getTrainingById(trainerId, trainingId))
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> trainingService.getTrainingById(TRAINER_ID, TRAINING_ID)
+        );
+        assertEquals("Training with id 100 not found", exception.getMessage());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldThrowInvalidRequestExceptionWhenGettingTrainingNotOwnedByAuthenticatedTrainer() {
-        // Arrange
-        // TODO: define authenticated trainerId (e.g. 1L)
-        // TODO: create Training owned by different trainer (e.g. trainerId 2L)
-        // TODO: mock trainingRepository.findById(trainingId) -> Optional.of(training)
+        Training training = buildTraining(TRAINING_ID, OTHER_TRAINER_ID);
+        when(trainingRepository.findById(TRAINING_ID)).thenReturn(Optional.of(training));
 
-        // Act & Assert
-        // TODO: assertThrows(InvalidRequestException.class, () -> trainingService.getTrainingById(trainerId, trainingId))
+        InvalidRequestException exception = assertThrows(
+                InvalidRequestException.class,
+                () -> trainingService.getTrainingById(TRAINER_ID, TRAINING_ID)
+        );
+        assertEquals("Trainer cannot access this training", exception.getMessage());
     }
 
     // --- getTrainingsByTraineeUsernameAndCriteria ---
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldGetTrainingsByTraineeUsernameAndCriteriaWhenMatchesExist() {
-        // Arrange
-        // TODO: define traineeUsername, from, to, trainerName, trainingTypeName
-        // TODO: create List<Training> matching criteria
-        // TODO: mock trainingRepository.findByTraineeUsernameAndCriteria(
-        //           traineeUsername, from, to, trainerName, trainingTypeName.toUpperCase()) -> trainings
+        String traineeUsername = "Emily.Davis";
+        LocalDate from = LocalDate.of(2024, 1, 1);
+        LocalDate to = LocalDate.of(2024, 12, 31);
+        String trainerName = "John";
+        String trainingTypeName = "Yoga";
+        Training training = buildTraining(TRAINING_ID, TRAINER_ID);
+        when(trainingRepository.findByTraineeUsernameAndCriteria(
+                eq(traineeUsername),
+                eq(from),
+                eq(to),
+                eq(trainerName),
+                eq("YOGA")
+        )).thenReturn(List.of(training));
 
-        // Act
-        // TODO: List<TrainingResponse> responses = trainingService.getTrainingsByTraineeUsernameAndCriteria(
-        //           traineeUsername, from, to, trainerName, trainingTypeName)
+        List<TrainingResponse> responses = trainingService.getTrainingsByTraineeUsernameAndCriteria(
+                traineeUsername, from, to, trainerName, trainingTypeName
+        );
 
-        // Assert
-        // TODO: assert responses size equals expected count
+        assertEquals(1, responses.size());
+        assertEquals(TRAINING_ID, responses.get(0).trainingId());
     }
 
     // --- getTrainingsByTrainerUsernameAndCriteria ---
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldGetTrainingsByTrainerUsernameAndCriteriaWhenMatchesExist() {
-        // Arrange
-        // TODO: define trainerUsername, from, to, traineeName
-        // TODO: create List<Training> matching criteria
-        // TODO: mock trainingRepository.findByTrainerUsernameAndCriteria(
-        //           trainerUsername, from, to, traineeName) -> trainings
+        String trainerUsername = "John.Doe";
+        LocalDate from = LocalDate.of(2024, 1, 1);
+        LocalDate to = LocalDate.of(2024, 12, 31);
+        String traineeName = "Emily";
+        Training training = buildTraining(TRAINING_ID, TRAINER_ID);
+        when(trainingRepository.findByTrainerUsernameAndCriteria(
+                eq(trainerUsername),
+                eq(from),
+                eq(to),
+                eq(traineeName)
+        )).thenReturn(List.of(training));
 
-        // Act
-        // TODO: List<TrainingResponse> responses = trainingService.getTrainingsByTrainerUsernameAndCriteria(
-        //           trainerUsername, from, to, traineeName)
+        List<TrainingResponse> responses = trainingService.getTrainingsByTrainerUsernameAndCriteria(
+                trainerUsername, from, to, traineeName
+        );
 
-        // Assert
-        // TODO: assert responses size equals expected count
+        assertEquals(1, responses.size());
+        assertEquals(TRAINING_ID, responses.get(0).trainingId());
+        assertEquals("John.Doe", responses.get(0).trainerUsername());
+    }
+
+    private CreateTrainingRequest validCreateRequest() {
+        return new CreateTrainingRequest(
+                TRAINEE_ID,
+                TRAINER_ID,
+                TRAINING_TYPE_ID,
+                "Morning Yoga",
+                LocalDate.of(2024, 6, 15),
+                60L
+        );
+    }
+
+    private UpdateTrainingRequest validUpdateRequest() {
+        return new UpdateTrainingRequest(
+                "Evening Cardio",
+                LocalDate.of(2024, 7, 1),
+                90L
+        );
+    }
+
+    private TrainingType buildTrainingType(Long id, String name) {
+        TrainingType trainingType = new TrainingType();
+        trainingType.setId(id);
+        trainingType.setName(name);
+        return trainingType;
+    }
+
+    private Trainee buildTrainee(Long traineeId, String username, String firstName, String lastName) {
+        User user = buildUser(username, firstName, lastName);
+        Trainee trainee = new Trainee();
+        trainee.setTraineeId(traineeId);
+        trainee.setUser(user);
+        return trainee;
+    }
+
+    private Trainer buildTrainer(Long trainerId, String username, String firstName, String lastName) {
+        User user = buildUser(username, firstName, lastName);
+        Trainer trainer = new Trainer();
+        trainer.setTrainerId(trainerId);
+        trainer.setUser(user);
+        return trainer;
+    }
+
+    private User buildUser(String username, String firstName, String lastName) {
+        User user = new User();
+        user.setUserId(100L);
+        user.setUsername(username);
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setPassword("password");
+        user.setActive(true);
+        return user;
+    }
+
+    private Training buildTraining(Long trainingId, Long ownerTrainerId) {
+        Trainee trainee = buildTrainee(TRAINEE_ID, "Emily.Davis", "Emily", "Davis");
+        Trainer trainer = buildTrainer(ownerTrainerId, "John.Doe", "John", "Doe");
+        TrainingType trainingType = buildTrainingType(TRAINING_TYPE_ID, "YOGA");
+
+        Training training = new Training();
+        training.setTrainingId(trainingId);
+        training.setTrainee(trainee);
+        training.setTrainer(trainer);
+        training.setType(trainingType);
+        training.setName("Morning Yoga");
+        training.setDate(LocalDate.of(2024, 6, 15));
+        training.setDurationInMinutes(60L);
+        return training;
     }
 }

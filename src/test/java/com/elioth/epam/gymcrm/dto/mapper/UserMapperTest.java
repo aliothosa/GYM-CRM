@@ -1,10 +1,16 @@
 package com.elioth.epam.gymcrm.dto.mapper;
 
+import com.elioth.epam.gymcrm.domain.User;
+import com.elioth.epam.gymcrm.dto.request.CreateTraineeRequest;
+import com.elioth.epam.gymcrm.dto.request.CreateTrainerRequest;
+import com.elioth.epam.gymcrm.dto.request.UpdateTraineeRequest;
+import com.elioth.epam.gymcrm.dto.request.UpdateTrainerRequest;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-@Disabled("Practice skeleton - implement one test at a time, then remove @Disabled from class")
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 class UserMapperTest {
 
     private UserMapper userMapper;
@@ -15,54 +21,54 @@ class UserMapperTest {
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldMapCreateTraineeRequestToUser() {
-        // Arrange
-        // TODO: create CreateTraineeRequest with firstName and lastName
+        CreateTraineeRequest request = new CreateTraineeRequest("John", "Doe", null, null);
 
-        // Act
-        // TODO: User user = userMapper.toUser(request, "username", "password");
+        User user = userMapper.toUser(request, "john.doe", "password123");
 
-        // Assert
-        // TODO: assert firstName, lastName, username, password, and active=true
+        assertEquals("John", user.getFirstName());
+        assertEquals("Doe", user.getLastName());
+        assertEquals("john.doe", user.getUsername());
+        assertEquals("password123", user.getPassword());
+        assertTrue(user.getActive());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldMapCreateTrainerRequestToUser() {
-        // Arrange
-        // TODO: create CreateTrainerRequest with firstName and lastName
+        CreateTrainerRequest request = new CreateTrainerRequest("Jane", "Smith", 1L);
 
-        // Act
-        // TODO: User user = userMapper.toUser(request, "username", "password");
+        User user = userMapper.toUser(request, "jane.smith", "password456");
 
-        // Assert
-        // TODO: assert firstName, lastName, username, password, and active=true
+        assertEquals("Jane", user.getFirstName());
+        assertEquals("Smith", user.getLastName());
+        assertEquals("jane.smith", user.getUsername());
+        assertEquals("password456", user.getPassword());
+        assertTrue(user.getActive());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldUpdateUserFromUpdateTraineeRequest() {
-        // Arrange
-        // TODO: create User and UpdateTraineeRequest
+        User user = new User();
+        user.setFirstName("Old");
+        user.setLastName("Name");
+        UpdateTraineeRequest request = new UpdateTraineeRequest("New", "Trainee", null, null);
 
-        // Act
-        // TODO: userMapper.updateUser(user, request);
+        userMapper.updateUser(user, request);
 
-        // Assert
-        // TODO: assert firstName and lastName are updated
+        assertEquals("New", user.getFirstName());
+        assertEquals("Trainee", user.getLastName());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldUpdateUserFromUpdateTrainerRequest() {
-        // Arrange
-        // TODO: create User and UpdateTrainerRequest
+        User user = new User();
+        user.setFirstName("Old");
+        user.setLastName("Name");
+        UpdateTrainerRequest request = new UpdateTrainerRequest("New", "Trainer", 2L);
 
-        // Act
-        // TODO: userMapper.updateUser(user, request);
+        userMapper.updateUser(user, request);
 
-        // Assert
-        // TODO: assert firstName and lastName are updated
+        assertEquals("New", user.getFirstName());
+        assertEquals("Trainer", user.getLastName());
     }
 }

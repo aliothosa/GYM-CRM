@@ -1,81 +1,107 @@
 package com.elioth.epam.gymcrm.dto.mapper;
 
-import org.junit.jupiter.api.Disabled;
+import com.elioth.epam.gymcrm.domain.Address;
+import com.elioth.epam.gymcrm.domain.Trainee;
+import com.elioth.epam.gymcrm.domain.User;
+import com.elioth.epam.gymcrm.dto.request.CreateTraineeRequest;
+import com.elioth.epam.gymcrm.dto.request.UpdateTraineeRequest;
+import com.elioth.epam.gymcrm.dto.response.CreatedTraineeResponse;
+import com.elioth.epam.gymcrm.dto.response.TraineeResponse;
 import org.junit.jupiter.api.Test;
 
-@Disabled("Practice skeleton - implement one test at a time, then remove @Disabled from class")
+import java.time.LocalDate;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 class TraineeMapperTest {
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldMapCreateTraineeRequestToEntity() {
-        // Arrange
-        // TODO: create CreateTraineeRequest and User
+        Address address = new Address("Main St", "Boston", "MA", "02101", 42);
+        LocalDate birthDate = LocalDate.of(1990, 5, 15);
+        CreateTraineeRequest request = new CreateTraineeRequest("John", "Doe", birthDate, address);
+        User user = new User();
+        user.setUsername("john.doe");
 
-        // Act
-        // TODO: Trainee trainee = TraineeMapper.toEntity(request, user);
+        Trainee trainee = TraineeMapper.toEntity(request, user);
 
-        // Assert
-        // TODO: assert user, birthDate, and address are mapped correctly
+        assertEquals(user, trainee.getUser());
+        assertEquals(birthDate, trainee.getBirthDate());
+        assertEquals(address, trainee.getAddress());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldUpdateTraineeEntityFromRequest() {
-        // Arrange
-        // TODO: create Trainee and UpdateTraineeRequest
+        Trainee trainee = new Trainee();
+        Address newAddress = new Address("Oak Ave", "Cambridge", "MA", "02139", 10);
+        LocalDate newBirthDate = LocalDate.of(1995, 12, 1);
+        UpdateTraineeRequest request = new UpdateTraineeRequest("Updated", "Name", newBirthDate, newAddress);
 
-        // Act
-        // TODO: TraineeMapper.updateEntity(trainee, request);
+        TraineeMapper.updateEntity(trainee, request);
 
-        // Assert
-        // TODO: assert birthDate and address are updated
+        assertEquals(newBirthDate, trainee.getBirthDate());
+        assertEquals(newAddress, trainee.getAddress());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldMapTraineeToResponse() {
-        // Arrange
-        // TODO: create Trainee with associated User
+        User user = new User();
+        user.setUserId(20L);
+        user.setFirstName("Alice");
+        user.setLastName("Wonder");
+        user.setUsername("alice.wonder");
+        user.setActive(true);
+        Address address = new Address("Pine Rd", "Denver", "CO", "80202", 15);
+        LocalDate birthDate = LocalDate.of(1988, 1, 5);
+        Trainee trainee = new Trainee();
+        trainee.setTraineeId(10L);
+        trainee.setUser(user);
+        trainee.setBirthDate(birthDate);
+        trainee.setAddress(address);
 
-        // Act
-        // TODO: TraineeResponse response = TraineeMapper.toResponse(trainee);
+        TraineeResponse response = TraineeMapper.toResponse(trainee);
 
-        // Assert
-        // TODO: assert all response fields match trainee and user data
+        assertEquals(10L, response.traineeId());
+        assertEquals(20L, response.userId());
+        assertEquals("Alice", response.firstName());
+        assertEquals("Wonder", response.lastName());
+        assertEquals("alice.wonder", response.username());
+        assertTrue(response.active());
+        assertEquals(birthDate, response.birthDate());
+        assertEquals(address, response.address());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldMapTraineeToCreatedResponse() {
-        // Arrange
-        // TODO: create Trainee with associated User
+        User user = new User();
+        user.setUsername("new.trainee");
+        user.setPassword("generatedPass");
+        Trainee trainee = new Trainee();
+        trainee.setTraineeId(5L);
+        trainee.setUser(user);
 
-        // Act
-        // TODO: CreatedTraineeResponse response = TraineeMapper.toCreatedResponse(trainee);
+        CreatedTraineeResponse response = TraineeMapper.toCreatedResponse(trainee);
 
-        // Assert
-        // TODO: assert traineeId, username, and password are mapped correctly
+        assertEquals(5L, response.traineeId());
+        assertEquals("new.trainee", response.username());
+        assertEquals("generatedPass", response.password());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldReturnNullWhenTraineeIsNull() {
-        // Act
-        // TODO: call toResponse(null) and toCreatedResponse(null)
-
-        // Assert
-        // TODO: assert both methods return null
+        assertNull(TraineeMapper.toResponse(null));
+        assertNull(TraineeMapper.toCreatedResponse(null));
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldThrowWhenTraineeHasNoAssociatedUser() {
-        // Arrange
-        // TODO: create Trainee with user = null
+        Trainee trainee = new Trainee();
+        trainee.setTraineeId(1L);
 
-        // Act & Assert
-        // TODO: assertThrows(IllegalStateException.class, () -> TraineeMapper.toResponse(trainee))
-        // TODO: assertThrows(IllegalStateException.class, () -> TraineeMapper.toCreatedResponse(trainee))
+        assertThrows(IllegalStateException.class, () -> TraineeMapper.toResponse(trainee));
+        assertThrows(IllegalStateException.class, () -> TraineeMapper.toCreatedResponse(trainee));
     }
 }

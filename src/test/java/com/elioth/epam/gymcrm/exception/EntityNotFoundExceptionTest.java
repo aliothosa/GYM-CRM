@@ -1,41 +1,31 @@
 package com.elioth.epam.gymcrm.exception;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-@Disabled("Practice skeleton - implement one test at a time, then remove @Disabled from class")
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 class EntityNotFoundExceptionTest {
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldCreateExceptionWithMessage() {
-        // Act
-        // TODO: EntityNotFoundException exception = new EntityNotFoundException("Trainee not found");
+        EntityNotFoundException exception = new EntityNotFoundException("Trainee not found");
 
-        // Assert
-        // TODO: assert exception.getMessage() equals expected message
+        assertEquals("Trainee not found", exception.getMessage());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldCreateExceptionWithEntityNameAndId() {
-        // Act
-        // TODO: EntityNotFoundException exception = new EntityNotFoundException("Trainee", 42L);
+        EntityNotFoundException exception = new EntityNotFoundException("Trainee", 42L);
 
-        // Assert
-        // TODO: assert exception.getMessage() equals "Trainee not found with id: 42"
+        assertEquals("Trainee not found with id: 42", exception.getMessage());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldPreserveErrorMessage() {
-        // Arrange
-        // TODO: define expected message string
+        String expectedMessage = "Custom not found message";
 
-        // Act
-        // TODO: EntityNotFoundException exception = new EntityNotFoundException(expectedMessage);
+        EntityNotFoundException exception = new EntityNotFoundException(expectedMessage);
 
-        // Assert
-        // TODO: assert exception.getMessage() is preserved exactly
+        assertEquals(expectedMessage, exception.getMessage());
     }
 }

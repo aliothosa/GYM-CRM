@@ -1,28 +1,47 @@
 package com.elioth.epam.gymcrm.repository;
 
-import org.junit.jupiter.api.Disabled;
+import com.elioth.epam.gymcrm.domain.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.test.context.ActiveProfiles;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest
-@Disabled("Requires H2 or dedicated test database configuration; enable after test profile is set up.")
+@ActiveProfiles("test")
 class UserRepositoryTest {
 
     @Autowired
     private UserRepository userRepository;
 
+    private User persistUser(String firstName, String lastName, String username) {
+        User user = new User();
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setUsername(username);
+        user.setPassword("secret");
+        user.setActive(true);
+        return userRepository.save(user);
+    }
+
     @Test
     void countByFirstNameAndLastName_shouldReturnCount_whenUsersExist() {
-        // TODO: persist two Users with firstName "John" and lastName "Smith"; one unrelated user
-        // TODO: call userRepository.countByFirstNameAndLastName("John", "Smith")
-        // TODO: assert count equals 2
+        persistUser("John", "Smith", "john.smith1");
+        persistUser("John", "Smith", "john.smith2");
+        persistUser("Jane", "Doe", "jane.doe");
+
+        long count = userRepository.countByFirstNameAndLastName("John", "Smith");
+
+        assertEquals(2, count);
     }
 
     @Test
     void countByFirstNameAndLastName_shouldReturnZero_whenNoUsersMatch() {
-        // TODO: persist users with other name combinations only (or empty database)
-        // TODO: call userRepository.countByFirstNameAndLastName("Jane", "Doe")
-        // TODO: assert count equals 0
+        persistUser("John", "Smith", "john.smith");
+
+        long count = userRepository.countByFirstNameAndLastName("Jane", "Doe");
+
+        assertEquals(0, count);
     }
 }

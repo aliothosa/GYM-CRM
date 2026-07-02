@@ -1,12 +1,18 @@
 package com.elioth.epam.gymcrm.repository;
 
-import org.junit.jupiter.api.Disabled;
+import com.elioth.epam.gymcrm.domain.TrainingType;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.test.context.ActiveProfiles;
+
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
-@Disabled("Requires H2 or dedicated test database configuration; enable after test profile is set up.")
+@ActiveProfiles("test")
 class TrainingTypeRepositoryTest {
 
     @Autowired
@@ -14,15 +20,24 @@ class TrainingTypeRepositoryTest {
 
     @Test
     void findByName_shouldReturnTrainingType_whenNameExists() {
-        // TODO: persist TrainingType with name "Yoga"
-        // TODO: call trainingTypeRepository.findByName("Yoga")
-        // TODO: assert Optional.isPresent(), name equals "Yoga"
+        TrainingType yoga = new TrainingType();
+        yoga.setName("Yoga");
+        trainingTypeRepository.save(yoga);
+
+        Optional<TrainingType> result = trainingTypeRepository.findByName("Yoga");
+
+        assertTrue(result.isPresent());
+        assertEquals("Yoga", result.get().getName());
     }
 
     @Test
     void findByName_shouldReturnEmpty_whenNameNotFound() {
-        // TODO: persist TrainingType "Yoga" only (or empty database)
-        // TODO: call trainingTypeRepository.findByName("Pilates")
-        // TODO: assert Optional.isEmpty()
+        TrainingType yoga = new TrainingType();
+        yoga.setName("Yoga");
+        trainingTypeRepository.save(yoga);
+
+        Optional<TrainingType> result = trainingTypeRepository.findByName("Pilates");
+
+        assertTrue(result.isEmpty());
     }
 }

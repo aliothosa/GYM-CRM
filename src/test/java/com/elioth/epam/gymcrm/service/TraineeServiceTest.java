@@ -1,19 +1,47 @@
 package com.elioth.epam.gymcrm.service;
 
+import com.elioth.epam.gymcrm.domain.Address;
+import com.elioth.epam.gymcrm.domain.Trainee;
+import com.elioth.epam.gymcrm.domain.Trainer;
+import com.elioth.epam.gymcrm.domain.User;
+import com.elioth.epam.gymcrm.dto.request.ChangePasswordRequest;
+import com.elioth.epam.gymcrm.dto.request.CreateTraineeRequest;
+import com.elioth.epam.gymcrm.dto.request.UpdateTraineeRequest;
+import com.elioth.epam.gymcrm.dto.response.CreatedTraineeResponse;
+import com.elioth.epam.gymcrm.dto.response.TraineeResponse;
+import com.elioth.epam.gymcrm.exception.EntityNotFoundException;
+import com.elioth.epam.gymcrm.exception.IncorrectPasswordException;
+import com.elioth.epam.gymcrm.exception.InvalidRequestException;
 import com.elioth.epam.gymcrm.repository.TraineeRepository;
 import com.elioth.epam.gymcrm.repository.TrainerRepository;
 import com.elioth.epam.gymcrm.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 @ExtendWith(MockitoExtension.class)
-@Disabled("Practice skeleton - implement one test at a time, then remove @Disabled from class")
 class TraineeServiceTest {
+
+    private static final Long TRAINEE_ID = 1L;
+    private static final String USERNAME = "John.Doe";
 
     @Mock
     private TraineeRepository traineeRepository;
@@ -37,338 +65,405 @@ class TraineeServiceTest {
     // --- createProfile ---
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldCreateProfileWhenRequestIsValid() {
-        // Arrange
-        // TODO: create valid CreateTraineeRequest (firstName, lastName, address, birthDate)
-        // TODO: mock userRepository.countByFirstNameAndLastName(...) -> 0
-        // TODO: mock traineeRepository.save(...) -> saved Trainee with User
+        CreateTraineeRequest request = validCreateRequest();
+        when(userRepository.countByFirstNameAndLastName("John", "Doe")).thenReturn(0L);
+        when(traineeRepository.save(any(Trainee.class))).thenAnswer(invocation -> {
+            Trainee trainee = invocation.getArgument(0);
+            trainee.setTraineeId(TRAINEE_ID);
+            trainee.getUser().setUserId(10L);
+            return trainee;
+        });
 
-        // Act
-        // TODO: CreatedTraineeResponse response = traineeService.createProfile(request)
+        CreatedTraineeResponse response = traineeService.createProfile(request);
 
-        // Assert
-        // TODO: assert response is not null
-        // TODO: verify traineeRepository.save(...) was called once
+        assertNotNull(response);
+        assertEquals(TRAINEE_ID, response.traineeId());
+        assertEquals("John.Doe", response.username());
+        assertNotNull(response.password());
+
+        ArgumentCaptor<Trainee> captor = ArgumentCaptor.forClass(Trainee.class);
+        verify(traineeRepository).save(captor.capture());
+        Trainee saved = captor.getValue();
+        assertEquals("John", saved.getUser().getFirstName());
+        assertEquals("Doe", saved.getUser().getLastName());
+        assertEquals("John.Doe", saved.getUser().getUsername());
+        assertTrue(saved.getUser().getActive());
+        assertEquals(request.birthDate(), saved.getBirthDate());
+        assertEquals(request.address(), saved.getAddress());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldThrowInvalidRequestExceptionWhenCreateRequestIsNull() {
-        // Arrange
-        // TODO: no repository setup required
-
-        // Act & Assert
-        // TODO: assertThrows(InvalidRequestException.class, () -> traineeService.createProfile(null))
+        InvalidRequestException exception = assertThrows(
+                InvalidRequestException.class,
+                () -> traineeService.createProfile(null)
+        );
+        assertEquals("Request cannot be null", exception.getMessage());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldThrowInvalidRequestExceptionWhenCreateRequestHasBlankFirstName() {
-        // Arrange
-        // TODO: create CreateTraineeRequest with blank firstName
+        CreateTraineeRequest request = new CreateTraineeRequest(
+                " ",
+                "Doe",
+                LocalDate.of(1990, 1, 1),
+                buildAddress()
+        );
 
-        // Act & Assert
-        // TODO: assertThrows(InvalidRequestException.class, () -> traineeService.createProfile(request))
+        InvalidRequestException exception = assertThrows(
+                InvalidRequestException.class,
+                () -> traineeService.createProfile(request)
+        );
+        assertEquals("First name cannot be empty", exception.getMessage());
     }
 
     // --- updateProfile ---
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldUpdateProfileWhenRequestIsValid() {
-        // Arrange
-        // TODO: create valid UpdateTraineeRequest
-        // TODO: create existing Trainee with User
-        // TODO: mock traineeRepository.findById(traineeId) -> Optional.of(trainee)
+        UpdateTraineeRequest request = validUpdateRequest();
+        Trainee trainee = buildTrainee(TRAINEE_ID, USERNAME, "John", "Doe", true);
+        when(traineeRepository.findById(TRAINEE_ID)).thenReturn(Optional.of(trainee));
 
-        // Act
-        // TODO: TraineeResponse response = traineeService.updateProfile(traineeId, request)
+        TraineeResponse response = traineeService.updateProfile(TRAINEE_ID, request);
 
-        // Assert
-        // TODO: assert response fields match updated values
+        assertEquals(TRAINEE_ID, response.traineeId());
+        assertEquals("Jane", response.firstName());
+        assertEquals("Smith", response.lastName());
+        assertEquals(request.birthDate(), response.birthDate());
+        assertEquals(request.address(), response.address());
+        assertEquals("Jane", trainee.getUser().getFirstName());
+        assertEquals("Smith", trainee.getUser().getLastName());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldThrowInvalidRequestExceptionWhenUpdateRequestIsNull() {
-        // Arrange
-        // TODO: define traineeId
-
-        // Act & Assert
-        // TODO: assertThrows(InvalidRequestException.class, () -> traineeService.updateProfile(traineeId, null))
+        InvalidRequestException exception = assertThrows(
+                InvalidRequestException.class,
+                () -> traineeService.updateProfile(TRAINEE_ID, null)
+        );
+        assertEquals("Request cannot be null", exception.getMessage());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldThrowEntityNotFoundExceptionWhenUpdatingNonExistentTrainee() {
-        // Arrange
-        // TODO: create valid UpdateTraineeRequest
-        // TODO: mock traineeRepository.findById(traineeId) -> Optional.empty()
+        UpdateTraineeRequest request = validUpdateRequest();
+        when(traineeRepository.findById(TRAINEE_ID)).thenReturn(Optional.empty());
 
-        // Act & Assert
-        // TODO: assertThrows(EntityNotFoundException.class, () -> traineeService.updateProfile(traineeId, request))
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> traineeService.updateProfile(TRAINEE_ID, request)
+        );
+        assertEquals("Trainee not found", exception.getMessage());
     }
 
     // --- deleteProfile ---
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldDeleteProfileWhenTraineeExists() {
-        // Arrange
-        // TODO: create existing Trainee
-        // TODO: mock traineeRepository.findById(traineeId) -> Optional.of(trainee)
+        Trainee trainee = buildTrainee(TRAINEE_ID, USERNAME, "John", "Doe", true);
+        when(traineeRepository.findById(TRAINEE_ID)).thenReturn(Optional.of(trainee));
 
-        // Act
-        // TODO: traineeService.deleteProfile(traineeId)
+        traineeService.deleteProfile(TRAINEE_ID);
 
-        // Assert
-        // TODO: verify traineeRepository.delete(trainee) was called once
+        verify(traineeRepository).delete(trainee);
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldThrowEntityNotFoundExceptionWhenDeletingNonExistentTrainee() {
-        // Arrange
-        // TODO: mock traineeRepository.findById(traineeId) -> Optional.empty()
+        when(traineeRepository.findById(TRAINEE_ID)).thenReturn(Optional.empty());
 
-        // Act & Assert
-        // TODO: assertThrows(EntityNotFoundException.class, () -> traineeService.deleteProfile(traineeId))
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> traineeService.deleteProfile(TRAINEE_ID)
+        );
+        assertEquals("Trainee not found", exception.getMessage());
     }
 
     // --- getProfileById ---
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldGetProfileByIdWhenTraineeExists() {
-        // Arrange
-        // TODO: create existing Trainee with User
-        // TODO: mock traineeRepository.findById(traineeId) -> Optional.of(trainee)
+        Trainee trainee = buildTrainee(TRAINEE_ID, USERNAME, "John", "Doe", true);
+        when(traineeRepository.findById(TRAINEE_ID)).thenReturn(Optional.of(trainee));
 
-        // Act
-        // TODO: TraineeResponse response = traineeService.getProfileById(traineeId)
+        TraineeResponse response = traineeService.getProfileById(TRAINEE_ID);
 
-        // Assert
-        // TODO: assert response id and user fields match expected values
+        assertEquals(TRAINEE_ID, response.traineeId());
+        assertEquals("John", response.firstName());
+        assertEquals("Doe", response.lastName());
+        assertEquals(USERNAME, response.username());
+        assertTrue(response.active());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldThrowEntityNotFoundExceptionWhenGettingProfileByNonExistentId() {
-        // Arrange
-        // TODO: mock traineeRepository.findById(traineeId) -> Optional.empty()
+        when(traineeRepository.findById(TRAINEE_ID)).thenReturn(Optional.empty());
 
-        // Act & Assert
-        // TODO: assertThrows(EntityNotFoundException.class, () -> traineeService.getProfileById(traineeId))
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> traineeService.getProfileById(TRAINEE_ID)
+        );
+        assertEquals("Trainee not found", exception.getMessage());
     }
 
     // --- getProfileByUsername ---
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldGetProfileByUsernameWhenTraineeExists() {
-        // Arrange
-        // TODO: create existing Trainee with User (username set)
-        // TODO: mock traineeRepository.findByUserUsername(username) -> Optional.of(trainee)
+        Trainee trainee = buildTrainee(TRAINEE_ID, USERNAME, "John", "Doe", true);
+        when(traineeRepository.findByUserUsername(USERNAME)).thenReturn(Optional.of(trainee));
 
-        // Act
-        // TODO: TraineeResponse response = traineeService.getProfileByUsername(username)
+        TraineeResponse response = traineeService.getProfileByUsername(USERNAME);
 
-        // Assert
-        // TODO: assert response username matches expected value
+        assertEquals(USERNAME, response.username());
+        assertEquals(TRAINEE_ID, response.traineeId());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldThrowInvalidRequestExceptionWhenGettingProfileByBlankUsername() {
-        // Act & Assert
-        // TODO: assertThrows(InvalidRequestException.class, () -> traineeService.getProfileByUsername(" "))
+        InvalidRequestException exception = assertThrows(
+                InvalidRequestException.class,
+                () -> traineeService.getProfileByUsername(" ")
+        );
+        assertEquals("Invalid username", exception.getMessage());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldThrowEntityNotFoundExceptionWhenGettingProfileByUnknownUsername() {
-        // Arrange
-        // TODO: mock traineeRepository.findByUserUsername(username) -> Optional.empty()
+        when(traineeRepository.findByUserUsername(USERNAME)).thenReturn(Optional.empty());
 
-        // Act & Assert
-        // TODO: assertThrows(EntityNotFoundException.class, () -> traineeService.getProfileByUsername(username))
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> traineeService.getProfileByUsername(USERNAME)
+        );
+        assertEquals("Trainee not found", exception.getMessage());
     }
 
     // --- changePassword ---
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldChangePasswordWhenOldPasswordIsCorrect() {
-        // Arrange
-        // TODO: create Trainee with User (known password)
-        // TODO: create ChangePasswordRequest with matching oldPassword and valid newPassword
-        // TODO: mock traineeRepository.findById(traineeId) -> Optional.of(trainee)
+        Trainee trainee = buildTrainee(TRAINEE_ID, USERNAME, "John", "Doe", true);
+        trainee.getUser().setPassword("oldPass");
+        ChangePasswordRequest request = new ChangePasswordRequest("oldPass", "newPass123");
+        when(traineeRepository.findById(TRAINEE_ID)).thenReturn(Optional.of(trainee));
 
-        // Act
-        // TODO: TraineeResponse response = traineeService.changePassword(traineeId, request)
+        TraineeResponse response = traineeService.changePassword(TRAINEE_ID, request);
 
-        // Assert
-        // TODO: assert trainee user password equals newPassword
+        assertEquals("newPass123", trainee.getUser().getPassword());
+        assertEquals(TRAINEE_ID, response.traineeId());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldThrowInvalidRequestExceptionWhenChangePasswordRequestIsNull() {
-        // Arrange
-        // TODO: define traineeId
-
-        // Act & Assert
-        // TODO: assertThrows(InvalidRequestException.class, () -> traineeService.changePassword(traineeId, null))
+        InvalidRequestException exception = assertThrows(
+                InvalidRequestException.class,
+                () -> traineeService.changePassword(TRAINEE_ID, null)
+        );
+        assertEquals("Invalid request", exception.getMessage());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldThrowIncorrectPasswordExceptionWhenOldPasswordDoesNotMatch() {
-        // Arrange
-        // TODO: create Trainee with User (password "oldPass")
-        // TODO: create ChangePasswordRequest with wrong oldPassword
-        // TODO: mock traineeRepository.findById(traineeId) -> Optional.of(trainee)
+        Trainee trainee = buildTrainee(TRAINEE_ID, USERNAME, "John", "Doe", true);
+        trainee.getUser().setPassword("oldPass");
+        ChangePasswordRequest request = new ChangePasswordRequest("wrongPass", "newPass123");
+        when(traineeRepository.findById(TRAINEE_ID)).thenReturn(Optional.of(trainee));
 
-        // Act & Assert
-        // TODO: assertThrows(IncorrectPasswordException.class, () -> traineeService.changePassword(traineeId, request))
+        IncorrectPasswordException exception = assertThrows(
+                IncorrectPasswordException.class,
+                () -> traineeService.changePassword(TRAINEE_ID, request)
+        );
+        assertEquals("Incorrect old password", exception.getMessage());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldThrowEntityNotFoundExceptionWhenChangingPasswordForNonExistentTrainee() {
-        // Arrange
-        // TODO: create valid ChangePasswordRequest
-        // TODO: mock traineeRepository.findById(traineeId) -> Optional.empty()
+        ChangePasswordRequest request = new ChangePasswordRequest("oldPass", "newPass123");
+        when(traineeRepository.findById(TRAINEE_ID)).thenReturn(Optional.empty());
 
-        // Act & Assert
-        // TODO: assertThrows(EntityNotFoundException.class, () -> traineeService.changePassword(traineeId, request))
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> traineeService.changePassword(TRAINEE_ID, request)
+        );
+        assertEquals("Trainee not found", exception.getMessage());
     }
 
     // --- updateTrainersToTrainee ---
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldUpdateTrainersToTraineeWhenAllTrainerIdsExist() {
-        // Arrange
-        // TODO: create Trainee with empty trainers collection
-        // TODO: create List<Long> trainerIds with valid ids
-        // TODO: create List<Trainer> matching all ids
-        // TODO: mock traineeRepository.findById(traineeId) -> Optional.of(trainee)
-        // TODO: mock trainerRepository.findAllById(trainerIds) -> trainers
+        Trainee trainee = buildTrainee(TRAINEE_ID, USERNAME, "John", "Doe", true);
+        trainee.setTrainers(new HashSet<>());
+        List<Long> trainerIds = List.of(10L, 20L);
+        Trainer trainer1 = buildTrainer(10L, "Trainer.One", "One", "Trainer", true);
+        Trainer trainer2 = buildTrainer(20L, "Trainer.Two", "Two", "Trainer", true);
+        List<Trainer> trainers = List.of(trainer1, trainer2);
+        when(traineeRepository.findById(TRAINEE_ID)).thenReturn(Optional.of(trainee));
+        when(trainerRepository.findAllById(trainerIds)).thenReturn(trainers);
 
-        // Act
-        // TODO: traineeService.updateTrainersToTrainee(traineeId, trainerIds)
+        traineeService.updateTrainersToTrainee(TRAINEE_ID, trainerIds);
 
-        // Assert
-        // TODO: assert trainee trainers collection contains all expected trainers
+        assertEquals(2, trainee.getTrainers().size());
+        assertTrue(trainee.getTrainers().containsAll(trainers));
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldThrowInvalidRequestExceptionWhenTrainerIdsListIsNull() {
-        // Arrange
-        // TODO: define traineeId
-
-        // Act & Assert
-        // TODO: assertThrows(InvalidRequestException.class, () -> traineeService.updateTrainersToTrainee(traineeId, null))
+        InvalidRequestException exception = assertThrows(
+                InvalidRequestException.class,
+                () -> traineeService.updateTrainersToTrainee(TRAINEE_ID, null)
+        );
+        assertEquals("Trainer list cannot be null", exception.getMessage());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldThrowEntityNotFoundExceptionWhenTraineeNotFoundForTrainerUpdate() {
-        // Arrange
-        // TODO: create List<Long> trainerIds
-        // TODO: mock traineeRepository.findById(traineeId) -> Optional.empty()
+        List<Long> trainerIds = List.of(10L);
+        when(traineeRepository.findById(TRAINEE_ID)).thenReturn(Optional.empty());
 
-        // Act & Assert
-        // TODO: assertThrows(EntityNotFoundException.class, () -> traineeService.updateTrainersToTrainee(traineeId, trainerIds))
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> traineeService.updateTrainersToTrainee(TRAINEE_ID, trainerIds)
+        );
+        assertEquals("Trainee not found", exception.getMessage());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldThrowEntityNotFoundExceptionWhenOneOrMoreTrainersNotFound() {
-        // Arrange
-        // TODO: create Trainee
-        // TODO: create List<Long> trainerIds (size > returned trainers size)
-        // TODO: mock traineeRepository.findById(traineeId) -> Optional.of(trainee)
-        // TODO: mock trainerRepository.findAllById(trainerIds) -> partial list
+        Trainee trainee = buildTrainee(TRAINEE_ID, USERNAME, "John", "Doe", true);
+        List<Long> trainerIds = List.of(10L, 20L);
+        Trainer trainer1 = buildTrainer(10L, "Trainer.One", "One", "Trainer", true);
+        when(traineeRepository.findById(TRAINEE_ID)).thenReturn(Optional.of(trainee));
+        when(trainerRepository.findAllById(trainerIds)).thenReturn(List.of(trainer1));
 
-        // Act & Assert
-        // TODO: assertThrows(EntityNotFoundException.class, () -> traineeService.updateTrainersToTrainee(traineeId, trainerIds))
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> traineeService.updateTrainersToTrainee(TRAINEE_ID, trainerIds)
+        );
+        assertEquals("One or more trainers were not found", exception.getMessage());
     }
 
     // --- activate ---
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldActivateTraineeWhenCurrentlyInactive() {
-        // Arrange
-        // TODO: create Trainee with User (active = false)
-        // TODO: mock traineeRepository.findById(traineeId) -> Optional.of(trainee)
+        Trainee trainee = buildTrainee(TRAINEE_ID, USERNAME, "John", "Doe", false);
+        when(traineeRepository.findById(TRAINEE_ID)).thenReturn(Optional.of(trainee));
 
-        // Act
-        // TODO: traineeService.activate(traineeId)
+        traineeService.activate(TRAINEE_ID);
 
-        // Assert
-        // TODO: assert trainee user active is true
+        assertTrue(trainee.getUser().getActive());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldThrowInvalidRequestExceptionWhenActivatingAlreadyActiveTrainee() {
-        // Arrange
-        // TODO: create Trainee with User (active = true)
-        // TODO: mock traineeRepository.findById(traineeId) -> Optional.of(trainee)
+        Trainee trainee = buildTrainee(TRAINEE_ID, USERNAME, "John", "Doe", true);
+        when(traineeRepository.findById(TRAINEE_ID)).thenReturn(Optional.of(trainee));
 
-        // Act & Assert
-        // TODO: assertThrows(InvalidRequestException.class, () -> traineeService.activate(traineeId))
+        InvalidRequestException exception = assertThrows(
+                InvalidRequestException.class,
+                () -> traineeService.activate(TRAINEE_ID)
+        );
+        assertEquals("Trainee is already active.", exception.getMessage());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldThrowEntityNotFoundExceptionWhenActivatingNonExistentTrainee() {
-        // Arrange
-        // TODO: mock traineeRepository.findById(traineeId) -> Optional.empty()
+        when(traineeRepository.findById(TRAINEE_ID)).thenReturn(Optional.empty());
 
-        // Act & Assert
-        // TODO: assertThrows(EntityNotFoundException.class, () -> traineeService.activate(traineeId))
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> traineeService.activate(TRAINEE_ID)
+        );
+        assertEquals("Trainee not found", exception.getMessage());
     }
 
     // --- deactivate ---
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldDeactivateTraineeWhenCurrentlyActive() {
-        // Arrange
-        // TODO: create Trainee with User (active = true)
-        // TODO: mock traineeRepository.findById(traineeId) -> Optional.of(trainee)
+        Trainee trainee = buildTrainee(TRAINEE_ID, USERNAME, "John", "Doe", true);
+        when(traineeRepository.findById(TRAINEE_ID)).thenReturn(Optional.of(trainee));
 
-        // Act
-        // TODO: traineeService.deactivate(traineeId)
+        traineeService.deactivate(TRAINEE_ID);
 
-        // Assert
-        // TODO: assert trainee user active is false
+        assertFalse(trainee.getUser().getActive());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldThrowInvalidRequestExceptionWhenDeactivatingAlreadyInactiveTrainee() {
-        // Arrange
-        // TODO: create Trainee with User (active = false)
-        // TODO: mock traineeRepository.findById(traineeId) -> Optional.of(trainee)
+        Trainee trainee = buildTrainee(TRAINEE_ID, USERNAME, "John", "Doe", false);
+        when(traineeRepository.findById(TRAINEE_ID)).thenReturn(Optional.of(trainee));
 
-        // Act & Assert
-        // TODO: assertThrows(InvalidRequestException.class, () -> traineeService.deactivate(traineeId))
+        InvalidRequestException exception = assertThrows(
+                InvalidRequestException.class,
+                () -> traineeService.deactivate(TRAINEE_ID)
+        );
+        assertEquals("Trainee is already deactivated.", exception.getMessage());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldThrowEntityNotFoundExceptionWhenDeactivatingNonExistentTrainee() {
-        // Arrange
-        // TODO: mock traineeRepository.findById(traineeId) -> Optional.empty()
+        when(traineeRepository.findById(TRAINEE_ID)).thenReturn(Optional.empty());
 
-        // Act & Assert
-        // TODO: assertThrows(EntityNotFoundException.class, () -> traineeService.deactivate(traineeId))
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> traineeService.deactivate(TRAINEE_ID)
+        );
+        assertEquals("Trainee not found", exception.getMessage());
+    }
+
+    private CreateTraineeRequest validCreateRequest() {
+        return new CreateTraineeRequest(
+                "John",
+                "Doe",
+                LocalDate.of(1990, 5, 15),
+                buildAddress()
+        );
+    }
+
+    private UpdateTraineeRequest validUpdateRequest() {
+        return new UpdateTraineeRequest(
+                "Jane",
+                "Smith",
+                LocalDate.of(1992, 3, 20),
+                new Address("Oak St", "Boston", "MA", "02101", 42)
+        );
+    }
+
+    private Address buildAddress() {
+        return new Address("Main St", "New York", "NY", "10001", 10);
+    }
+
+    private Trainee buildTrainee(Long traineeId, String username, String firstName, String lastName, boolean active) {
+        User user = buildUser(username, firstName, lastName, "password", active);
+        Trainee trainee = new Trainee();
+        trainee.setTraineeId(traineeId);
+        trainee.setUser(user);
+        trainee.setBirthDate(LocalDate.of(1990, 5, 15));
+        trainee.setAddress(buildAddress());
+        return trainee;
+    }
+
+    private Trainer buildTrainer(Long trainerId, String username, String firstName, String lastName, boolean active) {
+        User user = buildUser(username, firstName, lastName, "password", active);
+        Trainer trainer = new Trainer();
+        trainer.setTrainerId(trainerId);
+        trainer.setUser(user);
+        return trainer;
+    }
+
+    private User buildUser(String username, String firstName, String lastName, String password, boolean active) {
+        User user = new User();
+        user.setUserId(100L);
+        user.setUsername(username);
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setPassword(password);
+        user.setActive(active);
+        return user;
     }
 }

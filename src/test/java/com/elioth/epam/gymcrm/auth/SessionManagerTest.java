@@ -2,7 +2,6 @@ package com.elioth.epam.gymcrm.auth;
 
 import com.elioth.epam.gymcrm.exception.UserNotAuthenticatedException;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -10,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@Disabled("Practice skeleton - remove @Disabled when implementing tests")
 class SessionManagerTest {
 
     private SessionManager sessionManager;
@@ -21,46 +19,45 @@ class SessionManagerTest {
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldStoreSessionOnLogin() {
-        // Arrange
-        // TODO: AuthSession session = new AuthSession(1L, "Emily.Davis", Role.TRAINEE)
+        AuthSession session = new AuthSession(1L, "Emily.Davis", Role.TRAINEE);
 
-        // Act
-        // TODO: sessionManager.login(session)
+        sessionManager.login(session);
 
-        // Assert
-        // TODO: assertTrue(sessionManager.isAuthenticated())
-        // TODO: assertEquals(session, sessionManager.getCurrentSession())
+        assertTrue(sessionManager.isAuthenticated());
+        assertEquals(session, sessionManager.getCurrentSession());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldClearSessionOnLogout() {
-        // Arrange
-        // TODO: login a session first
+        AuthSession session = new AuthSession(1L, "Emily.Davis", Role.TRAINEE);
+        sessionManager.login(session);
 
-        // Act
-        // TODO: sessionManager.logout()
+        sessionManager.logout();
 
-        // Assert
-        // TODO: assertFalse(sessionManager.isAuthenticated())
+        assertFalse(sessionManager.isAuthenticated());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldThrowWhenGettingSessionWithoutLogin() {
-        // Act & Assert
-        // TODO: assertThrows(UserNotAuthenticatedException.class, () -> sessionManager.getCurrentSession())
+        UserNotAuthenticatedException exception = assertThrows(
+                UserNotAuthenticatedException.class,
+                () -> sessionManager.getCurrentSession()
+        );
+
+        assertEquals("No user is logged in", exception.getMessage());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldReplaceSessionWhenLoggingInAgain() {
-        // Arrange
-        // TODO: login trainee session, then login trainer session
+        AuthSession traineeSession = new AuthSession(1L, "Emily.Davis", Role.TRAINEE);
+        AuthSession trainerSession = new AuthSession(2L, "John.Smith", Role.TRAINER);
 
-        // Assert
-        // TODO: assert current session is the latest one (trainer)
+        sessionManager.login(traineeSession);
+        sessionManager.login(trainerSession);
+
+        assertTrue(sessionManager.isAuthenticated());
+        assertEquals(trainerSession, sessionManager.getCurrentSession());
+        assertEquals(Role.TRAINER, sessionManager.getCurrentSession().role());
     }
 }

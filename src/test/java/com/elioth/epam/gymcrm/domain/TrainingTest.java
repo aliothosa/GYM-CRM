@@ -1,21 +1,51 @@
 package com.elioth.epam.gymcrm.domain;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-@Disabled("Optional/low-priority domain test; enable when practicing entity field assignment.")
+import java.time.LocalDate;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 class TrainingTest {
 
     @Test
     void shouldAllowSettingRequiredFields() {
-        // TODO: create Trainee, Trainer, TrainingType, and Training
-        // TODO: set trainee, trainer, type, name, date, durationInMinutes
-        // TODO: assert all getters return the assigned values
+        Trainee trainee = new Trainee();
+        Trainer trainer = new Trainer();
+        TrainingType type = new TrainingType();
+        type.setName("Cardio");
+        LocalDate date = LocalDate.of(2024, 6, 1);
+        Training training = new Training();
+        training.setTrainee(trainee);
+        training.setTrainer(trainer);
+        training.setType(type);
+        training.setName("Morning Run");
+        training.setDate(date);
+        training.setDurationInMinutes(60L);
+
+        assertEquals(trainee, training.getTrainee());
+        assertEquals(trainer, training.getTrainer());
+        assertEquals(type, training.getType());
+        assertEquals("Morning Run", training.getName());
+        assertEquals(date, training.getDate());
+        assertEquals(60L, training.getDurationInMinutes());
     }
 
     @Test
     void shouldStoreTrainingDateAndDuration() {
-        // TODO: create Training with date LocalDate.of(2024, 6, 1) and durationInMinutes 60L
-        // TODO: assert getDate() and getDurationInMinutes() match persisted values
+        Training training = new Training();
+        training.setDate(LocalDate.of(2024, 6, 1));
+        training.setDurationInMinutes(60L);
+
+        assertEquals(LocalDate.of(2024, 6, 1), training.getDate());
+        assertEquals(60L, training.getDurationInMinutes());
+    }
+
+    @Test
+    void shouldHaveNullTrainingIdBeforePersistence() {
+        Training training = new Training();
+
+        assertNull(training.getTrainingId());
     }
 }

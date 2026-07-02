@@ -1,80 +1,178 @@
 package com.elioth.epam.gymcrm.dto;
 
-import org.junit.jupiter.api.Disabled;
+import com.elioth.epam.gymcrm.domain.Address;
+import com.elioth.epam.gymcrm.dto.request.ChangePasswordRequest;
+import com.elioth.epam.gymcrm.dto.request.CreateTraineeRequest;
+import com.elioth.epam.gymcrm.dto.request.CreateTrainerRequest;
+import com.elioth.epam.gymcrm.dto.request.CreateTrainingRequest;
+import com.elioth.epam.gymcrm.dto.request.UpdateTraineeRequest;
+import com.elioth.epam.gymcrm.dto.request.UpdateTrainerRequest;
+import com.elioth.epam.gymcrm.dto.request.UpdateTrainingRequest;
+import com.elioth.epam.gymcrm.dto.response.CreatedTraineeResponse;
+import com.elioth.epam.gymcrm.dto.response.CreatedTrainerResponse;
+import com.elioth.epam.gymcrm.dto.response.TraineeResponse;
+import com.elioth.epam.gymcrm.dto.response.TrainerResponse;
+import com.elioth.epam.gymcrm.dto.response.TrainingResponse;
 import org.junit.jupiter.api.Test;
 
-@Disabled("Optional/low-priority DTO record test; enable when practicing record construction and accessors.")
+import java.time.LocalDate;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 class DtoRecordsTest {
 
     @Test
     void createTraineeRequest_shouldExposeComponents() {
-        // TODO: build CreateTraineeRequest with sample firstName, lastName, birthDate, Address
-        // TODO: assert accessor methods return the same values
+        Address address = new Address("Main St", "Boston", "MA", "02101", 42);
+        LocalDate birthDate = LocalDate.of(1995, 3, 10);
+        CreateTraineeRequest request = new CreateTraineeRequest("Jane", "Doe", birthDate, address);
+
+        assertEquals("Jane", request.firstName());
+        assertEquals("Doe", request.lastName());
+        assertEquals(birthDate, request.birthDate());
+        assertEquals(address, request.address());
     }
 
     @Test
     void createTrainerRequest_shouldExposeComponents() {
-        // TODO: build CreateTrainerRequest with firstName, lastName, trainingTypeId
-        // TODO: assert accessor methods return the same values
+        CreateTrainerRequest request = new CreateTrainerRequest("Bob", "Smith", 3L);
+
+        assertEquals("Bob", request.firstName());
+        assertEquals("Smith", request.lastName());
+        assertEquals(3L, request.trainingTypeId());
     }
 
     @Test
     void createTrainingRequest_shouldExposeComponents() {
-        // TODO: build CreateTrainingRequest with traineeId, trainerId, trainingTypeId, name, date, duration
-        // TODO: assert accessor methods return the same values
+        LocalDate trainingDate = LocalDate.of(2024, 7, 15);
+        CreateTrainingRequest request = new CreateTrainingRequest(
+                1L, 2L, 3L, "Morning Yoga", trainingDate, 90L
+        );
+
+        assertEquals(1L, request.traineeId());
+        assertEquals(2L, request.trainerId());
+        assertEquals(3L, request.trainingTypeId());
+        assertEquals("Morning Yoga", request.trainingName());
+        assertEquals(trainingDate, request.trainingDate());
+        assertEquals(90L, request.duration());
     }
 
     @Test
     void changePasswordRequest_shouldExposeComponents() {
-        // TODO: build ChangePasswordRequest("old", "new")
-        // TODO: assert oldPassword() and newPassword() match
+        ChangePasswordRequest request = new ChangePasswordRequest("oldPass", "newPass");
+
+        assertEquals("oldPass", request.oldPassword());
+        assertEquals("newPass", request.newPassword());
     }
 
     @Test
     void updateTraineeRequest_shouldExposeComponents() {
-        // TODO: build UpdateTraineeRequest with name, birthDate, Address fields
-        // TODO: assert accessor methods return the same values
+        Address address = new Address("Elm St", "Austin", "TX", "73301", 7);
+        LocalDate birthDate = LocalDate.of(1992, 8, 20);
+        UpdateTraineeRequest request = new UpdateTraineeRequest("Updated", "Name", birthDate, address);
+
+        assertEquals("Updated", request.firstName());
+        assertEquals("Name", request.lastName());
+        assertEquals(birthDate, request.birthDate());
+        assertEquals(address, request.address());
     }
 
     @Test
     void updateTrainerRequest_shouldExposeComponents() {
-        // TODO: build UpdateTrainerRequest with firstName, lastName, trainingTypeId
-        // TODO: assert accessor methods return the same values
+        UpdateTrainerRequest request = new UpdateTrainerRequest("New", "Trainer", 5L);
+
+        assertEquals("New", request.firstName());
+        assertEquals("Trainer", request.lastName());
+        assertEquals(5L, request.trainingTypeId());
     }
 
     @Test
     void updateTrainingRequest_shouldExposeComponents() {
-        // TODO: build UpdateTrainingRequest with name, date, duration
-        // TODO: assert accessor methods return the same values
+        LocalDate date = LocalDate.of(2024, 9, 1);
+        UpdateTrainingRequest request = new UpdateTrainingRequest("Evening Session", date, 45L);
+
+        assertEquals("Evening Session", request.name());
+        assertEquals(date, request.date());
+        assertEquals(45L, request.duration());
     }
 
     @Test
     void traineeResponse_shouldExposeComponents() {
-        // TODO: build TraineeResponse with ids, names, username, active, birthDate, address
-        // TODO: assert accessor methods return the same values
+        Address address = new Address("Pine Rd", "Denver", "CO", "80202", 15);
+        LocalDate birthDate = LocalDate.of(1988, 1, 5);
+        TraineeResponse response = new TraineeResponse(
+                10L, 20L, "Alice", "Wonder", "alice.wonder", true, birthDate, address
+        );
+
+        assertEquals(10L, response.traineeId());
+        assertEquals(20L, response.userId());
+        assertEquals("Alice", response.firstName());
+        assertEquals("Wonder", response.lastName());
+        assertEquals("alice.wonder", response.username());
+        assertTrue(response.active());
+        assertEquals(birthDate, response.birthDate());
+        assertEquals(address, response.address());
     }
 
     @Test
     void trainerResponse_shouldExposeComponents() {
-        // TODO: build TrainerResponse with ids, names, username, active, trainingTypeId, trainingTypeName
-        // TODO: assert accessor methods return the same values
+        TrainerResponse response = new TrainerResponse(
+                1L, 2L, "Carl", "Lee", "carl.lee", true, 3L, "CrossFit"
+        );
+
+        assertEquals(1L, response.trainerId());
+        assertEquals(2L, response.userId());
+        assertEquals("Carl", response.firstName());
+        assertEquals("Lee", response.lastName());
+        assertEquals("carl.lee", response.username());
+        assertTrue(response.active());
+        assertEquals(3L, response.trainingTypeId());
+        assertEquals("CrossFit", response.trainingTypeName());
     }
 
     @Test
     void trainingResponse_shouldExposeComponents() {
-        // TODO: build TrainingResponse with nested trainee/trainer/type fields and training metadata
-        // TODO: assert accessor methods return the same values
+        LocalDate trainingDate = LocalDate.of(2024, 10, 5);
+        TrainingResponse response = new TrainingResponse(
+                100L,
+                1L, "trainee.user", "Train", "One",
+                2L, "trainer.user", "Coach", "Two",
+                3L, "Yoga",
+                "Sunrise Flow", trainingDate, 60L
+        );
+
+        assertEquals(100L, response.trainingId());
+        assertEquals(1L, response.traineeId());
+        assertEquals("trainee.user", response.traineeUsername());
+        assertEquals("Train", response.traineeFirstName());
+        assertEquals("One", response.traineeLastName());
+        assertEquals(2L, response.trainerId());
+        assertEquals("trainer.user", response.trainerUsername());
+        assertEquals("Coach", response.trainerFirstName());
+        assertEquals("Two", response.trainerLastName());
+        assertEquals(3L, response.trainingTypeId());
+        assertEquals("Yoga", response.trainingTypeName());
+        assertEquals("Sunrise Flow", response.trainingName());
+        assertEquals(trainingDate, response.trainingDate());
+        assertEquals(60L, response.duration());
     }
 
     @Test
     void createdTraineeResponse_shouldExposeComponents() {
-        // TODO: build CreatedTraineeResponse(traineeId, username, password)
-        // TODO: assert accessor methods return the same values
+        CreatedTraineeResponse response = new CreatedTraineeResponse(5L, "new.trainee", "generatedPass");
+
+        assertEquals(5L, response.traineeId());
+        assertEquals("new.trainee", response.username());
+        assertEquals("generatedPass", response.password());
     }
 
     @Test
     void createdTrainerResponse_shouldExposeComponents() {
-        // TODO: build CreatedTrainerResponse(trainerId, username, password)
-        // TODO: assert accessor methods return the same values
+        CreatedTrainerResponse response = new CreatedTrainerResponse(7L, "new.trainer", "generatedPass");
+
+        assertEquals(7L, response.trainerId());
+        assertEquals("new.trainer", response.username());
+        assertEquals("generatedPass", response.password());
     }
 }

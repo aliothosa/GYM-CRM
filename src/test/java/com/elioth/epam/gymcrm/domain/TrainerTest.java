@@ -1,20 +1,32 @@
 package com.elioth.epam.gymcrm.domain;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-@Disabled("Optional/low-priority domain test; enable when practicing entity defaults and relationships.")
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 class TrainerTest {
 
     @Test
     void shouldInitializeTraineesCollection() {
-        // TODO: create new Trainer()
-        // TODO: assert trainees collection is non-null and empty
+        Trainer trainer = new Trainer();
+
+        assertNotNull(trainer.getTrainees());
+        assertTrue(trainer.getTrainees().isEmpty());
     }
 
     @Test
     void shouldAllowSettingUserAndSpecialization() {
-        // TODO: create User, TrainingType, and Trainer; wire user and specialization
-        // TODO: assert trainer.getUser() and trainer.getSpecialization() return assigned values
+        User user = new User();
+        user.setUsername("trainer.user");
+        TrainingType specialization = new TrainingType();
+        specialization.setName("Yoga");
+        Trainer trainer = new Trainer();
+        trainer.setUser(user);
+        trainer.setSpecialization(specialization);
+
+        assertEquals(user, trainer.getUser());
+        assertEquals(specialization, trainer.getSpecialization());
     }
 }

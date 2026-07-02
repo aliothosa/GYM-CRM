@@ -1,20 +1,33 @@
 package com.elioth.epam.gymcrm.domain;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-@Disabled("Optional/low-priority domain test; enable when practicing entity field assignment.")
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 class UserTest {
 
     @Test
     void shouldAllowSettingIdentityAndCredentials() {
-        // TODO: create User; set firstName, lastName, username, password, active
-        // TODO: assert getters return assigned values
+        User user = new User();
+        user.setFirstName("John");
+        user.setLastName("Doe");
+        user.setUsername("john.doe");
+        user.setPassword("secret");
+        user.setActive(true);
+
+        assertEquals("John", user.getFirstName());
+        assertEquals("Doe", user.getLastName());
+        assertEquals("john.doe", user.getUsername());
+        assertEquals("secret", user.getPassword());
+        assertTrue(user.getActive());
     }
 
     @Test
     void shouldHaveNullUserIdBeforePersistence() {
-        // TODO: create new User()
-        // TODO: assert getUserId() is null (not yet persisted)
+        User user = new User();
+
+        assertNull(user.getUserId());
     }
 }

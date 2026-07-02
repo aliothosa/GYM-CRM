@@ -1,7 +1,6 @@
 package com.elioth.epam.gymcrm.utils;
 
 import com.elioth.epam.gymcrm.domain.User;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -63,27 +62,26 @@ class UtilsTest {
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldCountUsersWithSameFirstAndLastName() {
-        // Arrange
-        // TODO: User target = buildUser("John", "Smith")
-        // TODO: Stream with one matching and one non-matching User
+        User target = buildUser("John", "Smith");
+        User matching = buildUser("John", "Smith");
+        User nonMatching = buildUser("Jane", "Doe");
+        Stream<User> stream = Stream.of(matching, nonMatching);
 
-        // Act
-        // TODO: long count = Utils.sameNameUserCount(target, stream)
+        long count = Utils.sameNameUserCount(target, stream);
 
-        // Assert
-        // TODO: assertEquals(1L, count)
+        assertEquals(1L, count);
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldReturnZeroWhenNoMatchingNamesExist() {
-        // Arrange
-        // TODO: empty stream or non-matching users
+        User target = buildUser("John", "Smith");
+        User other = buildUser("Jane", "Doe");
+        Stream<User> stream = Stream.of(other);
 
-        // Act & Assert
-        // TODO: assertEquals(0L, Utils.sameNameUserCount(...))
+        long count = Utils.sameNameUserCount(target, stream);
+
+        assertEquals(0L, count);
     }
 
     private User buildUser(String firstName, String lastName) {

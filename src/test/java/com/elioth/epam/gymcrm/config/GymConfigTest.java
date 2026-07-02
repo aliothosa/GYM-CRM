@@ -1,23 +1,21 @@
 package com.elioth.epam.gymcrm.config;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-/**
- * Lightweight config test for {@link GymConfig}.
- * GymConfig references classpath:application.yaml — add a test yaml or adjust before enabling.
- */
-@Disabled("Practice skeleton - enable after application.yaml exists or PropertySource is adjusted")
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+@SpringJUnitConfig(classes = GymConfig.class)
+@TestPropertySource(properties = "gymcrm.cli.enabled=false")
 class GymConfigTest {
 
-    @Test
-    @Disabled("Practice skeleton")
-    void shouldLoadGymConfigInContext() {
-        // Arrange
-        // TODO: use @SpringBootTest(properties = "gymcrm.cli.enabled=false") if full context needed
-        // TODO: or test GymConfig as @Configuration class with @ContextConfiguration
+    @Autowired
+    private GymConfig gymConfig;
 
-        // Assert
-        // TODO: assert context contains GymConfig bean
+    @Test
+    void shouldLoadGymConfigInContext() {
+        assertNotNull(gymConfig);
     }
 }

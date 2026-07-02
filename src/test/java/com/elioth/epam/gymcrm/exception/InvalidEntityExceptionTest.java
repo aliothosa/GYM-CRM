@@ -1,31 +1,24 @@
 package com.elioth.epam.gymcrm.exception;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-@Disabled("Practice skeleton - implement one test at a time, then remove @Disabled from class")
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 class InvalidEntityExceptionTest {
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldCreateExceptionWithMessage() {
-        // Act
-        // TODO: InvalidEntityException exception = new InvalidEntityException("Invalid entity state");
+        InvalidEntityException exception = new InvalidEntityException("Invalid entity state");
 
-        // Assert
-        // TODO: assert exception.getMessage() equals expected message
+        assertEquals("Invalid entity state", exception.getMessage());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldPreserveErrorMessage() {
-        // Arrange
-        // TODO: define expected message string
+        String expectedMessage = "Entity validation failed";
 
-        // Act
-        // TODO: InvalidEntityException exception = new InvalidEntityException(expectedMessage);
+        InvalidEntityException exception = new InvalidEntityException(expectedMessage);
 
-        // Assert
-        // TODO: assert exception.getMessage() is preserved exactly
+        assertEquals(expectedMessage, exception.getMessage());
     }
 }

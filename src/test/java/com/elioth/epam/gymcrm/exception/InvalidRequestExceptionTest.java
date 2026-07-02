@@ -1,31 +1,24 @@
 package com.elioth.epam.gymcrm.exception;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-@Disabled("Practice skeleton - implement one test at a time, then remove @Disabled from class")
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 class InvalidRequestExceptionTest {
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldCreateExceptionWithMessage() {
-        // Act
-        // TODO: InvalidRequestException exception = new InvalidRequestException("Invalid request");
+        InvalidRequestException exception = new InvalidRequestException("Invalid request");
 
-        // Assert
-        // TODO: assert exception.getMessage() equals expected message
+        assertEquals("Invalid request", exception.getMessage());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldPreserveErrorMessage() {
-        // Arrange
-        // TODO: define expected message string
+        String expectedMessage = "Request payload is malformed";
 
-        // Act
-        // TODO: InvalidRequestException exception = new InvalidRequestException(expectedMessage);
+        InvalidRequestException exception = new InvalidRequestException(expectedMessage);
 
-        // Assert
-        // TODO: assert exception.getMessage() is preserved exactly
+        assertEquals(expectedMessage, exception.getMessage());
     }
 }

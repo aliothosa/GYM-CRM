@@ -22,14 +22,17 @@ import com.elioth.epam.gymcrm.service.TraineeService;
 import com.elioth.epam.gymcrm.service.TrainerService;
 import com.elioth.epam.gymcrm.service.TrainingService;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -77,6 +80,17 @@ class GymCrmFacadeTest {
     }
 
     @Test
+    void shouldLoginAsTrainerAndStoreSession() {
+        AuthSession session = new AuthSession(2L, "Jane.Trainer", Role.TRAINER);
+        when(authService.loginTrainer("Jane.Trainer", "pass456")).thenReturn(session);
+
+        AuthSession result = facade.loginAsTrainer("Jane.Trainer", "pass456");
+
+        assertEquals(session, result);
+        verify(sessionManager).login(session);
+    }
+
+    @Test
     void shouldDelegateCreateTraineeProfileWithoutLogin() {
         CreateTraineeRequest request = new CreateTraineeRequest("John", "Smith", null, null);
         CreatedTraineeResponse response = new CreatedTraineeResponse(10L, "John.Smith", "secret");
@@ -86,6 +100,42 @@ class GymCrmFacadeTest {
 
         assertEquals(response, result);
         verify(traineeService).createProfile(request);
+    }
+
+    @Test
+    void shouldDelegateCreateTrainerProfileWithoutLogin() {
+        CreateTrainerRequest request = new CreateTrainerRequest("Jane", "Trainer", 1L);
+        CreatedTrainerResponse response = new CreatedTrainerResponse(20L, "Jane.Trainer", "secret");
+        when(trainerService.createProfile(request)).thenReturn(response);
+
+        CreatedTrainerResponse result = facade.createTrainerProfile(request);
+
+        assertEquals(response, result);
+        verify(trainerService).createProfile(request);
+    }
+
+    @Test
+    void shouldRejectTraineeOperationWhenLoggedAsTrainer() {
+        AuthSession trainerSession = new AuthSession(2L, "Jane.Trainer", Role.TRAINER);
+        when(sessionManager.getCurrentSession()).thenReturn(trainerSession);
+
+        assertThrows(UnauthorizedOperationException.class, () -> facade.getTraineeProfile());
+    }
+
+    @Test
+    void shouldRejectTrainerOperationWhenLoggedAsTrainee() {
+        AuthSession traineeSession = new AuthSession(1L, "Emily.Davis", Role.TRAINEE);
+        when(sessionManager.getCurrentSession()).thenReturn(traineeSession);
+
+        assertThrows(UnauthorizedOperationException.class, () -> facade.getTrainerProfile());
+    }
+
+    @Test
+    void shouldRejectProtectedOperationWhenNotAuthenticated() {
+        when(sessionManager.getCurrentSession())
+                .thenThrow(new UserNotAuthenticatedException("No user is logged in"));
+
+        assertThrows(UserNotAuthenticatedException.class, () -> facade.getTraineeProfile());
     }
 
     @Test
@@ -104,166 +154,265 @@ class GymCrmFacadeTest {
     }
 
     @Test
-    void shouldLogoutCurrentSession() {
-        facade.logout();
+    void shouldGetTraineeProfileUsingSessionId() {
+        AuthSession session = new AuthSession(1L, "Emily.Davis", Role.TRAINEE);
+        TraineeResponse response = new TraineeResponse(1L, 4L, "Emily", "Davis", "Emily.Davis", true, null, null);
+
+        when(sessionManager.getCurrentSession()).thenReturn(session);
+        when(traineeService.getProfileById(1L)).thenReturn(response);
+
+        TraineeResponse result = facade.getTraineeProfile();
+
+        assertEquals(response, result);
+        verify(traineeService).getProfileById(1L);
+    }
+
+    @Test
+    void shouldRejectGetTraineeProfileByUsernameForAnotherUser() {
+        AuthSession session = new AuthSession(1L, "Emily.Davis", Role.TRAINEE);
+        when(sessionManager.getCurrentSession()).thenReturn(session);
+
+        assertThrows(UnauthorizedOperationException.class,
+                () -> facade.getTraineeProfileByUsername("Other.User"));
+    }
+
+    @Test
+    void shouldDeleteTraineeProfileAndLogout() {
+        AuthSession session = new AuthSession(1L, "Emily.Davis", Role.TRAINEE);
+        when(sessionManager.getCurrentSession()).thenReturn(session);
+
+        facade.deleteTraineeProfile();
+
+        verify(traineeService).deleteProfile(1L);
         verify(sessionManager).logout();
     }
 
-    // ========================= Practice skeletons (disabled) =========================
-
     @Test
-    @Disabled("Practice skeleton")
-    void shouldLoginAsTrainerAndStoreSession() {
-        // Arrange
-        // TODO: mock authService.loginTrainer(...) -> AuthSession with Role.TRAINER
-
-        // Act
-        // TODO: facade.loginAsTrainer(...)
-
-        // Assert
-        // TODO: verify sessionManager.login(session)
-    }
-
-    @Test
-    @Disabled("Practice skeleton")
-    void shouldDelegateCreateTrainerProfileWithoutLogin() {
-        // Arrange
-        // TODO: mock trainerService.createProfile(...)
-
-        // Act & Assert
-        // TODO: verify delegation
-    }
-
-    @Test
-    @Disabled("Practice skeleton")
-    void shouldRejectTraineeOperationWhenLoggedAsTrainer() {
-        // Arrange
-        // TODO: sessionManager.getCurrentSession() -> trainer session
-
-        // Act & Assert
-        // TODO: assertThrows(UnauthorizedOperationException.class, () -> facade.getTraineeProfile())
-    }
-
-    @Test
-    @Disabled("Practice skeleton")
-    void shouldRejectTrainerOperationWhenLoggedAsTrainee() {
-        // Arrange
-        // TODO: session with Role.TRAINEE
-
-        // Act & Assert
-        // TODO: assertThrows(UnauthorizedOperationException.class, () -> facade.getTrainerProfile())
-    }
-
-    @Test
-    @Disabled("Practice skeleton")
-    void shouldRejectProtectedOperationWhenNotAuthenticated() {
-        // Arrange
-        // TODO: sessionManager.getCurrentSession() -> throw UserNotAuthenticatedException
-
-        // Act & Assert
-        // TODO: assertThrows(UserNotAuthenticatedException.class, () -> facade.getTraineeProfile())
-    }
-
-    @Test
-    @Disabled("Practice skeleton")
-    void shouldGetTraineeProfileUsingSessionId() {
-        // TODO: mock trainee session + traineeService.getProfileById(session.id())
-    }
-
-    @Test
-    @Disabled("Practice skeleton")
-    void shouldRejectGetTraineeProfileByUsernameForAnotherUser() {
-        // TODO: session username != requested username -> UnauthorizedOperationException
-    }
-
-    @Test
-    @Disabled("Practice skeleton")
-    void shouldDeleteTraineeProfileAndLogout() {
-        // TODO: verify traineeService.deleteProfile + sessionManager.logout
-    }
-
-    @Test
-    @Disabled("Practice skeleton")
     void shouldChangeTraineePasswordUsingSession() {
-        // TODO: verify traineeService.changePassword(session.id(), request)
+        AuthSession session = new AuthSession(1L, "Emily.Davis", Role.TRAINEE);
+        ChangePasswordRequest request = new ChangePasswordRequest("oldPass", "newPass");
+        TraineeResponse response = new TraineeResponse(1L, 4L, "Emily", "Davis", "Emily.Davis", true, null, null);
+
+        when(sessionManager.getCurrentSession()).thenReturn(session);
+        when(traineeService.changePassword(1L, request)).thenReturn(response);
+
+        TraineeResponse result = facade.changeTraineePassword(request);
+
+        assertEquals(response, result);
+        verify(traineeService).changePassword(1L, request);
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldActivateAndDeactivateTraineeProfile() {
-        // TODO: verify traineeService.activate/deactivate with session id
+        AuthSession session = new AuthSession(1L, "Emily.Davis", Role.TRAINEE);
+        when(sessionManager.getCurrentSession()).thenReturn(session);
+
+        facade.activateTraineeProfile();
+        verify(traineeService).activate(1L);
+
+        facade.deactivateTraineeProfile();
+        verify(traineeService).deactivate(1L);
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldUpdateTraineeTrainersListUsingSession() {
-        // TODO: verify traineeService.updateTrainersToTrainee(session.id(), ids)
+        AuthSession session = new AuthSession(1L, "Emily.Davis", Role.TRAINEE);
+        List<Long> trainerIds = List.of(10L, 11L);
+        when(sessionManager.getCurrentSession()).thenReturn(session);
+
+        facade.updateTraineeTrainersList(trainerIds);
+
+        verify(traineeService).updateTrainersToTrainee(1L, trainerIds);
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldGetTrainersNotAssignedToCurrentTrainee() {
-        // TODO: verify trainerService.getTrainersNotAssignedToTrainee(session.username())
+        AuthSession session = new AuthSession(1L, "Emily.Davis", Role.TRAINEE);
+        TrainerResponse trainer = new TrainerResponse(10L, 20L, "Bob", "Lee", "Bob.Lee", true, 1L, "Yoga");
+        when(sessionManager.getCurrentSession()).thenReturn(session);
+        when(trainerService.getTrainersNotAssignedToTrainee("Emily.Davis")).thenReturn(List.of(trainer));
+
+        List<TrainerResponse> result = facade.getTrainersNotAssignedToTrainee();
+
+        assertEquals(1, result.size());
+        assertEquals(trainer, result.getFirst());
+        verify(trainerService).getTrainersNotAssignedToTrainee("Emily.Davis");
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldGetTraineeTrainingsByCriteriaUsingSessionUsername() {
-        // TODO: verify trainingService.getTrainingsByTraineeUsernameAndCriteria(...)
+        AuthSession session = new AuthSession(1L, "Emily.Davis", Role.TRAINEE);
+        LocalDate from = LocalDate.of(2024, 1, 1);
+        LocalDate to = LocalDate.of(2024, 12, 31);
+        TrainingResponse training = new TrainingResponse(
+                1L, 1L, "Emily.Davis", "Emily", "Davis",
+                2L, "Jane.Trainer", "Jane", "Trainer",
+                3L, "Yoga", "Morning Yoga", LocalDate.of(2024, 6, 1), 60L
+        );
+
+        when(sessionManager.getCurrentSession()).thenReturn(session);
+        when(trainingService.getTrainingsByTraineeUsernameAndCriteria(
+                "Emily.Davis", from, to, "Jane", "Yoga"
+        )).thenReturn(List.of(training));
+
+        List<TrainingResponse> result = facade.getTraineeTrainingsByCriteria(from, to, "Jane", "Yoga");
+
+        assertEquals(1, result.size());
+        assertEquals(training, result.getFirst());
+        verify(trainingService).getTrainingsByTraineeUsernameAndCriteria(
+                "Emily.Davis", from, to, "Jane", "Yoga"
+        );
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldGetTrainerProfileUsingSessionId() {
-        // TODO: verify trainerService.getProfileById(session.id())
+        AuthSession session = new AuthSession(2L, "Jane.Trainer", Role.TRAINER);
+        TrainerResponse response = new TrainerResponse(2L, 5L, "Jane", "Trainer", "Jane.Trainer", true, 1L, "Yoga");
+
+        when(sessionManager.getCurrentSession()).thenReturn(session);
+        when(trainerService.getProfileById(2L)).thenReturn(response);
+
+        TrainerResponse result = facade.getTrainerProfile();
+
+        assertEquals(response, result);
+        verify(trainerService).getProfileById(2L);
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldUpdateTrainerProfileUsingSession() {
-        // TODO: verify trainerService.updateProfile(session.id(), request)
+        AuthSession session = new AuthSession(2L, "Jane.Trainer", Role.TRAINER);
+        UpdateTrainerRequest request = new UpdateTrainerRequest("Jane", "Smith", 1L);
+        TrainerResponse response = new TrainerResponse(2L, 5L, "Jane", "Smith", "Jane.Trainer", true, 1L, "Yoga");
+
+        when(sessionManager.getCurrentSession()).thenReturn(session);
+        when(trainerService.updateProfile(2L, request)).thenReturn(response);
+
+        TrainerResponse result = facade.updateTrainerProfile(request);
+
+        assertEquals(response, result);
+        verify(trainerService).updateProfile(2L, request);
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldFindTrainersBySpecializationWhenAuthenticatedAsTrainer() {
-        // TODO: verify trainerService.findBySpecializationName(name)
+        AuthSession session = new AuthSession(2L, "Jane.Trainer", Role.TRAINER);
+        TrainerResponse trainer = new TrainerResponse(2L, 5L, "Jane", "Trainer", "Jane.Trainer", true, 1L, "Yoga");
+
+        when(sessionManager.getCurrentSession()).thenReturn(session);
+        when(trainerService.findBySpecializationName("Yoga")).thenReturn(List.of(trainer));
+
+        List<TrainerResponse> result = facade.findTrainersBySpecializationName("Yoga");
+
+        assertEquals(1, result.size());
+        assertEquals(trainer, result.getFirst());
+        verify(trainerService).findBySpecializationName("Yoga");
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldCreateTrainingWhenTrainerIdMatchesSession() {
-        // TODO: request.trainerId() == session.id()
+        AuthSession session = new AuthSession(2L, "Jane.Trainer", Role.TRAINER);
+        CreateTrainingRequest request = new CreateTrainingRequest(
+                1L, 2L, 3L, "Morning Yoga", LocalDate.of(2024, 6, 1), 60L
+        );
+        TrainingResponse response = new TrainingResponse(
+                100L, 1L, "Emily.Davis", "Emily", "Davis",
+                2L, "Jane.Trainer", "Jane", "Trainer",
+                3L, "Yoga", "Morning Yoga", LocalDate.of(2024, 6, 1), 60L
+        );
+
+        when(sessionManager.getCurrentSession()).thenReturn(session);
+        when(trainingService.createTraining(2L, request)).thenReturn(response);
+
+        TrainingResponse result = facade.createTraining(request);
+
+        assertEquals(response, result);
+        verify(trainingService).createTraining(2L, request);
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldRejectCreateTrainingWhenTrainerIdDoesNotMatchSession() {
-        // TODO: assertThrows(UnauthorizedOperationException.class, ...)
+        AuthSession session = new AuthSession(2L, "Jane.Trainer", Role.TRAINER);
+        CreateTrainingRequest request = new CreateTrainingRequest(
+                1L, 99L, 3L, "Morning Yoga", LocalDate.of(2024, 6, 1), 60L
+        );
+        when(sessionManager.getCurrentSession()).thenReturn(session);
+
+        assertThrows(UnauthorizedOperationException.class, () -> facade.createTraining(request));
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldUpdateDeleteAndGetTrainingUsingAuthenticatedTrainer() {
-        // TODO: verify trainingService methods with session.id()
+        AuthSession session = new AuthSession(2L, "Jane.Trainer", Role.TRAINER);
+        UpdateTrainingRequest updateRequest = new UpdateTrainingRequest(
+                "Evening Yoga", LocalDate.of(2024, 6, 2), 90L
+        );
+        TrainingResponse response = new TrainingResponse(
+                100L, 1L, "Emily.Davis", "Emily", "Davis",
+                2L, "Jane.Trainer", "Jane", "Trainer",
+                3L, "Yoga", "Evening Yoga", LocalDate.of(2024, 6, 2), 90L
+        );
+
+        when(sessionManager.getCurrentSession()).thenReturn(session);
+        when(trainingService.updateTraining(2L, 100L, updateRequest)).thenReturn(response);
+        when(trainingService.getTrainingById(2L, 100L)).thenReturn(response);
+
+        TrainingResponse updated = facade.updateTraining(100L, updateRequest);
+        assertEquals(response, updated);
+        verify(trainingService).updateTraining(2L, 100L, updateRequest);
+
+        facade.deleteTraining(100L);
+        verify(trainingService).deleteTraining(2L, 100L);
+
+        TrainingResponse fetched = facade.getTrainingById(100L);
+        assertEquals(response, fetched);
+        verify(trainingService).getTrainingById(2L, 100L);
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldGetTrainerTrainingsByCriteriaUsingSessionUsername() {
-        // TODO: verify trainingService.getTrainingsByTrainerUsernameAndCriteria(...)
+        AuthSession session = new AuthSession(2L, "Jane.Trainer", Role.TRAINER);
+        LocalDate from = LocalDate.of(2024, 1, 1);
+        LocalDate to = LocalDate.of(2024, 12, 31);
+        TrainingResponse training = new TrainingResponse(
+                100L, 1L, "Emily.Davis", "Emily", "Davis",
+                2L, "Jane.Trainer", "Jane", "Trainer",
+                3L, "Yoga", "Morning Yoga", LocalDate.of(2024, 6, 1), 60L
+        );
+
+        when(sessionManager.getCurrentSession()).thenReturn(session);
+        when(trainingService.getTrainingsByTrainerUsernameAndCriteria(
+                "Jane.Trainer", from, to, "Emily"
+        )).thenReturn(List.of(training));
+
+        List<TrainingResponse> result = facade.getTrainerTrainingsByCriteria(from, to, "Emily");
+
+        assertEquals(1, result.size());
+        assertEquals(training, result.getFirst());
+        verify(trainingService).getTrainingsByTrainerUsernameAndCriteria(
+                "Jane.Trainer", from, to, "Emily"
+        );
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldReturnCurrentSessionFromSessionManager() {
-        // TODO: verify facade.getCurrentSession() delegates to sessionManager
+        AuthSession session = new AuthSession(1L, "Emily.Davis", Role.TRAINEE);
+        when(sessionManager.getCurrentSession()).thenReturn(session);
+
+        AuthSession result = facade.getCurrentSession();
+
+        assertEquals(session, result);
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldReportAuthenticatedWhenSessionExists() {
-        // TODO: when(sessionManager.isAuthenticated()).thenReturn(true)
-        // TODO: assertTrue(facade.isAuthenticated())
+        when(sessionManager.isAuthenticated()).thenReturn(true);
+
+        assertTrue(facade.isAuthenticated());
+    }
+
+    @Test
+    void shouldLogoutCurrentSession() {
+        facade.logout();
+        verify(sessionManager).logout();
     }
 }

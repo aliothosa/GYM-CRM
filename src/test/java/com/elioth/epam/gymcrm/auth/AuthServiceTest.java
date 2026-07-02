@@ -1,18 +1,27 @@
 package com.elioth.epam.gymcrm.auth;
 
-import com.elioth.epam.gymcrm.service.AuthService;
+import com.elioth.epam.gymcrm.domain.Trainee;
+import com.elioth.epam.gymcrm.domain.Trainer;
+import com.elioth.epam.gymcrm.domain.User;
+import com.elioth.epam.gymcrm.exception.EntityNotFoundException;
+import com.elioth.epam.gymcrm.exception.InvalidRequestException;
 import com.elioth.epam.gymcrm.repository.TraineeRepository;
 import com.elioth.epam.gymcrm.repository.TrainerRepository;
+import com.elioth.epam.gymcrm.service.AuthService;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
+
 @ExtendWith(MockitoExtension.class)
-@Disabled("Practice skeleton - implement one test at a time, then remove @Disabled from class")
 class AuthServiceTest {
 
     @Mock
@@ -31,86 +40,132 @@ class AuthServiceTest {
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldLoginTraineeWhenCredentialsAreValidAndUserIsActive() {
-        // Arrange
-        // TODO: create Trainee with active User (username/password match)
-        // TODO: mock traineeRepository.findByUserUsernameAndUserPassword(...) -> Optional.of(trainee)
+        Trainee trainee = buildActiveTrainee(1L, "Emily.Davis", "pass123");
 
-        // Act
-        // TODO: AuthSession session = authService.loginTrainee("Emily.Davis", "pass123");
+        when(traineeRepository.findByUserUsernameAndUserPassword("Emily.Davis", "pass123"))
+                .thenReturn(Optional.of(trainee));
 
-        // Assert
-        // TODO: assert session.role() == Role.TRAINEE
-        // TODO: assert session.username() equals expected username
-        // TODO: assert session.id() equals traineeId
+        AuthSession session = authService.loginTrainee("Emily.Davis", "pass123");
+
+        assertEquals(Role.TRAINEE, session.role());
+        assertEquals("Emily.Davis", session.username());
+        assertEquals(1L, session.id());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldLoginTrainerWhenCredentialsAreValidAndUserIsActive() {
-        // Arrange
-        // TODO: create Trainer with active User
-        // TODO: mock trainerRepository.findByUserUsernameAndUserPassword(...)
+        Trainer trainer = buildActiveTrainer(2L, "John.Smith", "pass456");
 
-        // Act
-        // TODO: call authService.loginTrainer(...)
+        when(trainerRepository.findByUserUsernameAndUserPassword("John.Smith", "pass456"))
+                .thenReturn(Optional.of(trainer));
 
-        // Assert
-        // TODO: assert role TRAINER and correct id/username
+        AuthSession session = authService.loginTrainer("John.Smith", "pass456");
+
+        assertEquals(Role.TRAINER, session.role());
+        assertEquals("John.Smith", session.username());
+        assertEquals(2L, session.id());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldThrowExceptionWhenTraineeCredentialsAreInvalid() {
-        // Arrange
-        // TODO: mock repository to return Optional.empty()
+        when(traineeRepository.findByUserUsernameAndUserPassword("unknown", "wrong"))
+                .thenReturn(Optional.empty());
 
-        // Act & Assert
-        // TODO: assertThrows(EntityNotFoundException.class, () -> authService.loginTrainee(...))
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> authService.loginTrainee("unknown", "wrong")
+        );
+
+        assertEquals("Username or password incorrect", exception.getMessage());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldThrowExceptionWhenTrainerCredentialsAreInvalid() {
-        // Arrange
-        // TODO: mock repository to return Optional.empty()
+        when(trainerRepository.findByUserUsernameAndUserPassword("unknown", "wrong"))
+                .thenReturn(Optional.empty());
 
-        // Act & Assert
-        // TODO: assertThrows(EntityNotFoundException.class, () -> authService.loginTrainer(...))
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> authService.loginTrainer("unknown", "wrong")
+        );
+
+        assertEquals("Username or password incorrect", exception.getMessage());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldRejectLoginWhenTraineeIsInactive() {
-        // Arrange
-        // TODO: Trainee user.active = false
+        Trainee trainee = buildActiveTrainee(1L, "Emily.Davis", "pass123");
+        trainee.getUser().setActive(false);
 
-        // Act & Assert
-        // TODO: assertThrows(InvalidRequestException.class, ...)
+        when(traineeRepository.findByUserUsernameAndUserPassword("Emily.Davis", "pass123"))
+                .thenReturn(Optional.of(trainee));
+
+        InvalidRequestException exception = assertThrows(
+                InvalidRequestException.class,
+                () -> authService.loginTrainee("Emily.Davis", "pass123")
+        );
+
+        assertEquals("Trainee account is not active", exception.getMessage());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldRejectLoginWhenTrainerIsInactive() {
-        // Arrange
-        // TODO: Trainer user.active = false
+        Trainer trainer = buildActiveTrainer(2L, "John.Smith", "pass456");
+        trainer.getUser().setActive(false);
 
-        // Act & Assert
-        // TODO: assertThrows(InvalidRequestException.class, ...)
+        when(trainerRepository.findByUserUsernameAndUserPassword("John.Smith", "pass456"))
+                .thenReturn(Optional.of(trainer));
+
+        InvalidRequestException exception = assertThrows(
+                InvalidRequestException.class,
+                () -> authService.loginTrainer("John.Smith", "pass456")
+        );
+
+        assertEquals("Trainer account is not active", exception.getMessage());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldRejectLoginWhenUsernameIsBlank() {
-        // Act & Assert
-        // TODO: assertThrows(InvalidRequestException.class, () -> authService.loginTrainee(" ", "pass"))
+        InvalidRequestException exception = assertThrows(
+                InvalidRequestException.class,
+                () -> authService.loginTrainee(" ", "pass")
+        );
+
+        assertEquals("Invalid username", exception.getMessage());
     }
 
     @Test
-    @Disabled("Practice skeleton")
     void shouldRejectLoginWhenPasswordIsBlank() {
-        // Act & Assert
-        // TODO: assertThrows(InvalidRequestException.class, () -> authService.loginTrainee("user", " "))
+        InvalidRequestException exception = assertThrows(
+                InvalidRequestException.class,
+                () -> authService.loginTrainee("user", " ")
+        );
+
+        assertEquals("Invalid password", exception.getMessage());
+    }
+
+    private Trainee buildActiveTrainee(Long traineeId, String username, String password) {
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(password);
+        user.setActive(true);
+
+        Trainee trainee = new Trainee();
+        trainee.setTraineeId(traineeId);
+        trainee.setUser(user);
+        return trainee;
+    }
+
+    private Trainer buildActiveTrainer(Long trainerId, String username, String password) {
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(password);
+        user.setActive(true);
+
+        Trainer trainer = new Trainer();
+        trainer.setTrainerId(trainerId);
+        trainer.setUser(user);
+        return trainer;
     }
 }

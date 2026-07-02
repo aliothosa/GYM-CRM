@@ -1,20 +1,24 @@
 package com.elioth.epam.gymcrm.domain;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-@Disabled("Optional/low-priority domain test; enable when practicing entity field assignment.")
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 class TrainingTypeTest {
 
     @Test
     void shouldAllowSettingName() {
-        // TODO: create TrainingType and set name to "Yoga"
-        // TODO: assert getName() equals "Yoga"
+        TrainingType trainingType = new TrainingType();
+        trainingType.setName("Yoga");
+
+        assertEquals("Yoga", trainingType.getName());
     }
 
     @Test
     void shouldHaveNullIdBeforePersistence() {
-        // TODO: create new TrainingType()
-        // TODO: assert getId() is null (not yet persisted)
+        TrainingType trainingType = new TrainingType();
+
+        assertNull(trainingType.getId());
     }
 }
