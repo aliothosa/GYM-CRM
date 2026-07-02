@@ -177,6 +177,20 @@ class GymCrmFacadeTest {
     }
 
     @Test
+    void shouldGetTraineeProfileByUsernameWhenSessionMatches() {
+        AuthSession session = new AuthSession(1L, "Emily.Davis", Role.TRAINEE);
+        TraineeResponse response = new TraineeResponse(1L, 4L, "Emily", "Davis", "Emily.Davis", true, null, null);
+
+        when(sessionManager.getCurrentSession()).thenReturn(session);
+        when(traineeService.getProfileByUsername("Emily.Davis")).thenReturn(response);
+
+        TraineeResponse result = facade.getTraineeProfileByUsername("Emily.Davis");
+
+        assertEquals(response, result);
+        verify(traineeService).getProfileByUsername("Emily.Davis");
+    }
+
+    @Test
     void shouldDeleteTraineeProfileAndLogout() {
         AuthSession session = new AuthSession(1L, "Emily.Davis", Role.TRAINEE);
         when(sessionManager.getCurrentSession()).thenReturn(session);
@@ -279,6 +293,29 @@ class GymCrmFacadeTest {
     }
 
     @Test
+    void shouldGetTrainerProfileByUsernameWhenSessionMatches() {
+        AuthSession session = new AuthSession(2L, "Jane.Trainer", Role.TRAINER);
+        TrainerResponse response = new TrainerResponse(2L, 5L, "Jane", "Trainer", "Jane.Trainer", true, 1L, "Yoga");
+
+        when(sessionManager.getCurrentSession()).thenReturn(session);
+        when(trainerService.getProfileByUsername("Jane.Trainer")).thenReturn(response);
+
+        TrainerResponse result = facade.getTrainerProfileByUsername("Jane.Trainer");
+
+        assertEquals(response, result);
+        verify(trainerService).getProfileByUsername("Jane.Trainer");
+    }
+
+    @Test
+    void shouldRejectGetTrainerProfileByUsernameForAnotherUser() {
+        AuthSession session = new AuthSession(2L, "Jane.Trainer", Role.TRAINER);
+        when(sessionManager.getCurrentSession()).thenReturn(session);
+
+        assertThrows(UnauthorizedOperationException.class,
+                () -> facade.getTrainerProfileByUsername("Other.Trainer"));
+    }
+
+    @Test
     void shouldUpdateTrainerProfileUsingSession() {
         AuthSession session = new AuthSession(2L, "Jane.Trainer", Role.TRAINER);
         UpdateTrainerRequest request = new UpdateTrainerRequest("Jane", "Smith", 1L);
@@ -291,6 +328,33 @@ class GymCrmFacadeTest {
 
         assertEquals(response, result);
         verify(trainerService).updateProfile(2L, request);
+    }
+
+    @Test
+    void shouldChangeTrainerPasswordUsingSession() {
+        AuthSession session = new AuthSession(2L, "Jane.Trainer", Role.TRAINER);
+        ChangePasswordRequest request = new ChangePasswordRequest("oldPass", "newPass");
+        TrainerResponse response = new TrainerResponse(2L, 5L, "Jane", "Trainer", "Jane.Trainer", true, 1L, "Yoga");
+
+        when(sessionManager.getCurrentSession()).thenReturn(session);
+        when(trainerService.changePassword(2L, request)).thenReturn(response);
+
+        TrainerResponse result = facade.changeTrainerPassword(request);
+
+        assertEquals(response, result);
+        verify(trainerService).changePassword(2L, request);
+    }
+
+    @Test
+    void shouldActivateAndDeactivateTrainerProfile() {
+        AuthSession session = new AuthSession(2L, "Jane.Trainer", Role.TRAINER);
+        when(sessionManager.getCurrentSession()).thenReturn(session);
+
+        facade.activateTrainerProfile();
+        verify(trainerService).activate(2L);
+
+        facade.deactivateTrainerProfile();
+        verify(trainerService).deactivate(2L);
     }
 
     @Test

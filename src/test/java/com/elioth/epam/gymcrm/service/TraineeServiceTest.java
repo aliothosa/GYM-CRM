@@ -62,7 +62,6 @@ class TraineeServiceTest {
         traineeService.setUserRepository(userRepository);
     }
 
-    // --- createProfile ---
 
     @Test
     void shouldCreateProfileWhenRequestIsValid() {
@@ -118,7 +117,6 @@ class TraineeServiceTest {
         assertEquals("First name cannot be empty", exception.getMessage());
     }
 
-    // --- updateProfile ---
 
     @Test
     void shouldUpdateProfileWhenRequestIsValid() {
@@ -158,7 +156,6 @@ class TraineeServiceTest {
         assertEquals("Trainee not found", exception.getMessage());
     }
 
-    // --- deleteProfile ---
 
     @Test
     void shouldDeleteProfileWhenTraineeExists() {
@@ -181,7 +178,6 @@ class TraineeServiceTest {
         assertEquals("Trainee not found", exception.getMessage());
     }
 
-    // --- getProfileById ---
 
     @Test
     void shouldGetProfileByIdWhenTraineeExists() {
@@ -208,7 +204,6 @@ class TraineeServiceTest {
         assertEquals("Trainee not found", exception.getMessage());
     }
 
-    // --- getProfileByUsername ---
 
     @Test
     void shouldGetProfileByUsernameWhenTraineeExists() {
@@ -241,7 +236,6 @@ class TraineeServiceTest {
         assertEquals("Trainee not found", exception.getMessage());
     }
 
-    // --- changePassword ---
 
     @Test
     void shouldChangePasswordWhenOldPasswordIsCorrect() {
@@ -291,7 +285,6 @@ class TraineeServiceTest {
         assertEquals("Trainee not found", exception.getMessage());
     }
 
-    // --- updateTrainersToTrainee ---
 
     @Test
     void shouldUpdateTrainersToTraineeWhenAllTrainerIdsExist() {
@@ -346,7 +339,6 @@ class TraineeServiceTest {
         assertEquals("One or more trainers were not found", exception.getMessage());
     }
 
-    // --- activate ---
 
     @Test
     void shouldActivateTraineeWhenCurrentlyInactive() {
@@ -381,7 +373,6 @@ class TraineeServiceTest {
         assertEquals("Trainee not found", exception.getMessage());
     }
 
-    // --- deactivate ---
 
     @Test
     void shouldDeactivateTraineeWhenCurrentlyActive() {

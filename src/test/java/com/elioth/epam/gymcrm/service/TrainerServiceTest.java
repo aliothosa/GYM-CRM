@@ -60,7 +60,6 @@ class TrainerServiceTest {
         trainerService.setTrainingTypeRepository(trainingTypeRepository);
     }
 
-    // --- createProfile ---
 
     @Test
     void shouldCreateProfileWhenRequestIsValid() {
@@ -113,7 +112,6 @@ class TrainerServiceTest {
         assertEquals("TrainingType not found", exception.getMessage());
     }
 
-    // --- updateProfile ---
 
     @Test
     void shouldUpdateProfileWhenRequestIsValid() {
@@ -170,7 +168,6 @@ class TrainerServiceTest {
         assertEquals("TrainingType not found", exception.getMessage());
     }
 
-    // --- getProfileById ---
 
     @Test
     void shouldGetProfileByIdWhenTrainerExists() {
@@ -199,7 +196,6 @@ class TrainerServiceTest {
         assertEquals("Trainer not found", exception.getMessage());
     }
 
-    // --- getProfileByUsername ---
 
     @Test
     void shouldGetProfileByUsernameWhenTrainerExists() {
@@ -233,7 +229,6 @@ class TrainerServiceTest {
         assertEquals("Trainer not found", exception.getMessage());
     }
 
-    // --- changePassword ---
 
     @Test
     void shouldChangePasswordWhenOldPasswordIsCorrect() {
@@ -285,7 +280,6 @@ class TrainerServiceTest {
         assertEquals("Trainer not found", exception.getMessage());
     }
 
-    // --- findBySpecializationName ---
 
     @Test
     void shouldFindTrainersBySpecializationNameWhenTrainersExist() {
@@ -311,7 +305,6 @@ class TrainerServiceTest {
         assertEquals("Specialization name cannot be empty", exception.getMessage());
     }
 
-    // --- getTrainersNotAssignedToTrainee ---
 
     @Test
     void shouldGetTrainersNotAssignedToTraineeWhenTraineeUsernameIsValid() {
@@ -336,7 +329,6 @@ class TrainerServiceTest {
         assertEquals("Invalid trainee username", exception.getMessage());
     }
 
-    // --- activate ---
 
     @Test
     void shouldActivateTrainerWhenCurrentlyInactive() {
@@ -373,7 +365,6 @@ class TrainerServiceTest {
         assertEquals("Trainer not found", exception.getMessage());
     }
 
-    // --- deactivate ---
 
     @Test
     void shouldDeactivateTrainerWhenCurrentlyActive() {

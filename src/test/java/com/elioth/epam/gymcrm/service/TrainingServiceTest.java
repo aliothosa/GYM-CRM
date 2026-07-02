@@ -67,7 +67,6 @@ class TrainingServiceTest {
         trainingService.setTrainingTypeRepository(trainingTypeRepository);
     }
 
-    // --- createTraining ---
 
     @Test
     void shouldCreateTrainingWhenRequestIsValidAndTrainerIdMatches() {
@@ -174,7 +173,6 @@ class TrainingServiceTest {
         assertEquals("Training type with id 5 not found", exception.getMessage());
     }
 
-    // --- updateTraining ---
 
     @Test
     void shouldUpdateTrainingWhenRequestIsValidAndTrainerOwnsTraining() {
@@ -227,7 +225,6 @@ class TrainingServiceTest {
         assertEquals("Trainer cannot access this training", exception.getMessage());
     }
 
-    // --- deleteTraining ---
 
     @Test
     void shouldDeleteTrainingWhenTrainerOwnsTraining() {
@@ -262,7 +259,6 @@ class TrainingServiceTest {
         assertEquals("Trainer cannot access this training", exception.getMessage());
     }
 
-    // --- getTrainingById ---
 
     @Test
     void shouldGetTrainingByIdWhenTrainerOwnsTraining() {
@@ -298,7 +294,6 @@ class TrainingServiceTest {
         assertEquals("Trainer cannot access this training", exception.getMessage());
     }
 
-    // --- getTrainingsByTraineeUsernameAndCriteria ---
 
     @Test
     void shouldGetTrainingsByTraineeUsernameAndCriteriaWhenMatchesExist() {
@@ -324,7 +319,6 @@ class TrainingServiceTest {
         assertEquals(TRAINING_ID, responses.get(0).trainingId());
     }
 
-    // --- getTrainingsByTrainerUsernameAndCriteria ---
 
     @Test
     void shouldGetTrainingsByTrainerUsernameAndCriteriaWhenMatchesExist() {
