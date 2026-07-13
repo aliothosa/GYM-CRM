@@ -10,11 +10,14 @@ import com.elioth.epam.gymcrm.exception.EntityNotFoundException;
 import com.elioth.epam.gymcrm.exception.InvalidRequestException;
 import com.elioth.epam.gymcrm.logging.UserLogger;
 import com.elioth.epam.gymcrm.service.TrainingService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@Api(tags = "Trainings", description = "Training management operations")
+@Tag(name = "Trainings", description = "Training management operations")
 public class TrainingController {
 
     private UserLogger userLogger;
@@ -36,22 +39,21 @@ public class TrainingController {
         this.trainingService = trainingService;
     }
 
-    @ApiOperation(
-            value = "Add training",
-            notes = "Creates a training between an existing trainee and trainer",
-            response = Void.class
+    @Operation(
+            summary = "Add training",
+            description = "Creates a training between an existing trainee and trainer"
     )
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Training created successfully"),
-            @ApiResponse(code = 400, message = "Trainee, trainer, or training type not found"),
-            @ApiResponse(code = 403, message = "Authentication required"),
-            @ApiResponse(code = 404, message = "Invalid training information")
+            @ApiResponse(responseCode = "200", description = "Training created successfully"),
+            @ApiResponse(responseCode = "400", description = "Trainee, trainer, or training type not found"),
+            @ApiResponse(responseCode = "403", description = "Authentication required"),
+            @ApiResponse(responseCode = "404", description = "Invalid training information")
     })
     @PostMapping(value = "/trainings")
     public ResponseEntity<Void> addTraining(
-            @ApiParam(value = "Information required to create a training", required = true)
+            @Parameter(description = "Information required to create a training", required = true)
             @RequestBody CreateTrainingRestRequest createTrainingRequest,
-            @ApiParam(hidden = true)
+            @Parameter(hidden = true)
             @SessionAttribute("AUTH_SESSION")
                 AuthSession authSession
     ) {
@@ -68,19 +70,23 @@ public class TrainingController {
     }
 
 
-    @ApiOperation(
-            value = "Get training types",
-            notes = "Returns all available training type names",
-            response = String.class,
-            responseContainer = "List"
+    @Operation(
+            summary = "Get training types",
+            description = "Returns all available training type names"
     )
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Training types retrieved successfully"),
-            @ApiResponse(code = 403, message = "Authentication required")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Training types retrieved successfully",
+                    content = @Content(array = @ArraySchema(
+                            schema = @Schema(implementation = String.class)
+                    ))
+            ),
+            @ApiResponse(responseCode = "403", description = "Authentication required")
     })
     @GetMapping(value = "/trainings/training-types")
     public ResponseEntity<List<String>> getAllTrainingTypes(
-            @ApiParam(hidden = true)
+            @Parameter(hidden = true)
             @SessionAttribute("AUTH_SESSION")
             AuthSession authSession
     ) {
@@ -92,24 +98,28 @@ public class TrainingController {
     }
 
 
-    @ApiOperation(
-            value = "Get trainee trainings",
-            notes = "Returns trainings for a trainee using the supplied search criteria",
-            response = TraineeTrainingResponse.class,
-            responseContainer = "List"
+    @Operation(
+            summary = "Get trainee trainings",
+            description = "Returns trainings for a trainee using the supplied search criteria"
     )
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Trainee trainings retrieved successfully"),
-            @ApiResponse(code = 400, message = "Invalid training search criteria"),
-            @ApiResponse(code = 403, message = "Authentication required")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Trainee trainings retrieved successfully",
+                    content = @Content(array = @ArraySchema(
+                            schema = @Schema(implementation = TraineeTrainingResponse.class)
+                    ))
+            ),
+            @ApiResponse(responseCode = "400", description = "Invalid training search criteria"),
+            @ApiResponse(responseCode = "403", description = "Authentication required")
     })
     @GetMapping(value = "/trainees/{username}/trainings")
     public ResponseEntity<List<TraineeTrainingResponse>> getTrainingsOfTrainee(
-            @ApiParam(value = "Trainee username", required = true)
+            @Parameter(description = "Trainee username", required = true)
             @PathVariable String username,
-            @ApiParam(value = "Criteria used to filter trainee trainings", required = true)
+            @Parameter(description = "Criteria used to filter trainee trainings", required = true)
             @RequestBody GetTraineeTrainingsRestRequest request,
-            @ApiParam(hidden = true)
+            @Parameter(hidden = true)
             @SessionAttribute("AUTH_SESSION")
                 AuthSession authSession
     ){
@@ -123,24 +133,28 @@ public class TrainingController {
         }
     }
 
-    @ApiOperation(
-            value = "Get trainer trainings",
-            notes = "Returns trainings for a trainer using the supplied search criteria",
-            response = TrainerTrainingResponse.class,
-            responseContainer = "List"
+    @Operation(
+            summary = "Get trainer trainings",
+            description = "Returns trainings for a trainer using the supplied search criteria"
     )
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Trainer trainings retrieved successfully"),
-            @ApiResponse(code = 400, message = "Invalid training search criteria"),
-            @ApiResponse(code = 403, message = "Authentication required")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Trainer trainings retrieved successfully",
+                    content = @Content(array = @ArraySchema(
+                            schema = @Schema(implementation = TrainerTrainingResponse.class)
+                    ))
+            ),
+            @ApiResponse(responseCode = "400", description = "Invalid training search criteria"),
+            @ApiResponse(responseCode = "403", description = "Authentication required")
     })
     @GetMapping(value = "/trainers/{username}/trainings")
     public ResponseEntity<List<TrainerTrainingResponse>> getTrainingsOfTrainer(
-            @ApiParam(value = "Trainer username", required = true)
+            @Parameter(description = "Trainer username", required = true)
             @PathVariable("username") String username,
-            @ApiParam(value = "Criteria used to filter trainer trainings", required = true)
+            @Parameter(description = "Criteria used to filter trainer trainings", required = true)
             @RequestBody GetTrainerTrainingsRestRequest request,
-            @ApiParam(hidden = true)
+            @Parameter(hidden = true)
             @SessionAttribute("AUTH_SESSION")
                 AuthSession authSession
     ){

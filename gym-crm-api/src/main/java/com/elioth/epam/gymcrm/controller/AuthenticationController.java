@@ -4,11 +4,11 @@ import com.elioth.epam.gymcrm.auth.AuthSession;
 import com.elioth.epam.gymcrm.exception.EntityNotFoundException;
 import com.elioth.epam.gymcrm.logging.UserLogger;
 import com.elioth.epam.gymcrm.service.AuthService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/auth")
-@Api(tags = "Authentication", description = "Authentication operations")
+@Tag(name = "Authentication", description = "Authentication operations")
 public class AuthenticationController {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -36,22 +36,21 @@ public class AuthenticationController {
         this.authService = authService;
     }
 
-    @ApiOperation(
-            value = "Log in",
-            notes = "Authenticates a trainee or trainer and stores the authenticated session",
-            response = Void.class
+    @Operation(
+            summary = "Log in",
+            description = "Authenticates a trainee or trainer and stores the authenticated session"
     )
     @ApiResponses({
-            @ApiResponse(code = 200, message = "User authenticated successfully"),
-            @ApiResponse(code = 401, message = "Invalid username or password")
+            @ApiResponse(responseCode = "200", description = "User authenticated successfully"),
+            @ApiResponse(responseCode = "401", description = "Invalid username or password")
     })
     @PostMapping(value = "/login")
     public ResponseEntity<Void> login(
-            @ApiParam(value = "Username", required = true)
+            @Parameter(description = "Username", required = true)
             @RequestParam String username,
-            @ApiParam(value = "User password", required = true)
+            @Parameter(description = "User password", required = true)
             @RequestParam String password,
-            @ApiParam(hidden = true)
+            @Parameter(hidden = true)
             HttpSession httpSession
     ){
         logger.info("Attempting to authenticate user: {}", username);
@@ -75,25 +74,24 @@ public class AuthenticationController {
         return ResponseEntity.ok().build();
     }
 
-    @ApiOperation(
-            value = "Change authenticated user",
-            notes = "Replaces the current authenticated session with another valid user",
-            response = Void.class
+    @Operation(
+            summary = "Change authenticated user",
+            description = "Replaces the current authenticated session with another valid user"
     )
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Authenticated user changed successfully"),
-            @ApiResponse(code = 401, message = "Invalid username or password")
+            @ApiResponse(responseCode = "200", description = "Authenticated user changed successfully"),
+            @ApiResponse(responseCode = "401", description = "Invalid username or password")
     })
     @PutMapping(value = "/login")
     public ResponseEntity<Void> changeLogin(
-            @ApiParam(value = "Username", required = true)
+            @Parameter(description = "Username", required = true)
             @RequestParam String username,
-            @ApiParam(value = "User password", required = true)
+            @Parameter(description = "User password", required = true)
             @RequestParam String password,
-            @ApiParam(hidden = true)
+            @Parameter(hidden = true)
             @SessionAttribute("AUTH_SESSION")
                     AuthSession pastAuthSession,
-            @ApiParam(hidden = true)
+            @Parameter(hidden = true)
             HttpSession httpSession
     ){
         logger.info("Attempting to change login from user: {} to user {}", pastAuthSession.username(), username);

@@ -7,6 +7,7 @@ import com.elioth.epam.gymcrm.dto.request.ChangePasswordRequest;
 import com.elioth.epam.gymcrm.dto.request.CreateTrainerRequest;
 import com.elioth.epam.gymcrm.dto.request.UpdateTrainerRequest;
 import com.elioth.epam.gymcrm.dto.response.CreatedTrainerResponse;
+import com.elioth.epam.gymcrm.dto.response.EmbeddedTrainerResponse;
 import com.elioth.epam.gymcrm.dto.response.TrainerResponse;
 import com.elioth.epam.gymcrm.exception.EntityNotFoundException;
 import com.elioth.epam.gymcrm.exception.IncorrectPasswordException;
@@ -399,6 +400,63 @@ class TrainerServiceTest {
                 () -> trainerService.deactivate(TRAINER_ID)
         );
         assertEquals("Trainer not found", exception.getMessage());
+    }
+
+    @Test
+    void shouldUpdateProfileByUsername() {
+        UpdateTrainerRequest request = validUpdateRequest();
+        TrainingType oldType = buildTrainingType(TRAINING_TYPE_ID, "YOGA");
+        TrainingType newType = buildTrainingType(6L, "CARDIO");
+        Trainer trainer = buildTrainer(TRAINER_ID, USERNAME, "John", "Doe", true, oldType);
+        when(trainerRepository.findByUserUsername(USERNAME)).thenReturn(Optional.of(trainer));
+        when(trainingTypeRepository.findByName("CARDIO")).thenReturn(Optional.of(newType));
+
+        TrainerResponse response = trainerService.updateProfile(USERNAME, request);
+
+        assertEquals("Jane", response.firstName());
+        assertEquals("Smith", response.lastName());
+        assertEquals("CARDIO", response.trainingTypeName());
+        assertEquals(newType, trainer.getSpecialization());
+    }
+
+    @Test
+    void shouldGetEmbeddedTrainersNotAssignedToTrainee() {
+        TrainingType type = buildTrainingType(TRAINING_TYPE_ID, "YOGA");
+        Trainer trainer = buildTrainer(TRAINER_ID, USERNAME, "John", "Doe", true, type);
+        when(trainerRepository.findTrainersNotAssignedToTrainee("trainee"))
+                .thenReturn(List.of(trainer));
+
+        List<EmbeddedTrainerResponse> response =
+                trainerService.getTrainersNotAssignedToTraineeEmbedded("trainee");
+
+        assertEquals(1, response.size());
+        assertEquals(USERNAME, response.getFirst().username());
+        assertEquals("YOGA", response.getFirst().Specialization());
+    }
+
+    @Test
+    void shouldRejectBlankUsernameForEmbeddedUnassignedTrainers() {
+        InvalidRequestException exception = assertThrows(
+                InvalidRequestException.class,
+                () -> trainerService.getTrainersNotAssignedToTraineeEmbedded(" ")
+        );
+
+        assertEquals("Invalid trainee username", exception.getMessage());
+    }
+
+    @Test
+    void shouldSetStatusByUsernameAndRejectInvalidChanges() {
+        TrainingType type = buildTrainingType(TRAINING_TYPE_ID, "YOGA");
+        Trainer inactive = buildTrainer(TRAINER_ID, USERNAME, "John", "Doe", false, type);
+        when(trainerRepository.findByUserUsername(USERNAME)).thenReturn(Optional.of(inactive));
+
+        trainerService.setStatus(USERNAME, true);
+
+        assertTrue(inactive.getUser().getActive());
+        assertThrows(InvalidRequestException.class,
+                () -> trainerService.setStatus(USERNAME, true));
+        assertThrows(InvalidRequestException.class,
+                () -> trainerService.setStatus(USERNAME, null));
     }
 
     private CreateTrainerRequest validCreateRequest() {

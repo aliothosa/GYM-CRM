@@ -3,11 +3,13 @@ package com.elioth.epam.gymcrm.service;
 import com.elioth.epam.gymcrm.domain.Address;
 import com.elioth.epam.gymcrm.domain.Trainee;
 import com.elioth.epam.gymcrm.domain.Trainer;
+import com.elioth.epam.gymcrm.domain.TrainingType;
 import com.elioth.epam.gymcrm.domain.User;
 import com.elioth.epam.gymcrm.dto.request.ChangePasswordRequest;
 import com.elioth.epam.gymcrm.dto.request.CreateTraineeRequest;
 import com.elioth.epam.gymcrm.dto.request.UpdateTraineeRequest;
 import com.elioth.epam.gymcrm.dto.response.CreatedTraineeResponse;
+import com.elioth.epam.gymcrm.dto.response.EmbeddedTrainerResponse;
 import com.elioth.epam.gymcrm.dto.response.TraineeResponse;
 import com.elioth.epam.gymcrm.exception.EntityNotFoundException;
 import com.elioth.epam.gymcrm.exception.IncorrectPasswordException;
@@ -27,6 +29,7 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -407,6 +410,80 @@ class TraineeServiceTest {
         assertEquals("Trainee not found", exception.getMessage());
     }
 
+    @Test
+    void shouldUpdateProfileByUsername() {
+        UpdateTraineeRequest request = validUpdateRequest();
+        Trainee trainee = buildTrainee(TRAINEE_ID, USERNAME, "John", "Doe", true);
+        when(traineeRepository.findByUserUsername(USERNAME)).thenReturn(Optional.of(trainee));
+
+        TraineeResponse response = traineeService.updateProfile(USERNAME, request);
+
+        assertEquals("Jane", response.firstName());
+        assertEquals("Smith", response.lastName());
+        assertEquals(request.birthDate(), trainee.getBirthDate());
+        assertEquals(request.address(), trainee.getAddress());
+    }
+
+    @Test
+    void shouldDeleteProfileByUsername() {
+        Trainee trainee = buildTrainee(TRAINEE_ID, USERNAME, "John", "Doe", true);
+        when(traineeRepository.findByUserUsername(USERNAME)).thenReturn(Optional.of(trainee));
+
+        traineeService.deleteProfile(USERNAME);
+
+        verify(traineeRepository).delete(trainee);
+    }
+
+    @Test
+    void shouldUpdateTrainersByUsername() {
+        Trainee trainee = buildTrainee(TRAINEE_ID, USERNAME, "John", "Doe", true);
+        trainee.setTrainers(new HashSet<>());
+        Trainer trainer = buildTrainer(10L, "Trainer.One", "One", "Trainer", true);
+        TrainingType type = new TrainingType();
+        type.setId(1L);
+        type.setName("YOGA");
+        trainer.setSpecialization(type);
+        Set<String> usernames = Set.of("Trainer.One");
+        when(traineeRepository.findByUserUsername(USERNAME)).thenReturn(Optional.of(trainee));
+        when(trainerRepository.findAllByUserUsernameIn(usernames)).thenReturn(Set.of(trainer));
+
+        Set<EmbeddedTrainerResponse> response =
+                traineeService.updateTrainersToTrainee(USERNAME, usernames);
+
+        assertEquals(1, response.size());
+        assertEquals("Trainer.One", response.iterator().next().username());
+        assertTrue(trainee.getTrainers().contains(trainer));
+    }
+
+    @Test
+    void shouldRejectInvalidTrainerUsernameSets() {
+        assertThrows(InvalidRequestException.class,
+                () -> traineeService.updateTrainersToTrainee(USERNAME, (Set<String>) null));
+
+        Trainee trainee = buildTrainee(TRAINEE_ID, USERNAME, "John", "Doe", true);
+        trainee.setTrainers(new HashSet<>());
+        Set<String> usernames = Set.of("missing");
+        when(traineeRepository.findByUserUsername(USERNAME)).thenReturn(Optional.of(trainee));
+        when(trainerRepository.findAllByUserUsernameIn(usernames)).thenReturn(Set.of());
+
+        assertThrows(EntityNotFoundException.class,
+                () -> traineeService.updateTrainersToTrainee(USERNAME, usernames));
+    }
+
+    @Test
+    void shouldSetStatusByUsernameAndRejectInvalidChanges() {
+        Trainee inactive = buildTrainee(TRAINEE_ID, USERNAME, "John", "Doe", false);
+        when(traineeRepository.findByUserUsername(USERNAME)).thenReturn(Optional.of(inactive));
+
+        traineeService.setStatus(USERNAME, true);
+
+        assertTrue(inactive.getUser().getActive());
+        assertThrows(InvalidRequestException.class,
+                () -> traineeService.setStatus(USERNAME, true));
+        assertThrows(InvalidRequestException.class,
+                () -> traineeService.setStatus(USERNAME, null));
+    }
+
     private CreateTraineeRequest validCreateRequest() {
         return new CreateTraineeRequest(
                 "John",
@@ -459,4 +536,5 @@ class TraineeServiceTest {
         user.setActive(active);
         return user;
     }
+
 }

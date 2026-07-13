@@ -78,6 +78,19 @@ class RestCallLoggingInterceptorTest {
     }
 
     @Test
+    void shouldUseAnonymousForBlankUsernameAndNonAuthenticationSessionAttribute() {
+        MockHttpServletRequest request = request("GET", "/trainees");
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("AUTH_SESSION", "not-an-auth-session");
+        request.setSession(session);
+        request.addParameter("username", "   ");
+
+        complete(request, response(HttpStatus.OK), null);
+
+        assertTrue(loggedMessage("anonymous").contains("username=   "));
+    }
+
+    @Test
     void shouldLogErrorResponse() {
         MockHttpServletRequest request = request("GET", "/trainees/unknown");
         MockHttpServletResponse response = response(HttpStatus.NOT_FOUND);
@@ -115,6 +128,27 @@ class RestCallLoggingInterceptorTest {
         assertTrue(loggedMessage("anonymous").endsWith(
                 "response=404 Not Found, message=Entity not found"
         ));
+    }
+
+    @Test
+    void shouldHandleUnknownStatusAndExceptionWithoutMessage() {
+        MockHttpServletRequest request = request("GET", "/custom");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        response.setStatus(599);
+
+        complete(request, response, new RuntimeException());
+
+        assertTrue(loggedMessage("anonymous").endsWith("response=599 Unknown"));
+    }
+
+    @Test
+    void shouldLogMultipleSafeParameterValues() {
+        MockHttpServletRequest request = request("GET", "/trainers");
+        request.addParameter("specialty", "Yoga", "Fitness");
+
+        complete(request, response(HttpStatus.OK), null);
+
+        assertTrue(loggedMessage("anonymous").contains("specialty=[Yoga, Fitness]"));
     }
 
     @Test

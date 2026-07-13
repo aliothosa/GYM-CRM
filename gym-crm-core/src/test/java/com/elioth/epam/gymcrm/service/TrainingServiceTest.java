@@ -6,7 +6,12 @@ import com.elioth.epam.gymcrm.domain.Training;
 import com.elioth.epam.gymcrm.domain.TrainingType;
 import com.elioth.epam.gymcrm.domain.User;
 import com.elioth.epam.gymcrm.dto.request.CreateTrainingRequest;
+import com.elioth.epam.gymcrm.dto.request.CreateTrainingRestRequest;
+import com.elioth.epam.gymcrm.dto.request.GetTraineeTrainingsRestRequest;
+import com.elioth.epam.gymcrm.dto.request.GetTrainerTrainingsRestRequest;
 import com.elioth.epam.gymcrm.dto.request.UpdateTrainingRequest;
+import com.elioth.epam.gymcrm.dto.response.TraineeTrainingResponse;
+import com.elioth.epam.gymcrm.dto.response.TrainerTrainingResponse;
 import com.elioth.epam.gymcrm.dto.response.TrainingResponse;
 import com.elioth.epam.gymcrm.exception.EntityNotFoundException;
 import com.elioth.epam.gymcrm.exception.InvalidEntityException;
@@ -343,6 +348,128 @@ class TrainingServiceTest {
         assertEquals("John.Doe", responses.get(0).trainerUsername());
     }
 
+    @Test
+    void shouldCreateTrainingFromRestRequest() {
+        CreateTrainingRestRequest request = validRestCreateRequest();
+        Trainee trainee = buildTrainee(TRAINEE_ID, "Emily.Davis", "Emily", "Davis");
+        Trainer trainer = buildTrainer(TRAINER_ID, "John.Doe", "John", "Doe");
+        TrainingType type = buildTrainingType(TRAINING_TYPE_ID, "YOGA");
+        trainer.setSpecialization(type);
+        when(traineeRepository.findByUserUsername("Emily.Davis")).thenReturn(Optional.of(trainee));
+        when(trainerRepository.findByUserUsername("John.Doe")).thenReturn(Optional.of(trainer));
+        when(trainingRepository.save(any(Training.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        trainingService.createTraining(request);
+
+        ArgumentCaptor<Training> captor = ArgumentCaptor.forClass(Training.class);
+        verify(trainingRepository).save(captor.capture());
+        Training saved = captor.getValue();
+        assertEquals(trainee, saved.getTrainee());
+        assertEquals(trainer, saved.getTrainer());
+        assertEquals(type, saved.getType());
+        assertEquals("REST Yoga", saved.getName());
+        assertEquals(45L, saved.getDurationInMinutes());
+    }
+
+    @Test
+    void shouldRejectInvalidRestCreationAndMissingUsers() {
+        CreateTrainingRestRequest invalid = new CreateTrainingRestRequest(
+                " ", "John.Doe", "Yoga", LocalDate.of(2024, 8, 1), 45L
+        );
+        assertThrows(InvalidEntityException.class,
+                () -> trainingService.createTraining(invalid));
+
+        CreateTrainingRestRequest request = validRestCreateRequest();
+        when(traineeRepository.findByUserUsername("Emily.Davis")).thenReturn(Optional.empty());
+        assertThrows(EntityNotFoundException.class, () -> trainingService.createTraining(request));
+
+        Trainee trainee = buildTrainee(TRAINEE_ID, "Emily.Davis", "Emily", "Davis");
+        when(traineeRepository.findByUserUsername("Emily.Davis")).thenReturn(Optional.of(trainee));
+        when(trainerRepository.findByUserUsername("John.Doe")).thenReturn(Optional.empty());
+        assertThrows(EntityNotFoundException.class, () -> trainingService.createTraining(request));
+    }
+
+    @Test
+    void shouldGetTraineeTrainingsFromRestCriteria() {
+        LocalDate from = LocalDate.of(2024, 1, 1);
+        LocalDate to = LocalDate.of(2024, 12, 31);
+        GetTraineeTrainingsRestRequest request =
+                new GetTraineeTrainingsRestRequest(from, to, "John", "Yoga");
+        Training training = buildTraining(TRAINING_ID, TRAINER_ID);
+        when(trainingRepository.findByTraineeUsernameAndCriteria(
+                "Emily.Davis", from, to, "John", "YOGA"
+        )).thenReturn(List.of(training));
+
+        List<TraineeTrainingResponse> response =
+                trainingService.getTrainingsByTraineeUsernameAndCriteria("Emily.Davis", request);
+
+        assertEquals(1, response.size());
+        assertEquals("Morning Yoga", response.getFirst().name());
+        assertEquals("Username: John.Doe, Name: John Doe", response.getFirst().trainerName());
+    }
+
+    @Test
+    void shouldGetTrainerTrainingsFromRestCriteria() {
+        LocalDate from = LocalDate.of(2024, 1, 1);
+        LocalDate to = LocalDate.of(2024, 12, 31);
+        GetTrainerTrainingsRestRequest request =
+                new GetTrainerTrainingsRestRequest(from, to, "Emily");
+        Training training = buildTraining(TRAINING_ID, TRAINER_ID);
+        when(trainingRepository.findByTrainerUsernameAndCriteria(
+                "John.Doe", from, to, "Emily"
+        )).thenReturn(List.of(training));
+
+        List<TrainerTrainingResponse> response =
+                trainingService.getTrainingsByTrainerUsernameAndCriteria("John.Doe", request);
+
+        assertEquals(1, response.size());
+        assertEquals("Morning Yoga", response.getFirst().name());
+        assertEquals("Username: Emily.Davis, Name: Emily Davis", response.getFirst().traineeName());
+    }
+
+    @Test
+    void shouldValidateRestTrainingQueries() {
+        assertThrows(InvalidRequestException.class,
+                () -> trainingService.getTrainingsByTrainerUsernameAndCriteria("trainer", null));
+        assertThrows(InvalidRequestException.class,
+                () -> trainingService.validateQueryRequest(null));
+
+        LocalDate from = LocalDate.of(2024, 2, 1);
+        LocalDate before = LocalDate.of(2024, 1, 1);
+        assertThrows(InvalidRequestException.class, () -> trainingService.validateQueryRequest(
+                new GetTraineeTrainingsRestRequest(from, before, "trainer", "Yoga")
+        ));
+    }
+
+    @Test
+    void shouldGetTrainingsByUsernameOrRejectEmptyResults() {
+        Training training = buildTraining(TRAINING_ID, TRAINER_ID);
+        when(trainingRepository.findAllByTrainerUserUsernameOrTraineeUserUsername(
+                "John.Doe", "John.Doe"
+        )).thenReturn(List.of(training));
+
+        List<TrainerTrainingResponse> response =
+                trainingService.getTrainingsByTrainerUsername("John.Doe");
+
+        assertEquals(1, response.size());
+
+        when(trainingRepository.findAllByTrainerUserUsernameOrTraineeUserUsername(
+                "missing", "missing"
+        )).thenReturn(List.of());
+        assertThrows(EntityNotFoundException.class,
+                () -> trainingService.getTrainingsByTrainerUsername("missing"));
+    }
+
+    @Test
+    void shouldGetTrainingTypeNames() {
+        when(trainingTypeRepository.findAll()).thenReturn(List.of(
+                buildTrainingType(1L, "YOGA"),
+                buildTrainingType(2L, "CARDIO")
+        ));
+
+        assertEquals(List.of("YOGA", "CARDIO"), trainingService.getTrainingTypeNames());
+    }
+
     private CreateTrainingRequest validCreateRequest() {
         return new CreateTrainingRequest(
                 TRAINEE_ID,
@@ -359,6 +486,16 @@ class TrainingServiceTest {
                 "Evening Cardio",
                 LocalDate.of(2024, 7, 1),
                 90L
+        );
+    }
+
+    private CreateTrainingRestRequest validRestCreateRequest() {
+        return new CreateTrainingRestRequest(
+                "Emily.Davis",
+                "John.Doe",
+                "REST Yoga",
+                LocalDate.of(2024, 8, 1),
+                45L
         );
     }
 

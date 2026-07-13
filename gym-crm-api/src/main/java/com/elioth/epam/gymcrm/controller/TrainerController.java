@@ -12,11 +12,14 @@ import com.elioth.epam.gymcrm.exception.EntityNotFoundException;
 import com.elioth.epam.gymcrm.exception.InvalidRequestException;
 import com.elioth.epam.gymcrm.logging.UserLogger;
 import com.elioth.epam.gymcrm.service.TrainerService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +32,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/trainers", produces = "application/JSON", consumes = "application/JSON")
-@Api(tags = "Trainers", description = "Trainer profile management operations")
+@Tag(name = "Trainers", description = "Trainer profile management operations")
 public class TrainerController {
     private final UserLogger userLogger;
     private final Logger LOG = LoggerFactory.getLogger(TrainerController.class);
@@ -42,18 +45,20 @@ public class TrainerController {
         this.userLogger = userLogger;
     }
 
-    @ApiOperation(
-            value = "Register trainer",
-            notes = "Creates a new trainer profile",
-            response = CreatedTrainerResponse.class
+    @Operation(
+            summary = "Register trainer",
+            description = "Creates a new trainer profile"
     )
     @ApiResponses({
-            @ApiResponse(code = 201, message = "Trainer registered successfully"),
-            @ApiResponse(code = 403, message = "Authentication required")
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Trainer registered successfully",
+                    content = @Content(schema = @Schema(implementation = CreatedTrainerResponse.class))
+            )
     })
     @PostMapping(value = "/register")
     public ResponseEntity<CreatedTrainerResponse> createTrainer(
-            @ApiParam(value = "Information required to register a trainer", required = true)
+            @Parameter(description = "Information required to register a trainer", required = true)
             @RequestBody CreateTrainerRequest createTrainerRequest
     ) {
         LOG.info("createTrainer request: {}", createTrainerRequest);
@@ -63,21 +68,24 @@ public class TrainerController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @ApiOperation(
-            value = "Get trainer profile",
-            notes = "Returns the profile information of the trainer identified by username",
-            response = TrainerResponse.class
+    @Operation(
+            summary = "Get trainer profile",
+            description = "Returns the profile information of the trainer identified by username"
     )
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Trainer profile retrieved successfully"),
-            @ApiResponse(code = 403, message = "Authentication required"),
-            @ApiResponse(code = 404, message = "Trainer not found")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Trainer profile retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = TrainerResponse.class))
+            ),
+            @ApiResponse(responseCode = "403", description = "Authentication required"),
+            @ApiResponse(responseCode = "404", description = "Trainer not found")
     })
     @GetMapping(value = "/{username}")
     public ResponseEntity<TrainerResponse> getTrainer(
-            @ApiParam(value = "Trainer username", required = true)
+            @Parameter(description = "Trainer username", required = true)
             @PathVariable String username,
-            @ApiParam(hidden = true)
+            @Parameter(hidden = true)
             @SessionAttribute("AUTH_SESSION")
                 AuthSession authSession
     ){
@@ -91,24 +99,27 @@ public class TrainerController {
         }
     }
 
-    @ApiOperation(
-            value = "Update trainer profile",
-            notes = "Updates the profile information of the trainer identified by username",
-            response = TrainerResponse.class
+    @Operation(
+            summary = "Update trainer profile",
+            description = "Updates the profile information of the trainer identified by username"
     )
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Trainer profile updated successfully"),
-            @ApiResponse(code = 400, message = "Invalid trainer information"),
-            @ApiResponse(code = 403, message = "Authentication required"),
-            @ApiResponse(code = 404, message = "Trainer or training type not found")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Trainer profile updated successfully",
+                    content = @Content(schema = @Schema(implementation = TrainerResponse.class))
+            ),
+            @ApiResponse(responseCode = "400", description = "Invalid trainer information"),
+            @ApiResponse(responseCode = "403", description = "Authentication required"),
+            @ApiResponse(responseCode = "404", description = "Trainer or training type not found")
     })
     @PutMapping(value = "/{username}")
     public ResponseEntity<TrainerResponse> updateTrainer(
-            @ApiParam(value = "Trainer username", required = true)
+            @Parameter(description = "Trainer username", required = true)
             @PathVariable String username,
-            @ApiParam(value = "Updated trainer profile information", required = true)
+            @Parameter(description = "Updated trainer profile information", required = true)
             @RequestBody UpdateTrainerRequest updateTrainerRequest,
-            @ApiParam(hidden = true)
+            @Parameter(hidden = true)
             @SessionAttribute("AUTH_SESSION")
                 AuthSession authSession
     ){
@@ -124,22 +135,26 @@ public class TrainerController {
         }
 
     }
-    @ApiOperation(
-            value = "Get unassigned trainers",
-            notes = "Returns trainers that are not assigned to the specified trainee",
-            response = EmbeddedTrainerResponse.class,
-            responseContainer = "List"
+    @Operation(
+            summary = "Get unassigned trainers",
+            description = "Returns trainers that are not assigned to the specified trainee"
     )
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Unassigned trainers retrieved successfully"),
-            @ApiResponse(code = 403, message = "Authentication required"),
-            @ApiResponse(code = 404, message = "Trainee not found")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Unassigned trainers retrieved successfully",
+                    content = @Content(array = @ArraySchema(
+                            schema = @Schema(implementation = EmbeddedTrainerResponse.class)
+                    ))
+            ),
+            @ApiResponse(responseCode = "403", description = "Authentication required"),
+            @ApiResponse(responseCode = "404", description = "Trainee not found")
     })
     @GetMapping(value = "/not-assigned/{username}")
     public ResponseEntity<List<EmbeddedTrainerResponse>> getAllTrainersNotAssignedToTrainee(
-            @ApiParam(value = "Trainee username", required = true)
+            @Parameter(description = "Trainee username", required = true)
             @PathVariable String username,
-            @ApiParam(hidden = true)
+            @Parameter(hidden = true)
             @SessionAttribute("AUTH_SESSION")
                 AuthSession authSession
     ){
@@ -152,24 +167,23 @@ public class TrainerController {
             return ResponseEntity.notFound().build();
         }
     }
-    @ApiOperation(
-            value = "Set trainer status",
-            notes = "Activates or deactivates the trainer identified by username",
-            response = Void.class
+    @Operation(
+            summary = "Set trainer status",
+            description = "Activates or deactivates the trainer identified by username"
     )
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Trainer status updated successfully"),
-            @ApiResponse(code = 400, message = "Invalid status change"),
-            @ApiResponse(code = 403, message = "Authentication required"),
-            @ApiResponse(code = 404, message = "Trainer not found")
+            @ApiResponse(responseCode = "200", description = "Trainer status updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid status change"),
+            @ApiResponse(responseCode = "403", description = "Authentication required"),
+            @ApiResponse(responseCode = "404", description = "Trainer not found")
     })
     @PatchMapping(value = "/{username}/satus")
     public ResponseEntity<Void> setStatus(
-            @ApiParam(value = "Trainer username", required = true)
+            @Parameter(description = "Trainer username", required = true)
             @PathVariable String username,
-            @ApiParam(value = "New active status", required = true)
+            @Parameter(description = "New active status", required = true)
             @RequestParam Boolean status,
-            @ApiParam(hidden = true)
+            @Parameter(hidden = true)
             @SessionAttribute("AUTH_SESSION")
             AuthSession authSession
     ){
