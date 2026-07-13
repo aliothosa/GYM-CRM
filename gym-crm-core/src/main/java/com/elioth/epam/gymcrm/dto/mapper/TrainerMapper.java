@@ -4,6 +4,7 @@ import com.elioth.epam.gymcrm.domain.Trainer;
 import com.elioth.epam.gymcrm.domain.TrainingType;
 import com.elioth.epam.gymcrm.domain.User;
 import com.elioth.epam.gymcrm.dto.response.CreatedTrainerResponse;
+import com.elioth.epam.gymcrm.dto.response.EmbeddedTrainerResponse;
 import com.elioth.epam.gymcrm.dto.response.TrainerResponse;
 import org.springframework.stereotype.Component;
 
@@ -41,7 +42,8 @@ public class TrainerMapper {
                 user.getUsername(),
                 user.getActive(),
                 specialization != null ? specialization.getId() : null,
-                specialization != null ? specialization.getName() : null
+                specialization != null ? specialization.getName() : null,
+                trainer.getTrainees().stream().map(TraineeMapper::toEmbeddedResponse).toList()
         );
     }
 
@@ -59,6 +61,15 @@ public class TrainerMapper {
                 trainer.getTrainerId(),
                 user.getUsername(),
                 user.getPassword()
+        );
+    }
+
+    public static EmbeddedTrainerResponse toEmbeddedResponse(Trainer trainer) {
+        return new EmbeddedTrainerResponse(
+                trainer.getUser().getUsername(),
+                trainer.getUser().getFirstName(),
+                trainer.getUser().getLastName(),
+                trainer.getSpecialization().getName()
         );
     }
 }

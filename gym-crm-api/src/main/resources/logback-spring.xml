@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration>
+    <property name="LOG_DIRECTORY" value="./logs"/>
+
+    <appender
+            name="GENERAL"
+            class="ch.qos.logback.core.FileAppender">
+
+        <file>${LOG_DIRECTORY}/general.log</file>
+        <append>true</append>
+
+        <encoder>
+            <pattern>
+                %d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level [%logger{36}] %msg%n
+            </pattern>
+        </encoder>
+
+    </appender>
+
+
+    <appender
+            name="USER"
+            class="ch.qos.logback.classic.sift.SiftingAppender">
+
+        <discriminator>
+            <key>username</key>
+            <defaultValue>unknown</defaultValue>
+        </discriminator>
+
+        <sift>
+            <appender
+                    name="USER-${username}"
+                    class="ch.qos.logback.core.FileAppender">
+
+                <file>
+                    ${LOG_DIRECTORY}/${username}.log
+                </file>
+
+                <append>true</append>
+
+                <encoder>
+                    <pattern>
+                        %d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level [%logger{36}] %msg%n
+                    </pattern>
+                </encoder>
+            </appender>
+        </sift>
+    </appender>
+
+    <logger
+            name="USER_ACTIVITY"
+            level="INFO"
+            additivity="false">
+
+        <appender-ref ref="USER"/>
+    </logger>
+
+    <root level="INFO">
+        <appender-ref ref="GENERAL"/>
+    </root>
+
+</configuration>

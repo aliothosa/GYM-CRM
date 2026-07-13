@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface TrainerRepository extends JpaRepository<Trainer, Long> {
     Optional<Trainer> findByUserUsername(String username);
@@ -26,4 +27,6 @@ public interface TrainerRepository extends JpaRepository<Trainer, Long> {
             )
             """)
     List<Trainer> findTrainersNotAssignedToTrainee(@Param("username") String username);
+
+    Set<Trainer> findAllByUserUsernameIn(Set<String> usernames);
 }

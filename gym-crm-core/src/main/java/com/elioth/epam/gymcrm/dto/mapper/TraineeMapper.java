@@ -8,6 +8,8 @@ import com.elioth.epam.gymcrm.domain.User;
 import com.elioth.epam.gymcrm.dto.request.CreateTraineeRequest;
 import com.elioth.epam.gymcrm.dto.request.UpdateTraineeRequest;
 import com.elioth.epam.gymcrm.dto.response.CreatedTraineeResponse;
+import com.elioth.epam.gymcrm.dto.response.EmbeddedTraineeResponse;
+import com.elioth.epam.gymcrm.dto.response.EmbeddedTrainerResponse;
 import com.elioth.epam.gymcrm.dto.response.TraineeResponse;
 import org.springframework.stereotype.Component;
 
@@ -45,7 +47,8 @@ public class TraineeMapper {
                 user.getUsername(),
                 user.getActive(),
                 trainee.getBirthDate(),
-                trainee.getAddress()
+                trainee.getAddress(),
+                trainee.getTrainers().stream().map(TrainerMapper::toEmbeddedResponse).toList()
         );
     }
 
@@ -63,6 +66,14 @@ public class TraineeMapper {
                 trainee.getTraineeId(),
                 user.getUsername(),
                 user.getPassword()
+        );
+    }
+
+    protected static EmbeddedTraineeResponse toEmbeddedResponse(Trainee trainee) {
+        return new EmbeddedTraineeResponse(
+                trainee.getUser().getUsername(),
+                trainee.getUser().getFirstName(),
+                trainee.getUser().getLastName()
         );
     }
 }

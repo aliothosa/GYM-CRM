@@ -1,5 +1,6 @@
 package com.elioth.epam.gymcrm.service;
 
+import com.elioth.epam.gymcrm.domain.Trainee;
 import com.elioth.epam.gymcrm.domain.Trainer;
 import com.elioth.epam.gymcrm.domain.TrainingType;
 import com.elioth.epam.gymcrm.domain.User;
@@ -8,6 +9,7 @@ import com.elioth.epam.gymcrm.dto.request.ChangePasswordRequest;
 import com.elioth.epam.gymcrm.dto.request.CreateTrainerRequest;
 import com.elioth.epam.gymcrm.dto.request.UpdateTrainerRequest;
 import com.elioth.epam.gymcrm.dto.response.CreatedTrainerResponse;
+import com.elioth.epam.gymcrm.dto.response.EmbeddedTrainerResponse;
 import com.elioth.epam.gymcrm.dto.response.TrainerResponse;
 import com.elioth.epam.gymcrm.exception.EntityNotFoundException;
 import com.elioth.epam.gymcrm.exception.IncorrectPasswordException;
@@ -85,7 +87,25 @@ public class TrainerService {
         validateUpdateRequest(request);
 
         Trainer fetchedTrainer = findTrainerByIdOrThrow(trainerId);
-        TrainingType trainingType = findTrainingTypeOrThrow(request.trainingTypeId());
+
+        TrainingType trainingType = findTrainingTypeByNameOrThrow(request.trainingType());
+
+        fetchedTrainer.getUser().setFirstName(request.firstName());
+        fetchedTrainer.getUser().setLastName(request.lastName());
+        fetchedTrainer.setSpecialization(trainingType);
+
+        return TrainerMapper.toResponse(fetchedTrainer);
+    }
+
+    @Transactional
+    public TrainerResponse updateProfile(String username, UpdateTrainerRequest request) {
+        LOG.info("Updating trainer profile with username: {}", username);
+
+        validateUpdateRequest(request);
+
+        Trainer fetchedTrainer = findTrainerByUsernameOrThrow(username);
+
+        TrainingType trainingType = findTrainingTypeByNameOrThrow(request.trainingType());
 
         fetchedTrainer.getUser().setFirstName(request.firstName());
         fetchedTrainer.getUser().setLastName(request.lastName());
@@ -148,6 +168,19 @@ public class TrainerService {
     }
 
     @Transactional
+    public List<EmbeddedTrainerResponse> getTrainersNotAssignedToTraineeEmbedded(String traineeUsername) {
+        LOG.info("Getting all trainers not assigned to trainee with username: {}", traineeUsername);
+
+        if (traineeUsername == null || traineeUsername.isBlank()) {
+            throw new InvalidRequestException("Invalid trainee username");
+        }
+
+        return trainerRepository.findTrainersNotAssignedToTrainee(traineeUsername).stream()
+                .map(TrainerMapper::toEmbeddedResponse)
+                .toList();
+    }
+
+    @Transactional
     public void activate(Long trainerId) {
         LOG.info("Activating trainer profile with id: {}", trainerId);
 
@@ -171,6 +204,22 @@ public class TrainerService {
         }
 
         fetchedTrainer.getUser().setActive(false);
+    }
+
+    @Transactional
+    public void setStatus(String username, Boolean activeStatus){
+        if (activeStatus == null) {
+            throw new InvalidRequestException("active status cannot be null");
+        }
+
+        LOG.info("Setting trainee with username: {} active status to '{}'",username, activeStatus ? "active"  : "inactive");
+
+        Trainer fetchedTrainer = findTrainerByUsernameOrThrow(username);
+
+        if (activeStatus.equals(fetchedTrainer.getUser().getActive())) {
+            throw new InvalidRequestException(String.format("Trainee is already %s.", activeStatus ? "active"  : "inactive") );
+        }
+        fetchedTrainer.getUser().setActive(activeStatus);
     }
 
     private Trainer findTrainerByIdOrThrow(Long trainerId) {
@@ -217,15 +266,21 @@ public class TrainerService {
         if (request == null) {
             throw new InvalidRequestException("Request cannot be null");
         }
+
+        if (request.username() == null || request.username().isBlank()) {
+            throw new InvalidRequestException("Username cannot be empty");
+        }
         if (request.firstName() == null || request.firstName().isBlank()) {
             throw new InvalidRequestException("First name cannot be empty");
         }
         if (request.lastName() == null || request.lastName().isBlank()) {
             throw new InvalidRequestException("Last name cannot be empty");
         }
-        if (request.trainingTypeId() == null) {
-            throw new InvalidRequestException("Training type id cannot be null");
+        if (request.isActive() == null ) {
+            throw new InvalidRequestException("Is active cannot be null");
         }
+
+
     }
 
     private void checkOldPassword(User user, String oldPassword) {
@@ -239,6 +294,11 @@ public class TrainerService {
 
     private TrainingType findTrainingTypeOrThrow(Long trainingTypeId) {
         return trainingTypeRepository.findById(trainingTypeId)
+                .orElseThrow(() -> new EntityNotFoundException("TrainingType not found"));
+    }
+
+    private TrainingType findTrainingTypeByNameOrThrow(String name) {
+        return trainingTypeRepository.findByName(name)
                 .orElseThrow(() -> new EntityNotFoundException("TrainingType not found"));
     }
 }

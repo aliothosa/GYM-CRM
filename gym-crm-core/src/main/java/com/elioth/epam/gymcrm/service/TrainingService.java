@@ -5,8 +5,9 @@ import com.elioth.epam.gymcrm.domain.Trainer;
 import com.elioth.epam.gymcrm.domain.Training;
 import com.elioth.epam.gymcrm.domain.TrainingType;
 import com.elioth.epam.gymcrm.dto.mapper.TrainingMapper;
-import com.elioth.epam.gymcrm.dto.request.CreateTrainingRequest;
-import com.elioth.epam.gymcrm.dto.request.UpdateTrainingRequest;
+import com.elioth.epam.gymcrm.dto.request.*;
+import com.elioth.epam.gymcrm.dto.response.TraineeTrainingResponse;
+import com.elioth.epam.gymcrm.dto.response.TrainerTrainingResponse;
 import com.elioth.epam.gymcrm.dto.response.TrainingResponse;
 import com.elioth.epam.gymcrm.exception.EntityNotFoundException;
 import com.elioth.epam.gymcrm.exception.InvalidEntityException;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.function.Function;
 
 @Service
 public class TrainingService {
@@ -74,6 +76,28 @@ public class TrainingService {
         LOG.info("Created training with id: {}", savedTraining.getTrainingId());
 
         return TrainingMapper.toResponse(savedTraining);
+    }
+
+    @Transactional
+    public void createTraining(CreateTrainingRestRequest request) {
+        LOG.info("Creating training for trainee: {}", request.traineeUsername());
+
+        validateRestCreationRequest(request);
+
+        Trainee trainee = findTraineeByUsernameOrThrow(request.traineeUsername());
+        Trainer trainer = findTrainerByUsernameOrThrow(request.trainerUsername());
+
+        Training training = new Training();
+
+        training.setTrainee(trainee);
+        training.setTrainer(trainer);
+        training.setName(request.trainingName());
+        training.setDate(request.date());
+        training.setDurationInMinutes(request.durationInMinutes());
+        training.setType(trainer.getSpecialization());
+
+        Training savedTraining = trainingRepository.save(training);
+
     }
 
     @Transactional
@@ -139,6 +163,28 @@ public class TrainingService {
                 .toList();
     }
 
+
+    @Transactional(readOnly = true)
+    public List<TraineeTrainingResponse> getTrainingsByTraineeUsernameAndCriteria(
+            String username,
+            GetTraineeTrainingsRestRequest request
+    ) {
+        LOG.info(
+                "Getting trainings for trainee username: {}, and criteria {}", username, request);
+
+        return trainingRepository.findByTraineeUsernameAndCriteria(
+                        username,
+                        request.periodFrom(),
+                        request.periodTo(),
+                        request.trainerName(),
+                        request.trainingType() != null ? request.trainingType().toUpperCase() : null
+                )
+                .stream()
+                .map(TrainingMapper::toTraineeTrainingResponse)
+                .toList();
+    }
+
+
     @Transactional(readOnly = true)
     public List<TrainingResponse> getTrainingsByTrainerUsernameAndCriteria(
             String trainerUsername,
@@ -157,6 +203,49 @@ public class TrainingService {
         return trainingRepository.findByTrainerUsernameAndCriteria(trainerUsername, from, to, traineeName)
                 .stream()
                 .map(TrainingMapper::toResponse)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<TrainerTrainingResponse> getTrainingsByTrainerUsernameAndCriteria(
+            String username,
+            GetTrainerTrainingsRestRequest request
+    ) {
+        LOG.info("Getting trainings for trainer username: {}, and criteria {}", username, request);
+
+        validateQueryRequest(request);
+
+        return trainingRepository.findByTrainerUsernameAndCriteria(
+                        username,
+                        request.periodFrom(),
+                        request.periodTo(),
+                        request.traineeName()
+                )
+                .stream()
+                .map(TrainingMapper::toTrainerTrainingResponse)
+                .toList();
+    }
+
+    @Transactional
+    public List<TrainerTrainingResponse> getTrainingsByTrainerUsername(String username){
+        LOG.info("getting training by trainer username: {}", username);
+
+        List<Training> trainings = trainingRepository.findAllByTrainerUserUsernameOrTraineeUserUsername(username, username);
+
+        if (trainings == null || trainings.isEmpty())
+            throw new EntityNotFoundException("No training found for username: " + username);
+
+        return trainings.stream()
+                .map(TrainingMapper::toTrainerTrainingResponse)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<String> getTrainingTypeNames(){
+        LOG.info("Getting all training types");
+
+        return trainingTypeRepository.findAll().stream()
+                .map(TrainingType::getName)
                 .toList();
     }
 
@@ -205,6 +294,69 @@ public class TrainingService {
         }
     }
 
+    private void validateRestCreationRequest(CreateTrainingRestRequest request) {
+        if (request == null) {
+            throw new InvalidEntityException("Request cannot be null");
+        }
+
+        if (request.traineeUsername() == null ||  request.traineeUsername().isBlank()) {
+            throw new InvalidEntityException("Trainee username cannot be empty");
+        }
+        if (request.trainerUsername() == null ||  request.trainerUsername().isBlank()) {
+            throw new InvalidEntityException("Trainer username cannot be empty");
+        }
+        if (request.trainingName() == null ||  request.trainingName().isBlank()) {
+            throw new InvalidEntityException("Training name cannot be empty");
+        }
+        if(request.durationInMinutes() == null || request.durationInMinutes() <= 0) {
+            throw new InvalidEntityException("Training duration must be greater than 0");
+        }
+        if (request.date() == null) {
+            throw new InvalidEntityException("Training date cannot be null");
+        }
+    }
+
+    private void validateQueryRequest(GetTrainerTrainingsRestRequest request) {
+        if (request == null) {
+            throw new InvalidRequestException("Request cannot be null");
+        }
+
+        if (request.periodFrom() == null) {
+            throw new InvalidRequestException("Period From cannot be null");
+        }
+        if (request.periodTo() == null ){
+            throw new InvalidRequestException("Period To cannot be null");
+        }
+        if (request.periodTo().isBefore(request.periodFrom())) {
+            throw new InvalidRequestException("Period To cannot be before Period From");
+        }
+        if (request.traineeName() == null || request.traineeName().isBlank()) {
+            throw new InvalidRequestException("Trainee name cannot be empty");
+        }
+    }
+
+    public void validateQueryRequest(GetTraineeTrainingsRestRequest request) {
+        if (request == null) {
+            throw new InvalidRequestException("Request cannot be null");
+        }
+
+        if (request.periodFrom() == null) {
+            throw new InvalidRequestException("Period From cannot be null");
+        }
+        if (request.periodTo() == null ){
+            throw new InvalidRequestException("Period To cannot be null");
+        }
+        if (request.periodTo().isBefore(request.periodFrom())) {
+            throw new InvalidRequestException("Period To cannot be before Period From");
+        }
+        if (request.trainerName() == null ||  request.trainerName().isBlank()) {
+            throw new InvalidRequestException("Trainer name cannot be empty");
+        }
+        if (request.trainingType() == null ||  request.trainingType().isBlank()) {
+            throw new InvalidRequestException("Training type cannot be empty");
+        }
+    }
+
     private Training findTrainingByIdOrThrow(Long id) {
         return trainingRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Training with id " + id + " not found"));
@@ -215,9 +367,19 @@ public class TrainingService {
                 .orElseThrow(() -> new EntityNotFoundException("Trainee with id " + id + " not found"));
     }
 
+    private Trainee findTraineeByUsernameOrThrow(String username) {
+        return traineeRepository.findByUserUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("Trainee with name " + username + " not found"));
+    }
+
     private Trainer findTrainerByIdOrThrow(Long id) {
         return trainerRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Trainer with id " + id + " not found"));
+    }
+
+    private Trainer findTrainerByUsernameOrThrow(String username) {
+        return trainerRepository.findByUserUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("Trainer with name " + username + " not found"));
     }
 
     private TrainingType findTrainingTypeByIdOrThrow(Long id) {

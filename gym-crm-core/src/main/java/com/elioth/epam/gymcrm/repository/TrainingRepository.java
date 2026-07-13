@@ -17,6 +17,8 @@ public interface TrainingRepository extends JpaRepository<Training, Long> {
 
     List<Training> findAllByDateBetween(LocalDate from, LocalDate to);
 
+    List<Training> findAllByTrainerUserUsernameOrTraineeUserUsername(String trainerUsername, String traineeUsername);
+
     @Query("""
             select training
             from Training training

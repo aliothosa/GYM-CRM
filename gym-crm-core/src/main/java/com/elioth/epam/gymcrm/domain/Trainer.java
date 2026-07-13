@@ -8,7 +8,9 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -33,5 +35,5 @@ public class Trainer {
     private TrainingType specialization;
 
     @ManyToMany(mappedBy = "trainers")
-    private List<Trainee> trainees = new ArrayList<>();
+    private Set<Trainee> trainees = new HashSet<>();
 }

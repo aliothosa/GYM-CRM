@@ -4,10 +4,12 @@ import com.elioth.epam.gymcrm.domain.Trainee;
 import com.elioth.epam.gymcrm.domain.Trainer;
 import com.elioth.epam.gymcrm.domain.User;
 import com.elioth.epam.gymcrm.dto.mapper.TraineeMapper;
+import com.elioth.epam.gymcrm.dto.mapper.TrainerMapper;
 import com.elioth.epam.gymcrm.dto.request.ChangePasswordRequest;
 import com.elioth.epam.gymcrm.dto.request.CreateTraineeRequest;
 import com.elioth.epam.gymcrm.dto.request.UpdateTraineeRequest;
 import com.elioth.epam.gymcrm.dto.response.CreatedTraineeResponse;
+import com.elioth.epam.gymcrm.dto.response.EmbeddedTrainerResponse;
 import com.elioth.epam.gymcrm.dto.response.TraineeResponse;
 import com.elioth.epam.gymcrm.exception.EntityNotFoundException;
 import com.elioth.epam.gymcrm.exception.IncorrectPasswordException;
@@ -24,6 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class TraineeService {
@@ -86,10 +90,39 @@ public class TraineeService {
 
         Trainee fetchedTrainee = findTraineeByIdOrThrow(traineeId);
 
-        fetchedTrainee.getUser().setFirstName(request.firstName());
-        fetchedTrainee.getUser().setLastName(request.lastName());
-        fetchedTrainee.setBirthDate(request.birthDate());
-        fetchedTrainee.setAddress(request.address());
+        User user = fetchedTrainee.getUser();
+
+        user.setUsername(request.username());
+        user.setFirstName(request.firstName());
+        user.setLastName(request.lastName());
+        if (Objects.nonNull(request.birthDate())) {
+            fetchedTrainee.setBirthDate(request.birthDate());
+        }
+        if  (Objects.nonNull(request.address())) {
+            fetchedTrainee.setAddress(request.address());
+        }
+
+        return TraineeMapper.toResponse(fetchedTrainee);
+    }
+
+    @Transactional
+    public TraineeResponse updateProfile(String username, UpdateTraineeRequest request) {
+        LOG.info("Updating trainee profile with username: {}", username);
+
+        validateUpdateRequest(request);
+        Trainee fetchedTrainee = findTraineeByUsernameOrThrow(username);
+
+        User user = fetchedTrainee.getUser();
+
+        user.setUsername(request.username());
+        user.setFirstName(request.firstName());
+        user.setLastName(request.lastName());
+        if (Objects.nonNull(request.birthDate())) {
+            fetchedTrainee.setBirthDate(request.birthDate());
+        }
+        if  (Objects.nonNull(request.address())) {
+            fetchedTrainee.setAddress(request.address());
+        }
 
         return TraineeMapper.toResponse(fetchedTrainee);
     }
@@ -99,6 +132,14 @@ public class TraineeService {
         LOG.info("Deleting trainee profile with id: {}", traineeId);
 
         Trainee fetchedTrainee = findTraineeByIdOrThrow(traineeId);
+        traineeRepository.delete(fetchedTrainee);
+    }
+
+    @Transactional
+    public void deleteProfile(String username) {
+        LOG.info("Deleting trainee profile with username: {}", username);
+
+        Trainee fetchedTrainee = findTraineeByUsernameOrThrow(username);
         traineeRepository.delete(fetchedTrainee);
     }
 
@@ -147,6 +188,28 @@ public class TraineeService {
         fetchedTrainee.getTrainers().clear();
         fetchedTrainee.getTrainers().addAll(fetchedTrainers);
     }
+    @Transactional
+    public Set<EmbeddedTrainerResponse> updateTrainersToTrainee(String username, Set<String> trainerUsernames){
+        if  (trainerUsernames == null) {
+            throw new InvalidRequestException("Trainer list cannot be null");
+        }
+
+        LOG.info("Updating trainers list for trainee with username: {}", username);
+
+        Trainee fetchedTrainee = findTraineeByUsernameOrThrow(username);
+        Set<Trainer> fetchedTrainers = trainerRepository.findAllByUserUsernameIn(trainerUsernames);
+
+        if (fetchedTrainers.size() != trainerUsernames.size()) {
+            throw new EntityNotFoundException("One or more trainers were not found");
+        }
+
+        fetchedTrainee.getTrainers().clear();
+        fetchedTrainee.getTrainers().addAll(fetchedTrainers);
+
+        return fetchedTrainers.stream()
+                .map(TrainerMapper::toEmbeddedResponse)
+                .collect(Collectors.toSet());
+    }
 
     @Transactional
     public void activate(Long traineeId) {
@@ -172,6 +235,22 @@ public class TraineeService {
         }
 
         fetchedTrainee.getUser().setActive(false);
+    }
+
+    @Transactional
+    public void setStatus(String username, Boolean activeStatus){
+        if (activeStatus == null) {
+            throw new InvalidRequestException("active status cannot be null");
+        }
+
+        LOG.info("Setting trainee with username: {} active status to '{}'",username, activeStatus ? "active"  : "inactive");
+
+        Trainee fetchedTrainee = findTraineeByUsernameOrThrow(username);
+
+        if (activeStatus.equals(fetchedTrainee.getUser().getActive())) {
+            throw new InvalidRequestException(String.format("Trainee is already %s.", activeStatus ? "active"  : "inactive") );
+        }
+        fetchedTrainee.getUser().setActive(activeStatus);
     }
 
     private Trainee findTraineeByIdOrThrow(Long traineeId) {
@@ -218,8 +297,12 @@ public class TraineeService {
     }
 
     private void validateUpdateRequest(UpdateTraineeRequest request) {
+
         if (request == null) {
             throw new InvalidRequestException("Request cannot be null");
+        }
+        if (request.username() == null || request.username().isBlank()) {
+            throw new InvalidRequestException("Username cannot be empty");
         }
         if (request.firstName() == null || request.firstName().isBlank()) {
             throw new InvalidRequestException("First name cannot be empty");
@@ -227,11 +310,8 @@ public class TraineeService {
         if (request.lastName() == null || request.lastName().isBlank()) {
             throw new InvalidRequestException("Last name cannot be empty");
         }
-        if (request.address() == null) {
-            throw new InvalidRequestException("Address cannot be null");
-        }
-        if (request.birthDate() == null) {
-            throw new InvalidRequestException("Birth date cannot be empty");
+        if (request.isActive() == null){
+            throw new InvalidRequestException("Trainee active status is mandatory");
         }
     }
 

@@ -9,11 +9,7 @@ import com.elioth.epam.gymcrm.dto.request.CreateTrainerRequest;
 import com.elioth.epam.gymcrm.dto.request.CreateTrainingRequest;
 import com.elioth.epam.gymcrm.dto.request.UpdateTraineeRequest;
 import com.elioth.epam.gymcrm.dto.request.UpdateTrainerRequest;
-import com.elioth.epam.gymcrm.dto.response.CreatedTraineeResponse;
-import com.elioth.epam.gymcrm.dto.response.CreatedTrainerResponse;
-import com.elioth.epam.gymcrm.dto.response.TraineeResponse;
-import com.elioth.epam.gymcrm.dto.response.TrainerResponse;
-import com.elioth.epam.gymcrm.dto.response.TrainingResponse;
+import com.elioth.epam.gymcrm.dto.response.*;
 import com.elioth.epam.gymcrm.facade.GymCrmFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -471,6 +467,13 @@ public class GymCrmRunner implements CommandLineRunner {
         System.out.println("  Username   : " + trainer.username());
         System.out.println("  Active     : " + trainer.active());
         System.out.println("  Specialty  : " + trainer.trainingTypeName() + " (id=" + trainer.trainingTypeId() + ")");
+    }
+
+    private void printEmbeddedTrainer(EmbeddedTrainerResponse trainer) {
+        System.out.println("  Username ID : " + trainer.username());
+        System.out.println("  Name       : " + trainer.firstName() + " " + trainer.lastName());
+        System.out.println("  Username   : " + trainer.username());
+        System.out.println("  Active     : " + trainer.Specialization());
     }
 
     private void printTraining(TrainingResponse training) {

@@ -1,12 +1,10 @@
 package com.elioth.epam.gymcrm.dto.mapper;
 
-import com.elioth.epam.gymcrm.domain.Trainee;
-import com.elioth.epam.gymcrm.domain.Trainer;
-import com.elioth.epam.gymcrm.domain.Training;
-import com.elioth.epam.gymcrm.domain.TrainingType;
-import com.elioth.epam.gymcrm.domain.User;
+import com.elioth.epam.gymcrm.domain.*;
 import com.elioth.epam.gymcrm.dto.request.CreateTrainingRequest;
 import com.elioth.epam.gymcrm.dto.request.UpdateTrainingRequest;
+import com.elioth.epam.gymcrm.dto.response.TraineeTrainingResponse;
+import com.elioth.epam.gymcrm.dto.response.TrainerTrainingResponse;
 import com.elioth.epam.gymcrm.dto.response.TrainingResponse;
 import org.springframework.stereotype.Component;
 
@@ -71,5 +69,44 @@ public class TrainingMapper {
                 training.getDate(),
                 training.getDurationInMinutes()
         );
+    }
+
+    public static TraineeTrainingResponse toTraineeTrainingResponse(Training training) {
+        if (training == null) {
+            throw new IllegalStateException("Training must have trainee");
+        }
+
+        User trainer = training.getTrainer().getUser();
+
+        return new TraineeTrainingResponse(
+                training.getName(),
+                training.getDate(),
+                training.getType().getName(),
+                training.getDurationInMinutes(),
+                formatUserData(trainer)
+        );
+
+    }
+
+    public static TrainerTrainingResponse toTrainerTrainingResponse(Training training) {
+        if (training == null) {
+            throw new IllegalStateException("Training is null");
+        }
+
+        User trainee = training.getTrainee().getUser();
+
+        return new TrainerTrainingResponse(
+                training.getName(),
+                training.getDate(),
+                training.getType().getName(),
+                training.getDurationInMinutes(),
+                formatUserData(trainee)
+        );
+    }
+
+    private static String formatUserData(User user) {
+        String dataFormat = "Username: %s, Name: %s %s";
+
+        return String.format(dataFormat, user.getUsername(), user.getFirstName(), user.getLastName());
     }
 }

@@ -1,5 +1,10 @@
 package com.elioth.epam.gymcrm.dto.response;
 
+import com.elioth.epam.gymcrm.domain.Trainee;
+
+import java.util.List;
+import java.util.Set;
+
 public record TrainerResponse(
         Long trainerId,
         Long userId,
@@ -8,5 +13,6 @@ public record TrainerResponse(
         String username,
         Boolean active,
         Long trainingTypeId,
-        String trainingTypeName
+        String trainingTypeName,
+        List<EmbeddedTraineeResponse> trainees
 ) {}
