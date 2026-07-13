@@ -1,0 +1,1 @@
+2026-07-13 10:47:46.672 [http-nio-8080-exec-1] WARN  [USER_ACTIVITY] REST_CALL method=GET endpoint=/trainings/training-types request={} status=403 response=Forbidden

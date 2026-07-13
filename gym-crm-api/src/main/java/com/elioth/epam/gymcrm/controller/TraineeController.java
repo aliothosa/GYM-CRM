@@ -12,6 +12,11 @@ import com.elioth.epam.gymcrm.exception.EntityNotFoundException;
 import com.elioth.epam.gymcrm.exception.InvalidRequestException;
 import com.elioth.epam.gymcrm.logging.UserLogger;
 import com.elioth.epam.gymcrm.service.TraineeService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +30,7 @@ import java.util.Set;
 
 @RestController
 @RequestMapping(value = "/trainees", produces = {"application/json"})
+@Api(tags = "Trainees", description = "Trainee profile management operations")
 public class TraineeController {
 
     private final UserLogger userLogger;
@@ -39,8 +45,21 @@ public class TraineeController {
 
     }
 
+    @ApiOperation(
+            value = "Register trainee",
+            notes = "Creates a new trainee profile",
+            response = CreatedTraineeResponse.class
+    )
+    @ApiResponses({
+            @ApiResponse(code = 201, message = "Trainee registered successfully"),
+            @ApiResponse(code = 400, message = "Invalid trainee information"),
+            @ApiResponse(code = 403, message = "Authentication required")
+    })
     @PostMapping(value = "/register")
-    public ResponseEntity<CreatedTraineeResponse> addTrainee(@RequestBody CreateTraineeRequest createTraineeRequest) {
+    public ResponseEntity<CreatedTraineeResponse> addTrainee(
+            @ApiParam(value = "Information required to register a trainee", required = true)
+            @RequestBody CreateTraineeRequest createTraineeRequest
+    ) {
         LOG.info("addTrainee request: {}",  createTraineeRequest);
 
         try {
@@ -51,9 +70,21 @@ public class TraineeController {
         }
     }
 
+    @ApiOperation(
+            value = "Get trainee profile",
+            notes = "Returns the profile information of the trainee identified by username",
+            response = TraineeResponse.class
+    )
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Trainee profile retrieved successfully"),
+            @ApiResponse(code = 403, message = "Authentication required"),
+            @ApiResponse(code = 404, message = "Trainee not found")
+    })
     @PostMapping(value = "/{username}")
     public ResponseEntity<TraineeResponse> getTraineeProfile(
+            @ApiParam(value = "Trainee username", required = true)
             @PathVariable String username,
+            @ApiParam(hidden = true)
             @SessionAttribute("AUTH_SESSION")
                 AuthSession session
     ){
@@ -71,10 +102,24 @@ public class TraineeController {
     }
 
 
+    @ApiOperation(
+            value = "Update trainee profile",
+            notes = "Updates the profile information of the trainee identified by username",
+            response = TraineeResponse.class
+    )
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Trainee profile updated successfully"),
+            @ApiResponse(code = 400, message = "Invalid trainee information"),
+            @ApiResponse(code = 403, message = "Authentication required"),
+            @ApiResponse(code = 404, message = "Trainee not found")
+    })
     @PutMapping(value = "/{username}")
     public ResponseEntity<TraineeResponse> updateTraineeProfile(
+            @ApiParam(value = "Trainee username", required = true)
             @PathVariable String username,
+            @ApiParam(value = "Updated trainee profile information", required = true)
             @RequestBody UpdateTraineeRequest updateTraineeRequest,
+            @ApiParam(hidden = true)
             @SessionAttribute("AUTH_SESSION")
                 AuthSession authSession
     ){
@@ -93,9 +138,21 @@ public class TraineeController {
         }
     }
 
+    @ApiOperation(
+            value = "Delete trainee profile",
+            notes = "Deletes the trainee profile identified by username",
+            response = Void.class
+    )
+    @ApiResponses({
+            @ApiResponse(code = 204, message = "Trainee profile deleted successfully"),
+            @ApiResponse(code = 403, message = "Authentication required"),
+            @ApiResponse(code = 404, message = "Trainee not found")
+    })
     @DeleteMapping(value = "/{username}")
     public ResponseEntity<Void> deleteTraineeProfile(
+            @ApiParam(value = "Trainee username", required = true)
             @PathVariable String username,
+            @ApiParam(hidden = true)
             @SessionAttribute("AUTH_SESSION")
                 AuthSession authSession
     ){
@@ -110,10 +167,24 @@ public class TraineeController {
         }
     }
 
+    @ApiOperation(
+            value = "Update trainee trainers",
+            notes = "Replaces the trainers assigned to the trainee identified by username",
+            response = EmbeddedTrainerResponse.class,
+            responseContainer = "Set"
+    )
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Trainee trainers updated successfully"),
+            @ApiResponse(code = 403, message = "Authentication required"),
+            @ApiResponse(code = 404, message = "Trainee or trainer not found")
+    })
     @PutMapping(value = "/update-trainer-list/{username}")
     public ResponseEntity<Set<EmbeddedTrainerResponse>> updateTraineeList(
+            @ApiParam(value = "Trainee username", required = true)
             @PathVariable String username,
+            @ApiParam(value = "Usernames of trainers to assign", required = true)
             @RequestParam Set<String> trainerUsernames,
+            @ApiParam(hidden = true)
             @SessionAttribute("AUTH_SESSION")
             AuthSession authSession
     ){
@@ -126,10 +197,24 @@ public class TraineeController {
         }
     }
 
+    @ApiOperation(
+            value = "Set trainee status",
+            notes = "Activates or deactivates the trainee identified by username",
+            response = Void.class
+    )
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Trainee status updated successfully"),
+            @ApiResponse(code = 400, message = "Invalid status change"),
+            @ApiResponse(code = 403, message = "Authentication required"),
+            @ApiResponse(code = 404, message = "Trainee not found")
+    })
     @PatchMapping(value = "/{username}/satus")
     public ResponseEntity<Void> setStatus(
+            @ApiParam(value = "Trainee username", required = true)
             @PathVariable String username,
+            @ApiParam(value = "New active status", required = true)
             @RequestParam Boolean status,
+            @ApiParam(hidden = true)
             @SessionAttribute("AUTH_SESSION")
                 AuthSession authSession
     ){

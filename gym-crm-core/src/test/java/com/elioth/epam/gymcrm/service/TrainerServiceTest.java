@@ -120,7 +120,7 @@ class TrainerServiceTest {
         TrainingType newType = buildTrainingType(6L, "CARDIO");
         Trainer trainer = buildTrainer(TRAINER_ID, USERNAME, "John", "Doe", true, oldType);
         when(trainerRepository.findById(TRAINER_ID)).thenReturn(Optional.of(trainer));
-        when(trainingTypeRepository.findById(6L)).thenReturn(Optional.of(newType));
+        when(trainingTypeRepository.findByName("CARDIO")).thenReturn(Optional.of(newType));
 
         TrainerResponse response = trainerService.updateProfile(TRAINER_ID, request);
 
@@ -159,7 +159,7 @@ class TrainerServiceTest {
         UpdateTrainerRequest request = validUpdateRequest();
         Trainer trainer = buildTrainer(TRAINER_ID, USERNAME, "John", "Doe", true, buildTrainingType(TRAINING_TYPE_ID, "YOGA"));
         when(trainerRepository.findById(TRAINER_ID)).thenReturn(Optional.of(trainer));
-        when(trainingTypeRepository.findById(6L)).thenReturn(Optional.empty());
+        when(trainingTypeRepository.findByName("CARDIO")).thenReturn(Optional.empty());
 
         EntityNotFoundException exception = assertThrows(
                 EntityNotFoundException.class,
@@ -406,7 +406,7 @@ class TrainerServiceTest {
     }
 
     private UpdateTrainerRequest validUpdateRequest() {
-        return new UpdateTrainerRequest("Jane", "Smith", 6L);
+        return new UpdateTrainerRequest(USERNAME, "Jane", "Smith", "CARDIO", true);
     }
 
     private TrainingType buildTrainingType(Long id, String name) {

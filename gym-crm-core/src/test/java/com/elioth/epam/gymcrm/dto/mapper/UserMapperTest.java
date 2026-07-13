@@ -51,7 +51,9 @@ class UserMapperTest {
         User user = new User();
         user.setFirstName("Old");
         user.setLastName("Name");
-        UpdateTraineeRequest request = new UpdateTraineeRequest("New", "Trainee", null, null);
+        UpdateTraineeRequest request = new UpdateTraineeRequest(
+                "new.trainee", "New", "Trainee", null, null, true
+        );
 
         userMapper.updateUser(user, request);
 
@@ -64,7 +66,9 @@ class UserMapperTest {
         User user = new User();
         user.setFirstName("Old");
         user.setLastName("Name");
-        UpdateTrainerRequest request = new UpdateTrainerRequest("New", "Trainer", 2L);
+        UpdateTrainerRequest request = new UpdateTrainerRequest(
+                "new.trainer", "New", "Trainer", "CARDIO", true
+        );
 
         userMapper.updateUser(user, request);
 

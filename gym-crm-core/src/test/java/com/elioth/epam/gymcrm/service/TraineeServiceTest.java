@@ -418,10 +418,12 @@ class TraineeServiceTest {
 
     private UpdateTraineeRequest validUpdateRequest() {
         return new UpdateTraineeRequest(
+                USERNAME,
                 "Jane",
                 "Smith",
                 LocalDate.of(1992, 3, 20),
-                new Address("Oak St", "Boston", "MA", "02101", 42)
+                new Address("Oak St", "Boston", "MA", "02101", 42),
+                true
         );
     }
 

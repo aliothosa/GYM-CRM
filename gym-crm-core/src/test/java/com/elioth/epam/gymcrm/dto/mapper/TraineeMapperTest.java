@@ -38,7 +38,9 @@ class TraineeMapperTest {
         Trainee trainee = new Trainee();
         Address newAddress = new Address("Oak Ave", "Cambridge", "MA", "02139", 10);
         LocalDate newBirthDate = LocalDate.of(1995, 12, 1);
-        UpdateTraineeRequest request = new UpdateTraineeRequest("Updated", "Name", newBirthDate, newAddress);
+        UpdateTraineeRequest request = new UpdateTraineeRequest(
+                "updated.name", "Updated", "Name", newBirthDate, newAddress, true
+        );
 
         TraineeMapper.updateEntity(trainee, request);
 

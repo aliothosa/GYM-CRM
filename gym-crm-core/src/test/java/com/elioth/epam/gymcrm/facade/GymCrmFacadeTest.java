@@ -141,8 +141,12 @@ class GymCrmFacadeTest {
     @Test
     void shouldUseCurrentTraineeSessionForProfileUpdate() {
         AuthSession session = new AuthSession(1L, "Emily.Davis", Role.TRAINEE);
-        UpdateTraineeRequest request = new UpdateTraineeRequest("Emily", "Davis", null, null);
-        TraineeResponse response = new TraineeResponse(1L, 4L, "Emily", "Davis", "Emily.Davis", true, null, null);
+        UpdateTraineeRequest request = new UpdateTraineeRequest(
+                "Emily.Davis", "Emily", "Davis", null, null, true
+        );
+        TraineeResponse response = new TraineeResponse(
+                1L, 4L, "Emily", "Davis", "Emily.Davis", true, null, null, List.of()
+        );
 
         when(sessionManager.getCurrentSession()).thenReturn(session);
         when(traineeService.updateProfile(eq(1L), eq(request))).thenReturn(response);
@@ -156,7 +160,9 @@ class GymCrmFacadeTest {
     @Test
     void shouldGetTraineeProfileUsingSessionId() {
         AuthSession session = new AuthSession(1L, "Emily.Davis", Role.TRAINEE);
-        TraineeResponse response = new TraineeResponse(1L, 4L, "Emily", "Davis", "Emily.Davis", true, null, null);
+        TraineeResponse response = new TraineeResponse(
+                1L, 4L, "Emily", "Davis", "Emily.Davis", true, null, null, List.of()
+        );
 
         when(sessionManager.getCurrentSession()).thenReturn(session);
         when(traineeService.getProfileById(1L)).thenReturn(response);
@@ -179,7 +185,9 @@ class GymCrmFacadeTest {
     @Test
     void shouldGetTraineeProfileByUsernameWhenSessionMatches() {
         AuthSession session = new AuthSession(1L, "Emily.Davis", Role.TRAINEE);
-        TraineeResponse response = new TraineeResponse(1L, 4L, "Emily", "Davis", "Emily.Davis", true, null, null);
+        TraineeResponse response = new TraineeResponse(
+                1L, 4L, "Emily", "Davis", "Emily.Davis", true, null, null, List.of()
+        );
 
         when(sessionManager.getCurrentSession()).thenReturn(session);
         when(traineeService.getProfileByUsername("Emily.Davis")).thenReturn(response);
@@ -205,7 +213,9 @@ class GymCrmFacadeTest {
     void shouldChangeTraineePasswordUsingSession() {
         AuthSession session = new AuthSession(1L, "Emily.Davis", Role.TRAINEE);
         ChangePasswordRequest request = new ChangePasswordRequest("oldPass", "newPass");
-        TraineeResponse response = new TraineeResponse(1L, 4L, "Emily", "Davis", "Emily.Davis", true, null, null);
+        TraineeResponse response = new TraineeResponse(
+                1L, 4L, "Emily", "Davis", "Emily.Davis", true, null, null, List.of()
+        );
 
         when(sessionManager.getCurrentSession()).thenReturn(session);
         when(traineeService.changePassword(1L, request)).thenReturn(response);
@@ -242,7 +252,9 @@ class GymCrmFacadeTest {
     @Test
     void shouldGetTrainersNotAssignedToCurrentTrainee() {
         AuthSession session = new AuthSession(1L, "Emily.Davis", Role.TRAINEE);
-        TrainerResponse trainer = new TrainerResponse(10L, 20L, "Bob", "Lee", "Bob.Lee", true, 1L, "Yoga");
+        TrainerResponse trainer = new TrainerResponse(
+                10L, 20L, "Bob", "Lee", "Bob.Lee", true, 1L, "Yoga", List.of()
+        );
         when(sessionManager.getCurrentSession()).thenReturn(session);
         when(trainerService.getTrainersNotAssignedToTrainee("Emily.Davis")).thenReturn(List.of(trainer));
 
@@ -281,7 +293,9 @@ class GymCrmFacadeTest {
     @Test
     void shouldGetTrainerProfileUsingSessionId() {
         AuthSession session = new AuthSession(2L, "Jane.Trainer", Role.TRAINER);
-        TrainerResponse response = new TrainerResponse(2L, 5L, "Jane", "Trainer", "Jane.Trainer", true, 1L, "Yoga");
+        TrainerResponse response = new TrainerResponse(
+                2L, 5L, "Jane", "Trainer", "Jane.Trainer", true, 1L, "Yoga", List.of()
+        );
 
         when(sessionManager.getCurrentSession()).thenReturn(session);
         when(trainerService.getProfileById(2L)).thenReturn(response);
@@ -295,7 +309,9 @@ class GymCrmFacadeTest {
     @Test
     void shouldGetTrainerProfileByUsernameWhenSessionMatches() {
         AuthSession session = new AuthSession(2L, "Jane.Trainer", Role.TRAINER);
-        TrainerResponse response = new TrainerResponse(2L, 5L, "Jane", "Trainer", "Jane.Trainer", true, 1L, "Yoga");
+        TrainerResponse response = new TrainerResponse(
+                2L, 5L, "Jane", "Trainer", "Jane.Trainer", true, 1L, "Yoga", List.of()
+        );
 
         when(sessionManager.getCurrentSession()).thenReturn(session);
         when(trainerService.getProfileByUsername("Jane.Trainer")).thenReturn(response);
@@ -318,8 +334,12 @@ class GymCrmFacadeTest {
     @Test
     void shouldUpdateTrainerProfileUsingSession() {
         AuthSession session = new AuthSession(2L, "Jane.Trainer", Role.TRAINER);
-        UpdateTrainerRequest request = new UpdateTrainerRequest("Jane", "Smith", 1L);
-        TrainerResponse response = new TrainerResponse(2L, 5L, "Jane", "Smith", "Jane.Trainer", true, 1L, "Yoga");
+        UpdateTrainerRequest request = new UpdateTrainerRequest(
+                "Jane.Trainer", "Jane", "Smith", "Yoga", true
+        );
+        TrainerResponse response = new TrainerResponse(
+                2L, 5L, "Jane", "Smith", "Jane.Trainer", true, 1L, "Yoga", List.of()
+        );
 
         when(sessionManager.getCurrentSession()).thenReturn(session);
         when(trainerService.updateProfile(2L, request)).thenReturn(response);
@@ -334,7 +354,9 @@ class GymCrmFacadeTest {
     void shouldChangeTrainerPasswordUsingSession() {
         AuthSession session = new AuthSession(2L, "Jane.Trainer", Role.TRAINER);
         ChangePasswordRequest request = new ChangePasswordRequest("oldPass", "newPass");
-        TrainerResponse response = new TrainerResponse(2L, 5L, "Jane", "Trainer", "Jane.Trainer", true, 1L, "Yoga");
+        TrainerResponse response = new TrainerResponse(
+                2L, 5L, "Jane", "Trainer", "Jane.Trainer", true, 1L, "Yoga", List.of()
+        );
 
         when(sessionManager.getCurrentSession()).thenReturn(session);
         when(trainerService.changePassword(2L, request)).thenReturn(response);
@@ -360,7 +382,9 @@ class GymCrmFacadeTest {
     @Test
     void shouldFindTrainersBySpecializationWhenAuthenticatedAsTrainer() {
         AuthSession session = new AuthSession(2L, "Jane.Trainer", Role.TRAINER);
-        TrainerResponse trainer = new TrainerResponse(2L, 5L, "Jane", "Trainer", "Jane.Trainer", true, 1L, "Yoga");
+        TrainerResponse trainer = new TrainerResponse(
+                2L, 5L, "Jane", "Trainer", "Jane.Trainer", true, 1L, "Yoga", List.of()
+        );
 
         when(sessionManager.getCurrentSession()).thenReturn(session);
         when(trainerService.findBySpecializationName("Yoga")).thenReturn(List.of(trainer));

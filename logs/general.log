@@ -1,0 +1,143 @@
+2026-07-13 10:47:17.309 [main] INFO  [c.e.epam.gymcrm.GymCrmApiApplication] Starting GymCrmApiApplication using Java 21.0.11 with PID 39551 (/home/aliothosa/IdeaProjects/GYM-CRM/gym-crm-api/target/classes started by aliothosa in /home/aliothosa/IdeaProjects/GYM-CRM)
+2026-07-13 10:47:17.312 [main] INFO  [c.e.epam.gymcrm.GymCrmApiApplication] No active profile set, falling back to 1 default profile: "default"
+2026-07-13 10:47:17.749 [main] INFO  [o.s.d.r.c.RepositoryConfigurationDelegate] Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-07-13 10:47:17.787 [main] INFO  [o.s.d.r.c.RepositoryConfigurationDelegate] Finished Spring Data repository scanning in 32 ms. Found 5 JPA repository interfaces.
+2026-07-13 10:47:18.090 [main] INFO  [o.s.boot.tomcat.TomcatWebServer] Tomcat initialized with port 8080 (http)
+2026-07-13 10:47:18.097 [main] INFO  [o.a.coyote.http11.Http11NioProtocol] Initializing ProtocolHandler ["http-nio-8080"]
+2026-07-13 10:47:18.099 [main] INFO  [o.a.catalina.core.StandardService] Starting service [Tomcat]
+2026-07-13 10:47:18.099 [main] INFO  [o.a.catalina.core.StandardEngine] Starting Servlet engine: [Apache Tomcat/11.0.21]
+2026-07-13 10:47:18.125 [main] INFO  [o.s.b.w.c.s.WebApplicationContextInitializer] Root WebApplicationContext: initialization completed in 778 ms
+2026-07-13 10:47:18.283 [main] INFO  [org.hibernate.orm.jpa] HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-07-13 10:47:18.311 [main] INFO  [org.hibernate.orm.core] HHH000001: Hibernate ORM core version 7.2.12.Final
+2026-07-13 10:47:18.569 [main] INFO  [o.s.o.j.p.SpringPersistenceUnitInfo] No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-07-13 10:47:18.588 [main] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Starting...
+2026-07-13 10:47:18.681 [main] INFO  [com.zaxxer.hikari.pool.HikariPool] HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@141dfcf9
+2026-07-13 10:47:18.682 [main] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Start completed.
+2026-07-13 10:47:18.706 [main] WARN  [org.hibernate.orm.deprecation] HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-07-13 10:47:18.720 [main] INFO  [o.hibernate.orm.connections.pooling] HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5432/gymcrm]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 16.14
+	Default catalog/schema: gymcrm/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-07-13 10:47:19.341 [main] INFO  [org.hibernate.orm.core] HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-07-13 10:47:19.561 [main] INFO  [o.s.o.j.LocalContainerEntityManagerFactoryBean] Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-07-13 10:47:19.662 [main] INFO  [o.s.d.j.r.q.QueryEnhancerFactories] Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-07-13 10:47:20.904 [main] WARN  [o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration] spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-07-13 10:47:21.122 [main] INFO  [o.a.coyote.http11.Http11NioProtocol] Starting ProtocolHandler ["http-nio-8080"]
+2026-07-13 10:47:21.126 [main] WARN  [o.s.b.w.s.s.c.AnnotationConfigServletWebServerApplicationContext] Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'
+2026-07-13 10:47:21.127 [main] INFO  [o.s.o.j.LocalContainerEntityManagerFactoryBean] Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-07-13 10:47:21.166 [main] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Shutdown initiated...
+2026-07-13 10:47:21.170 [main] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Shutdown completed.
+2026-07-13 10:47:21.177 [main] INFO  [o.s.b.a.l.ConditionEvaluationReportLogger] 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-07-13 10:47:21.185 [main] ERROR [o.s.b.d.LoggingFailureAnalysisReporter] 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Web server failed to start. Port 8080 was already in use.
+
+Action:
+
+Identify and stop the process that's listening on port 8080 or configure this application to listen on another port.
+
+2026-07-13 10:49:04.148 [main] INFO  [c.e.epam.gymcrm.GymCrmApiApplication] Starting GymCrmApiApplication using Java 21.0.11 with PID 39853 (/home/aliothosa/IdeaProjects/GYM-CRM/gym-crm-api/target/classes started by aliothosa in /home/aliothosa/IdeaProjects/GYM-CRM)
+2026-07-13 10:49:04.150 [main] INFO  [c.e.epam.gymcrm.GymCrmApiApplication] No active profile set, falling back to 1 default profile: "default"
+2026-07-13 10:49:04.622 [main] INFO  [o.s.d.r.c.RepositoryConfigurationDelegate] Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-07-13 10:49:04.661 [main] INFO  [o.s.d.r.c.RepositoryConfigurationDelegate] Finished Spring Data repository scanning in 34 ms. Found 5 JPA repository interfaces.
+2026-07-13 10:49:04.966 [main] INFO  [o.s.boot.tomcat.TomcatWebServer] Tomcat initialized with port 8080 (http)
+2026-07-13 10:49:04.973 [main] INFO  [o.a.coyote.http11.Http11NioProtocol] Initializing ProtocolHandler ["http-nio-8080"]
+2026-07-13 10:49:04.975 [main] INFO  [o.a.catalina.core.StandardService] Starting service [Tomcat]
+2026-07-13 10:49:04.975 [main] INFO  [o.a.catalina.core.StandardEngine] Starting Servlet engine: [Apache Tomcat/11.0.21]
+2026-07-13 10:49:05.003 [main] INFO  [o.s.b.w.c.s.WebApplicationContextInitializer] Root WebApplicationContext: initialization completed in 818 ms
+2026-07-13 10:49:05.158 [main] INFO  [org.hibernate.orm.jpa] HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-07-13 10:49:05.185 [main] INFO  [org.hibernate.orm.core] HHH000001: Hibernate ORM core version 7.2.12.Final
+2026-07-13 10:49:05.455 [main] INFO  [o.s.o.j.p.SpringPersistenceUnitInfo] No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-07-13 10:49:05.474 [main] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Starting...
+2026-07-13 10:49:05.574 [main] INFO  [com.zaxxer.hikari.pool.HikariPool] HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@39a865c1
+2026-07-13 10:49:05.575 [main] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Start completed.
+2026-07-13 10:49:05.594 [main] WARN  [org.hibernate.orm.deprecation] HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-07-13 10:49:05.609 [main] INFO  [o.hibernate.orm.connections.pooling] HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5432/gymcrm]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 16.14
+	Default catalog/schema: gymcrm/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-07-13 10:49:06.215 [main] INFO  [org.hibernate.orm.core] HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-07-13 10:49:06.360 [main] INFO  [o.s.o.j.LocalContainerEntityManagerFactoryBean] Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-07-13 10:49:06.448 [main] INFO  [o.s.d.j.r.q.QueryEnhancerFactories] Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-07-13 10:49:07.739 [main] WARN  [o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration] spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-07-13 10:49:07.960 [main] INFO  [o.a.coyote.http11.Http11NioProtocol] Starting ProtocolHandler ["http-nio-8080"]
+2026-07-13 10:49:07.965 [main] WARN  [o.s.b.w.s.s.c.AnnotationConfigServletWebServerApplicationContext] Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'
+2026-07-13 10:49:07.966 [main] INFO  [o.s.o.j.LocalContainerEntityManagerFactoryBean] Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-07-13 10:49:08.031 [main] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Shutdown initiated...
+2026-07-13 10:49:08.035 [main] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Shutdown completed.
+2026-07-13 10:49:08.049 [main] INFO  [o.s.b.a.l.ConditionEvaluationReportLogger] 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-07-13 10:49:08.068 [main] ERROR [o.s.b.d.LoggingFailureAnalysisReporter] 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Web server failed to start. Port 8080 was already in use.
+
+Action:
+
+Identify and stop the process that's listening on port 8080 or configure this application to listen on another port.
+
+2026-07-13 11:25:16.849 [main] INFO  [c.e.epam.gymcrm.GymCrmApiApplication] Starting GymCrmApiApplication using Java 21.0.11 with PID 53127 (/home/aliothosa/IdeaProjects/GYM-CRM/gym-crm-api/target/classes started by aliothosa in /home/aliothosa/IdeaProjects/GYM-CRM)
+2026-07-13 11:25:16.852 [main] INFO  [c.e.epam.gymcrm.GymCrmApiApplication] No active profile set, falling back to 1 default profile: "default"
+2026-07-13 11:25:17.300 [main] INFO  [o.s.d.r.c.RepositoryConfigurationDelegate] Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-07-13 11:25:17.337 [main] INFO  [o.s.d.r.c.RepositoryConfigurationDelegate] Finished Spring Data repository scanning in 32 ms. Found 5 JPA repository interfaces.
+2026-07-13 11:25:17.657 [main] INFO  [o.s.boot.tomcat.TomcatWebServer] Tomcat initialized with port 8080 (http)
+2026-07-13 11:25:17.665 [main] INFO  [o.a.coyote.http11.Http11NioProtocol] Initializing ProtocolHandler ["http-nio-8080"]
+2026-07-13 11:25:17.666 [main] INFO  [o.a.catalina.core.StandardService] Starting service [Tomcat]
+2026-07-13 11:25:17.667 [main] INFO  [o.a.catalina.core.StandardEngine] Starting Servlet engine: [Apache Tomcat/11.0.21]
+2026-07-13 11:25:17.694 [main] INFO  [o.s.b.w.c.s.WebApplicationContextInitializer] Root WebApplicationContext: initialization completed in 793 ms
+2026-07-13 11:25:17.796 [main] INFO  [org.hibernate.orm.jpa] HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-07-13 11:25:17.822 [main] INFO  [org.hibernate.orm.core] HHH000001: Hibernate ORM core version 7.2.12.Final
+2026-07-13 11:25:18.091 [main] INFO  [o.s.o.j.p.SpringPersistenceUnitInfo] No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-07-13 11:25:18.123 [main] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Starting...
+2026-07-13 11:25:18.226 [main] INFO  [com.zaxxer.hikari.pool.HikariPool] HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@5b6cc344
+2026-07-13 11:25:18.227 [main] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Start completed.
+2026-07-13 11:25:18.247 [main] WARN  [org.hibernate.orm.deprecation] HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-07-13 11:25:18.263 [main] INFO  [o.hibernate.orm.connections.pooling] HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5432/gymcrm]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 16.14
+	Default catalog/schema: gymcrm/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-07-13 11:25:18.873 [main] INFO  [org.hibernate.orm.core] HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-07-13 11:25:19.024 [main] INFO  [o.s.o.j.LocalContainerEntityManagerFactoryBean] Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-07-13 11:25:19.097 [main] INFO  [o.s.d.j.r.q.QueryEnhancerFactories] Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-07-13 11:25:20.490 [main] WARN  [o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration] spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-07-13 11:25:20.746 [main] INFO  [o.a.coyote.http11.Http11NioProtocol] Starting ProtocolHandler ["http-nio-8080"]
+2026-07-13 11:25:20.755 [main] INFO  [o.s.boot.tomcat.TomcatWebServer] Tomcat started on port 8080 (http) with context path '/'
+2026-07-13 11:25:20.759 [main] INFO  [c.e.epam.gymcrm.GymCrmApiApplication] Started GymCrmApiApplication in 4.302 seconds (process running for 4.57)

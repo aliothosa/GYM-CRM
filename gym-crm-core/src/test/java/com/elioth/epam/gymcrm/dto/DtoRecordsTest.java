@@ -16,6 +16,7 @@ import com.elioth.epam.gymcrm.dto.response.TrainingResponse;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -70,21 +71,29 @@ class DtoRecordsTest {
     void updateTraineeRequest_shouldExposeComponents() {
         Address address = new Address("Elm St", "Austin", "TX", "73301", 7);
         LocalDate birthDate = LocalDate.of(1992, 8, 20);
-        UpdateTraineeRequest request = new UpdateTraineeRequest("Updated", "Name", birthDate, address);
+        UpdateTraineeRequest request = new UpdateTraineeRequest(
+                "updated.name", "Updated", "Name", birthDate, address, true
+        );
 
+        assertEquals("updated.name", request.username());
         assertEquals("Updated", request.firstName());
         assertEquals("Name", request.lastName());
         assertEquals(birthDate, request.birthDate());
         assertEquals(address, request.address());
+        assertTrue(request.isActive());
     }
 
     @Test
     void updateTrainerRequest_shouldExposeComponents() {
-        UpdateTrainerRequest request = new UpdateTrainerRequest("New", "Trainer", 5L);
+        UpdateTrainerRequest request = new UpdateTrainerRequest(
+                "new.trainer", "New", "Trainer", "CARDIO", true
+        );
 
+        assertEquals("new.trainer", request.username());
         assertEquals("New", request.firstName());
         assertEquals("Trainer", request.lastName());
-        assertEquals(5L, request.trainingTypeId());
+        assertEquals("CARDIO", request.trainingType());
+        assertTrue(request.isActive());
     }
 
     @Test
@@ -102,7 +111,7 @@ class DtoRecordsTest {
         Address address = new Address("Pine Rd", "Denver", "CO", "80202", 15);
         LocalDate birthDate = LocalDate.of(1988, 1, 5);
         TraineeResponse response = new TraineeResponse(
-                10L, 20L, "Alice", "Wonder", "alice.wonder", true, birthDate, address
+                10L, 20L, "Alice", "Wonder", "alice.wonder", true, birthDate, address, List.of()
         );
 
         assertEquals(10L, response.traineeId());
@@ -113,12 +122,13 @@ class DtoRecordsTest {
         assertTrue(response.active());
         assertEquals(birthDate, response.birthDate());
         assertEquals(address, response.address());
+        assertEquals(List.of(), response.trainers());
     }
 
     @Test
     void trainerResponse_shouldExposeComponents() {
         TrainerResponse response = new TrainerResponse(
-                1L, 2L, "Carl", "Lee", "carl.lee", true, 3L, "CrossFit"
+                1L, 2L, "Carl", "Lee", "carl.lee", true, 3L, "CrossFit", List.of()
         );
 
         assertEquals(1L, response.trainerId());
@@ -129,6 +139,7 @@ class DtoRecordsTest {
         assertTrue(response.active());
         assertEquals(3L, response.trainingTypeId());
         assertEquals("CrossFit", response.trainingTypeName());
+        assertEquals(List.of(), response.trainees());
     }
 
     @Test

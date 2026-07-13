@@ -17,19 +17,25 @@ INSERT INTO training_types (id, name) VALUES
     (4, 'STRETCHING'),
     (5, 'RESISTANCE');
 
--- 2) Users (user_id 1-3 -> trainers, 4-5 -> trainees)
+-- 2) Users (user_id 1-3 and 6-7 -> trainers, 4-5 and 8-9 -> trainees)
 INSERT INTO users (user_id, first_name, last_name, username, password, active) VALUES
     (1, 'John', 'Doe', 'John.Doe', 'pass123', true),
     (2, 'Jane', 'Smith', 'Jane.Smith', 'pass123', true),
     (3, 'Mike', 'Brown', 'Mike.Brown', 'pass123', true),
     (4, 'Emily', 'Davis', 'Emily.Davis', 'pass123', true),
-    (5, 'Carlos', 'Lopez', 'Carlos.Lopez', 'pass123', true);
+    (5, 'Carlos', 'Lopez', 'Carlos.Lopez', 'pass123', true),
+    (6, 'Sofia', 'Martinez', 'Sofia.Martinez', 'pass123', true),
+    (7, 'Daniel', 'Wilson', 'Daniel.Wilson', 'pass123', true),
+    (8, 'Lucia', 'Hernandez', 'Lucia.Hernandez', 'pass123', true),
+    (9, 'Andre', 'Gomez', 'Andre.Gomez', 'pass123', false);
 
 -- 3) Trainers
 INSERT INTO trainers (trainer_id, user_id, training_type_id) VALUES
     (1, 1, 1),
     (2, 2, 2),
-    (3, 3, 5);
+    (3, 3, 5),
+    (4, 6, 3),
+    (5, 7, 4);
 
 -- 4) Trainees (embedded Address columns on trainees table)
 INSERT INTO trainees (
@@ -43,14 +49,20 @@ INSERT INTO trainees (
     number
 ) VALUES
     (1, 4, '1998-04-12', 'Main Street', 'Mexico City', 'CDMX', '01000', 100),
-    (2, 5, '2000-09-25', 'Oak Avenue', 'Guadalajara', 'Jalisco', '44100', 25);
+    (2, 5, '2000-09-25', 'Oak Avenue', 'Guadalajara', 'Jalisco', '44100', 25),
+    (3, 8, '1995-02-18', 'Reforma Avenue', 'Monterrey', 'Nuevo Leon', '64000', 210),
+    (4, 9, '1989-11-03', 'Sunset Boulevard', 'Puebla', 'Puebla', '72000', 47);
 
 -- 5) Trainee <-> Trainer assignments
 INSERT INTO trainee_trainers (trainee_id, trainer_id) VALUES
     (1, 1),
     (1, 2),
     (2, 2),
-    (2, 3);
+    (2, 3),
+    (3, 1),
+    (3, 4),
+    (4, 3),
+    (4, 5);
 
 -- 6) Trainings
 INSERT INTO trainings (
@@ -64,7 +76,12 @@ INSERT INTO trainings (
 ) VALUES
     (1, 1, 1, 1, 'Morning Fitness Session', '2026-06-01', 60),
     (2, 1, 2, 2, 'Yoga Basics', '2026-06-05', 45),
-    (3, 2, 3, 5, 'Resistance Training', '2026-06-08', 50);
+    (3, 2, 3, 5, 'Resistance Training', '2026-06-08', 50),
+    (4, 3, 4, 3, 'Zumba Fundamentals', '2026-06-10', 55),
+    (5, 4, 5, 4, 'Full Body Stretching', '2026-06-12', 40),
+    (6, 3, 1, 1, 'Functional Fitness', '2026-06-15', 60),
+    (7, 4, 3, 5, 'Resistance Circuit', '2026-06-18', 50),
+    (8, 2, 2, 2, 'Evening Yoga', '2026-06-20', 45);
 
 -- 7) Align identity sequences with explicit seed IDs
 SELECT setval(pg_get_serial_sequence('training_types', 'id'), COALESCE((SELECT MAX(id) FROM training_types), 1), true);

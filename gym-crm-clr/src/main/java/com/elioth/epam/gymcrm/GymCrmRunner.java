@@ -357,17 +357,18 @@ public class GymCrmRunner implements CommandLineRunner {
         String lastName = readStringOrDefault("Last name", current.lastName());
         LocalDate birthDate = readLocalDateOrDefault("Birth date (yyyy-MM-dd)", current.birthDate());
         Address address = readAddressOrDefault(current.address());
-        return new UpdateTraineeRequest(firstName, lastName, birthDate, address);
+        return new UpdateTraineeRequest(
+                current.username(), firstName, lastName, birthDate, address, current.active()
+        );
     }
 
     private UpdateTrainerRequest readUpdateTrainerRequest(TrainerResponse current) {
         String firstName = readStringOrDefault("First name", current.firstName());
         String lastName = readStringOrDefault("Last name", current.lastName());
-        Long trainingTypeId = readLongOrDefault(
-                "Training type ID (current: " + current.trainingTypeId() + ")",
-                current.trainingTypeId()
+        String trainingType = readStringOrDefault("Training type", current.trainingTypeName());
+        return new UpdateTrainerRequest(
+                current.username(), firstName, lastName, trainingType, current.active()
         );
-        return new UpdateTrainerRequest(firstName, lastName, trainingTypeId);
     }
 
     private Address readAddress() {
