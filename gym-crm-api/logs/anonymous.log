@@ -1,1 +1,25 @@
 2026-07-13 10:47:46.672 [http-nio-8080-exec-1] WARN  [USER_ACTIVITY] REST_CALL method=GET endpoint=/trainings/training-types request={} status=403 response=Forbidden
+2026-07-13 11:43:07.156 [http-nio-8080-exec-1] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/swagger-ui.html, request={}, response=404 Not Found
+2026-07-13 11:43:07.163 [http-nio-8080-exec-1] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/error, request={}, response=403 Forbidden
+2026-07-13 11:43:07.695 [http-nio-8080-exec-2] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/swagger-ui.html, request={}, response=404 Not Found
+2026-07-13 11:43:07.696 [http-nio-8080-exec-2] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/error, request={}, response=403 Forbidden
+2026-07-13 11:43:08.091 [http-nio-8080-exec-3] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/swagger-ui.html, request={}, response=404 Not Found
+2026-07-13 11:43:08.092 [http-nio-8080-exec-3] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/error, request={}, response=403 Forbidden
+2026-07-13 11:43:08.264 [http-nio-8080-exec-4] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/swagger-ui.html, request={}, response=404 Not Found
+2026-07-13 11:43:08.265 [http-nio-8080-exec-4] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/error, request={}, response=403 Forbidden
+2026-07-13 11:43:08.439 [http-nio-8080-exec-5] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/swagger-ui.html, request={}, response=404 Not Found
+2026-07-13 11:43:08.440 [http-nio-8080-exec-5] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/error, request={}, response=403 Forbidden
+2026-07-13 11:43:08.591 [http-nio-8080-exec-6] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/swagger-ui.html, request={}, response=404 Not Found
+2026-07-13 11:43:08.593 [http-nio-8080-exec-6] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/error, request={}, response=403 Forbidden
+2026-07-13 11:43:08.783 [http-nio-8080-exec-7] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/swagger-ui.html, request={}, response=404 Not Found
+2026-07-13 11:43:08.785 [http-nio-8080-exec-7] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/error, request={}, response=403 Forbidden
+2026-07-13 11:43:08.935 [http-nio-8080-exec-8] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/swagger-ui.html, request={}, response=404 Not Found
+2026-07-13 11:43:08.936 [http-nio-8080-exec-8] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/error, request={}, response=403 Forbidden
+2026-07-13 11:43:34.618 [http-nio-8080-exec-9] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/v3/api-docs, request={}, response=404 Not Found
+2026-07-13 11:43:34.619 [http-nio-8080-exec-9] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/error, request={}, response=403 Forbidden
+2026-07-13 11:46:26.106 [http-nio-8080-exec-1] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/swagger-ui.html, request={}, response=404 Not Found
+2026-07-13 11:46:26.130 [http-nio-8080-exec-1] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/error, request={}, response=404 Not Found
+2026-07-13 11:46:26.165 [http-nio-8080-exec-2] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/favicon.ico, request={}, response=403 Forbidden
+2026-07-13 11:46:26.197 [http-nio-8080-exec-2] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/error, request={}, response=403 Forbidden
+2026-07-13 11:47:00.504 [http-nio-8080-exec-3] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/swagger-ui/index.html, request={}, response=404 Not Found
+2026-07-13 11:47:00.505 [http-nio-8080-exec-3] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/error, request={}, response=404 Not Found

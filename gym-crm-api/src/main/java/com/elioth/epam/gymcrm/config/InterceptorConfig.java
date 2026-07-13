@@ -26,13 +26,21 @@ public class InterceptorConfig implements WebMvcConfigurer {
                 .addInterceptor(restCallLoggingInterceptor)
                 .addPathPatterns("/**");
 
-        registry
-                .addInterceptor(authenticationInterceptor)
+
+        registry.addInterceptor(authenticationInterceptor)
                 .addPathPatterns("/**")
                 .excludePathPatterns(
                         "/auth/**",
-                        "/trainee/register",
-                        "/trainer/register"
+                        "/trainees/register",
+                        "/trainers/register",
+
+                        "/swagger-ui.html",
+                        "/swagger-ui/**",
+                        "/v3/api-docs",
+                        "/v3/api-docs/**",
+                        "/v3/api-docs.yaml",
+
+                        "/error"
                 );
     }
 

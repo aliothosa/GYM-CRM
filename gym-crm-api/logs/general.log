@@ -1086,3 +1086,182 @@ Caused by: org.springframework.util.InvalidMimeTypeException: Invalid mime type 
 2026-07-13 11:19:25.081 [SpringApplicationShutdownHook] INFO  [o.s.o.j.LocalContainerEntityManagerFactoryBean] Closing JPA EntityManagerFactory for persistence unit 'default'
 2026-07-13 11:19:25.199 [SpringApplicationShutdownHook] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Shutdown initiated...
 2026-07-13 11:19:25.202 [SpringApplicationShutdownHook] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Shutdown completed.
+2026-07-13 11:39:09.308 [main] INFO  [c.e.e.g.GymCrmApiApplicationTests] Starting GymCrmApiApplicationTests using Java 21.0.11 with PID 68210 (started by aliothosa in /home/aliothosa/IdeaProjects/GYM-CRM/gym-crm-api)
+2026-07-13 11:39:09.311 [main] INFO  [c.e.e.g.GymCrmApiApplicationTests] The following 1 profile is active: "test"
+2026-07-13 11:39:10.215 [main] INFO  [o.s.d.r.c.RepositoryConfigurationDelegate] Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-07-13 11:39:10.304 [main] INFO  [o.s.d.r.c.RepositoryConfigurationDelegate] Finished Spring Data repository scanning in 75 ms. Found 5 JPA repository interfaces.
+2026-07-13 11:39:10.860 [main] INFO  [org.hibernate.orm.jpa] HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-07-13 11:39:10.923 [main] INFO  [org.hibernate.orm.core] HHH000001: Hibernate ORM core version 7.2.12.Final
+2026-07-13 11:39:11.298 [main] INFO  [o.s.o.j.p.SpringPersistenceUnitInfo] No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-07-13 11:39:11.339 [main] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Starting...
+2026-07-13 11:39:11.725 [main] INFO  [com.zaxxer.hikari.pool.HikariPool] HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:gymcrm-test user=SA
+2026-07-13 11:39:11.727 [main] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Start completed.
+2026-07-13 11:39:11.761 [main] WARN  [org.hibernate.orm.deprecation] HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-07-13 11:39:11.797 [main] INFO  [o.hibernate.orm.connections.pooling] HHH10001005: Database info:
+	Database JDBC URL [jdbc:h2:mem:gymcrm-test]
+	Database driver: H2 JDBC Driver
+	Database dialect: H2Dialect
+	Database version: 2.4.240
+	Default catalog/schema: GYMCRM-TEST/PUBLIC
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: 100
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-07-13 11:39:12.872 [main] INFO  [org.hibernate.orm.core] HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-07-13 11:39:12.944 [main] INFO  [o.s.o.j.LocalContainerEntityManagerFactoryBean] Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-07-13 11:39:13.029 [main] INFO  [o.s.d.j.r.q.QueryEnhancerFactories] Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-07-13 11:39:14.566 [main] WARN  [o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration] spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-07-13 11:39:14.978 [main] INFO  [c.e.e.g.GymCrmApiApplicationTests] Started GymCrmApiApplicationTests in 6.239 seconds (process running for 9.45)
+2026-07-13 11:39:15.009 [SpringApplicationShutdownHook] INFO  [o.s.o.j.LocalContainerEntityManagerFactoryBean] Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-07-13 11:39:15.140 [SpringApplicationShutdownHook] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Shutdown initiated...
+2026-07-13 11:39:15.142 [SpringApplicationShutdownHook] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Shutdown completed.
+2026-07-13 11:42:41.193 [main] INFO  [c.e.e.g.GymCrmApiApplicationTests] Starting GymCrmApiApplicationTests using Java 21.0.11 with PID 69354 (started by aliothosa in /home/aliothosa/IdeaProjects/GYM-CRM/gym-crm-api)
+2026-07-13 11:42:41.194 [main] INFO  [c.e.e.g.GymCrmApiApplicationTests] The following 1 profile is active: "test"
+2026-07-13 11:42:42.028 [main] INFO  [o.s.d.r.c.RepositoryConfigurationDelegate] Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-07-13 11:42:42.108 [main] INFO  [o.s.d.r.c.RepositoryConfigurationDelegate] Finished Spring Data repository scanning in 68 ms. Found 5 JPA repository interfaces.
+2026-07-13 11:42:42.608 [main] INFO  [org.hibernate.orm.jpa] HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-07-13 11:42:42.676 [main] INFO  [org.hibernate.orm.core] HHH000001: Hibernate ORM core version 7.2.12.Final
+2026-07-13 11:42:43.060 [main] INFO  [o.s.o.j.p.SpringPersistenceUnitInfo] No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-07-13 11:42:43.096 [main] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Starting...
+2026-07-13 11:42:43.418 [main] INFO  [com.zaxxer.hikari.pool.HikariPool] HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:gymcrm-test user=SA
+2026-07-13 11:42:43.420 [main] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Start completed.
+2026-07-13 11:42:43.446 [main] WARN  [org.hibernate.orm.deprecation] HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-07-13 11:42:43.472 [main] INFO  [o.hibernate.orm.connections.pooling] HHH10001005: Database info:
+	Database JDBC URL [jdbc:h2:mem:gymcrm-test]
+	Database driver: H2 JDBC Driver
+	Database dialect: H2Dialect
+	Database version: 2.4.240
+	Default catalog/schema: GYMCRM-TEST/PUBLIC
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: 100
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-07-13 11:42:44.544 [main] INFO  [org.hibernate.orm.core] HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-07-13 11:42:44.620 [main] INFO  [o.s.o.j.LocalContainerEntityManagerFactoryBean] Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-07-13 11:42:44.715 [main] INFO  [o.s.d.j.r.q.QueryEnhancerFactories] Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-07-13 11:42:47.026 [main] WARN  [o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration] spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-07-13 11:42:47.439 [main] INFO  [c.e.e.g.GymCrmApiApplicationTests] Started GymCrmApiApplicationTests in 6.835 seconds (process running for 10.254)
+2026-07-13 11:42:47.473 [SpringApplicationShutdownHook] INFO  [o.s.o.j.LocalContainerEntityManagerFactoryBean] Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-07-13 11:42:47.601 [SpringApplicationShutdownHook] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Shutdown initiated...
+2026-07-13 11:42:47.603 [SpringApplicationShutdownHook] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Shutdown completed.
+2026-07-13 11:43:00.357 [main] INFO  [c.e.epam.gymcrm.GymCrmApiApplication] Starting GymCrmApiApplication using Java 21.0.11 with PID 69746 (/home/aliothosa/IdeaProjects/GYM-CRM/gym-crm-api/target/classes started by aliothosa in /home/aliothosa/IdeaProjects/GYM-CRM/gym-crm-api)
+2026-07-13 11:43:00.359 [main] INFO  [c.e.epam.gymcrm.GymCrmApiApplication] No active profile set, falling back to 1 default profile: "default"
+2026-07-13 11:43:00.760 [main] INFO  [o.s.d.r.c.RepositoryConfigurationDelegate] Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-07-13 11:43:00.797 [main] INFO  [o.s.d.r.c.RepositoryConfigurationDelegate] Finished Spring Data repository scanning in 30 ms. Found 5 JPA repository interfaces.
+2026-07-13 11:43:01.102 [main] INFO  [o.s.boot.tomcat.TomcatWebServer] Tomcat initialized with port 8080 (http)
+2026-07-13 11:43:01.110 [main] INFO  [o.a.coyote.http11.Http11NioProtocol] Initializing ProtocolHandler ["http-nio-8080"]
+2026-07-13 11:43:01.111 [main] INFO  [o.a.catalina.core.StandardService] Starting service [Tomcat]
+2026-07-13 11:43:01.111 [main] INFO  [o.a.catalina.core.StandardEngine] Starting Servlet engine: [Apache Tomcat/11.0.21]
+2026-07-13 11:43:01.137 [main] INFO  [o.s.b.w.c.s.WebApplicationContextInitializer] Root WebApplicationContext: initialization completed in 751 ms
+2026-07-13 11:43:01.248 [main] INFO  [org.hibernate.orm.jpa] HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-07-13 11:43:01.286 [main] INFO  [org.hibernate.orm.core] HHH000001: Hibernate ORM core version 7.2.12.Final
+2026-07-13 11:43:01.522 [main] INFO  [o.s.o.j.p.SpringPersistenceUnitInfo] No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-07-13 11:43:01.540 [main] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Starting...
+2026-07-13 11:43:01.639 [main] INFO  [com.zaxxer.hikari.pool.HikariPool] HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@141dfcf9
+2026-07-13 11:43:01.640 [main] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Start completed.
+2026-07-13 11:43:01.658 [main] WARN  [org.hibernate.orm.deprecation] HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-07-13 11:43:01.672 [main] INFO  [o.hibernate.orm.connections.pooling] HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5432/gymcrm]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 16.14
+	Default catalog/schema: gymcrm/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-07-13 11:43:02.274 [main] INFO  [org.hibernate.orm.core] HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-07-13 11:43:02.427 [main] INFO  [o.s.o.j.LocalContainerEntityManagerFactoryBean] Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-07-13 11:43:02.503 [main] INFO  [o.s.d.j.r.q.QueryEnhancerFactories] Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-07-13 11:43:03.710 [main] WARN  [o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration] spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-07-13 11:43:03.956 [main] INFO  [o.a.coyote.http11.Http11NioProtocol] Starting ProtocolHandler ["http-nio-8080"]
+2026-07-13 11:43:03.965 [main] INFO  [o.s.boot.tomcat.TomcatWebServer] Tomcat started on port 8080 (http) with context path '/'
+2026-07-13 11:43:03.969 [main] INFO  [c.e.epam.gymcrm.GymCrmApiApplication] Started GymCrmApiApplication in 3.978 seconds (process running for 4.185)
+2026-07-13 11:43:07.131 [http-nio-8080-exec-1] INFO  [o.a.c.c.C.[Tomcat].[localhost].[/]] Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-07-13 11:43:07.131 [http-nio-8080-exec-1] INFO  [o.s.web.servlet.DispatcherServlet] Initializing Servlet 'dispatcherServlet'
+2026-07-13 11:43:07.132 [http-nio-8080-exec-1] INFO  [o.s.web.servlet.DispatcherServlet] Completed initialization in 1 ms
+2026-07-13 11:45:32.780 [SpringApplicationShutdownHook] INFO  [o.s.boot.tomcat.GracefulShutdown] Commencing graceful shutdown. Waiting for active requests to complete
+2026-07-13 11:45:32.783 [tomcat-shutdown] INFO  [o.s.boot.tomcat.GracefulShutdown] Graceful shutdown complete
+2026-07-13 11:45:32.788 [SpringApplicationShutdownHook] INFO  [o.s.o.j.LocalContainerEntityManagerFactoryBean] Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-07-13 11:45:32.850 [SpringApplicationShutdownHook] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Shutdown initiated...
+2026-07-13 11:45:32.852 [SpringApplicationShutdownHook] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Shutdown completed.
+2026-07-13 11:45:58.733 [main] INFO  [c.e.e.g.GymCrmApiApplicationTests] Starting GymCrmApiApplicationTests using Java 21.0.11 with PID 70915 (started by aliothosa in /home/aliothosa/IdeaProjects/GYM-CRM/gym-crm-api)
+2026-07-13 11:45:58.735 [main] INFO  [c.e.e.g.GymCrmApiApplicationTests] The following 1 profile is active: "test"
+2026-07-13 11:45:59.543 [main] INFO  [o.s.d.r.c.RepositoryConfigurationDelegate] Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-07-13 11:45:59.613 [main] INFO  [o.s.d.r.c.RepositoryConfigurationDelegate] Finished Spring Data repository scanning in 59 ms. Found 5 JPA repository interfaces.
+2026-07-13 11:46:00.113 [main] INFO  [org.hibernate.orm.jpa] HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-07-13 11:46:00.178 [main] INFO  [org.hibernate.orm.core] HHH000001: Hibernate ORM core version 7.2.12.Final
+2026-07-13 11:46:00.523 [main] INFO  [o.s.o.j.p.SpringPersistenceUnitInfo] No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-07-13 11:46:00.558 [main] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Starting...
+2026-07-13 11:46:00.846 [main] INFO  [com.zaxxer.hikari.pool.HikariPool] HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:gymcrm-test user=SA
+2026-07-13 11:46:00.848 [main] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Start completed.
+2026-07-13 11:46:00.874 [main] WARN  [org.hibernate.orm.deprecation] HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-07-13 11:46:00.900 [main] INFO  [o.hibernate.orm.connections.pooling] HHH10001005: Database info:
+	Database JDBC URL [jdbc:h2:mem:gymcrm-test]
+	Database driver: H2 JDBC Driver
+	Database dialect: H2Dialect
+	Database version: 2.4.240
+	Default catalog/schema: GYMCRM-TEST/PUBLIC
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: 100
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-07-13 11:46:01.933 [main] INFO  [org.hibernate.orm.core] HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-07-13 11:46:02.019 [main] INFO  [o.s.o.j.LocalContainerEntityManagerFactoryBean] Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-07-13 11:46:02.100 [main] INFO  [o.s.d.j.r.q.QueryEnhancerFactories] Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-07-13 11:46:03.876 [main] WARN  [o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration] spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-07-13 11:46:04.280 [main] INFO  [c.e.e.g.GymCrmApiApplicationTests] Started GymCrmApiApplicationTests in 6.053 seconds (process running for 9.263)
+2026-07-13 11:46:04.315 [SpringApplicationShutdownHook] INFO  [o.s.o.j.LocalContainerEntityManagerFactoryBean] Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-07-13 11:46:04.440 [SpringApplicationShutdownHook] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Shutdown initiated...
+2026-07-13 11:46:04.442 [SpringApplicationShutdownHook] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Shutdown completed.
+2026-07-13 11:46:19.258 [main] INFO  [c.e.epam.gymcrm.GymCrmApiApplication] Starting GymCrmApiApplication using Java 21.0.11 with PID 71321 (/home/aliothosa/IdeaProjects/GYM-CRM/gym-crm-api/target/classes started by aliothosa in /home/aliothosa/IdeaProjects/GYM-CRM/gym-crm-api)
+2026-07-13 11:46:19.260 [main] INFO  [c.e.epam.gymcrm.GymCrmApiApplication] No active profile set, falling back to 1 default profile: "default"
+2026-07-13 11:46:19.716 [main] INFO  [o.s.d.r.c.RepositoryConfigurationDelegate] Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-07-13 11:46:19.757 [main] INFO  [o.s.d.r.c.RepositoryConfigurationDelegate] Finished Spring Data repository scanning in 34 ms. Found 5 JPA repository interfaces.
+2026-07-13 11:46:20.078 [main] INFO  [o.s.boot.tomcat.TomcatWebServer] Tomcat initialized with port 8080 (http)
+2026-07-13 11:46:20.086 [main] INFO  [o.a.coyote.http11.Http11NioProtocol] Initializing ProtocolHandler ["http-nio-8080"]
+2026-07-13 11:46:20.087 [main] INFO  [o.a.catalina.core.StandardService] Starting service [Tomcat]
+2026-07-13 11:46:20.087 [main] INFO  [o.a.catalina.core.StandardEngine] Starting Servlet engine: [Apache Tomcat/11.0.21]
+2026-07-13 11:46:20.115 [main] INFO  [o.s.b.w.c.s.WebApplicationContextInitializer] Root WebApplicationContext: initialization completed in 817 ms
+2026-07-13 11:46:20.220 [main] INFO  [org.hibernate.orm.jpa] HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-07-13 11:46:20.248 [main] INFO  [org.hibernate.orm.core] HHH000001: Hibernate ORM core version 7.2.12.Final
+2026-07-13 11:46:20.506 [main] INFO  [o.s.o.j.p.SpringPersistenceUnitInfo] No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-07-13 11:46:20.533 [main] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Starting...
+2026-07-13 11:46:20.657 [main] INFO  [com.zaxxer.hikari.pool.HikariPool] HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@a7bbdbc
+2026-07-13 11:46:20.658 [main] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Start completed.
+2026-07-13 11:46:20.677 [main] WARN  [org.hibernate.orm.deprecation] HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-07-13 11:46:20.691 [main] INFO  [o.hibernate.orm.connections.pooling] HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5432/gymcrm]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 16.14
+	Default catalog/schema: gymcrm/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-07-13 11:46:21.279 [main] INFO  [org.hibernate.orm.core] HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-07-13 11:46:21.444 [main] INFO  [o.s.o.j.LocalContainerEntityManagerFactoryBean] Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-07-13 11:46:21.514 [main] INFO  [o.s.d.j.r.q.QueryEnhancerFactories] Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-07-13 11:46:22.781 [main] WARN  [o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration] spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-07-13 11:46:23.029 [main] INFO  [o.a.coyote.http11.Http11NioProtocol] Starting ProtocolHandler ["http-nio-8080"]
+2026-07-13 11:46:23.040 [main] INFO  [o.s.boot.tomcat.TomcatWebServer] Tomcat started on port 8080 (http) with context path '/'
+2026-07-13 11:46:23.044 [main] INFO  [c.e.epam.gymcrm.GymCrmApiApplication] Started GymCrmApiApplication in 4.122 seconds (process running for 4.325)
+2026-07-13 11:46:26.085 [http-nio-8080-exec-1] INFO  [o.a.c.c.C.[Tomcat].[localhost].[/]] Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-07-13 11:46:26.085 [http-nio-8080-exec-1] INFO  [o.s.web.servlet.DispatcherServlet] Initializing Servlet 'dispatcherServlet'
+2026-07-13 11:46:26.086 [http-nio-8080-exec-1] INFO  [o.s.web.servlet.DispatcherServlet] Completed initialization in 1 ms
+2026-07-13 11:47:12.493 [SpringApplicationShutdownHook] INFO  [o.s.boot.tomcat.GracefulShutdown] Commencing graceful shutdown. Waiting for active requests to complete
+2026-07-13 11:47:12.496 [tomcat-shutdown] INFO  [o.s.boot.tomcat.GracefulShutdown] Graceful shutdown complete
+2026-07-13 11:47:12.501 [SpringApplicationShutdownHook] INFO  [o.s.o.j.LocalContainerEntityManagerFactoryBean] Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-07-13 11:47:12.563 [SpringApplicationShutdownHook] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Shutdown initiated...
+2026-07-13 11:47:12.567 [SpringApplicationShutdownHook] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Shutdown completed.

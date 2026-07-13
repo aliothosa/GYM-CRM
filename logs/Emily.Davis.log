@@ -1,0 +1,5 @@
+2026-07-13 11:32:16.767 [http-nio-8080-exec-5] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/error, request={username=Emily.Davis}, response=403 Forbidden
+2026-07-13 11:36:06.471 [http-nio-8080-exec-8] INFO  [USER_ACTIVITY] Successfully authenticated user: Emily.Davis at 2026-07-13T11:36:06.471950970
+2026-07-13 11:36:06.480 [http-nio-8080-exec-8] INFO  [USER_ACTIVITY] REST call: method=POST, endpoint=/auth/login, request={username=Emily.Davis}, response=200 OK
+2026-07-13 11:36:57.596 [http-nio-8080-exec-10] INFO  [USER_ACTIVITY] getting all training types
+2026-07-13 11:36:57.650 [http-nio-8080-exec-10] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/trainings/training-types, request={}, response=200 OK
