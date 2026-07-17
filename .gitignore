@@ -36,3 +36,6 @@ build/
 
 ### custom docs ###
 review.md
+
+### api call logs ###
+logs

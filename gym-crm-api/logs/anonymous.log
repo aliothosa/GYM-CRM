@@ -81,3 +81,5 @@
 2026-07-17 11:03:40.276 [main] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/swagger-ui/index.html, request={}, response=200 OK
 2026-07-17 11:11:09.769 [main] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/v3/api-docs, request={}, response=200 OK
 2026-07-17 11:11:09.802 [main] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/swagger-ui/index.html, request={}, response=200 OK
+2026-07-17 11:20:23.467 [main] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/v3/api-docs, request={}, response=200 OK
+2026-07-17 11:20:23.498 [main] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/swagger-ui/index.html, request={}, response=200 OK
