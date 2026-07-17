@@ -9,6 +9,7 @@ import com.elioth.epam.gymcrm.dto.response.TrainerTrainingResponse;
 import com.elioth.epam.gymcrm.exception.EntityNotFoundException;
 import com.elioth.epam.gymcrm.exception.InvalidRequestException;
 import com.elioth.epam.gymcrm.logging.UserLogger;
+import com.elioth.epam.gymcrm.metrics.GymCrmMetrics;
 import com.elioth.epam.gymcrm.service.TrainingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,11 +33,13 @@ public class TrainingController {
     private UserLogger userLogger;
 
     private TrainingService trainingService;
+    private GymCrmMetrics metrics;
 
     @Autowired
-    public TrainingController(UserLogger userLogger, TrainingService trainingService) {
+    public TrainingController(UserLogger userLogger, TrainingService trainingService, GymCrmMetrics metrics) {
         this.userLogger = userLogger;
         this.trainingService = trainingService;
+        this.metrics = metrics;
     }
 
     @Operation(
@@ -61,6 +64,7 @@ public class TrainingController {
 
        try{
            trainingService.createTraining(createTrainingRequest);
+           metrics.incrementTrainingsCreated();
            return ResponseEntity.ok().build();
        } catch (EntityNotFoundException e){
            return ResponseEntity.badRequest().build();

@@ -11,6 +11,7 @@ import com.elioth.epam.gymcrm.dto.response.TrainerResponse;
 import com.elioth.epam.gymcrm.exception.EntityNotFoundException;
 import com.elioth.epam.gymcrm.exception.InvalidRequestException;
 import com.elioth.epam.gymcrm.logging.UserLogger;
+import com.elioth.epam.gymcrm.metrics.GymCrmMetrics;
 import com.elioth.epam.gymcrm.service.TraineeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -40,12 +41,13 @@ public class TraineeController {
     private final Logger LOG = LoggerFactory.getLogger(TraineeController.class);
 
     private final TraineeService traineeService;
+    private final GymCrmMetrics metrics;
 
     @Autowired
-    public TraineeController(TraineeService traineeService, UserLogger userLogger) {
+    public TraineeController(TraineeService traineeService, UserLogger userLogger, GymCrmMetrics metrics) {
         this.userLogger = userLogger;
         this.traineeService = traineeService;
-
+        this.metrics = metrics;
     }
 
     @Operation(
@@ -69,6 +71,7 @@ public class TraineeController {
 
         try {
             CreatedTraineeResponse response = traineeService.createProfile(createTraineeRequest);
+            metrics.incrementTraineesCreated();
             return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch (InvalidRequestException e) {
             return ResponseEntity.badRequest().build();

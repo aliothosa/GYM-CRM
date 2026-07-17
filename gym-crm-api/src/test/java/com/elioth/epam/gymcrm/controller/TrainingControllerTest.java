@@ -10,6 +10,7 @@ import com.elioth.epam.gymcrm.dto.response.TrainerTrainingResponse;
 import com.elioth.epam.gymcrm.exception.EntityNotFoundException;
 import com.elioth.epam.gymcrm.exception.InvalidRequestException;
 import com.elioth.epam.gymcrm.logging.UserLogger;
+import com.elioth.epam.gymcrm.metrics.GymCrmMetrics;
 import com.elioth.epam.gymcrm.service.TrainingService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,13 +36,15 @@ class TrainingControllerTest {
     private UserLogger userLogger;
     @Mock
     private TrainingService trainingService;
+    @Mock
+    private GymCrmMetrics metrics;
 
     private TrainingController controller;
     private AuthSession session;
 
     @BeforeEach
     void setUp() {
-        controller = new TrainingController(userLogger, trainingService);
+        controller = new TrainingController(userLogger, trainingService, metrics);
         session = new AuthSession(1L, "actor", Role.TRAINEE);
     }
 
