@@ -8,5 +8,4 @@ import java.util.Optional;
 public interface TraineeRepository extends JpaRepository<Trainee, Long> {
     Optional<Trainee> findByUserUsername(String username);
 
-    Optional<Trainee> findByUserUsernameAndUserPassword(String username, String password);
 }

@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -35,6 +36,7 @@ public class TrainerService {
     private TrainerRepository trainerRepository;
     private UserRepository userRepository;
     private TrainingTypeRepository trainingTypeRepository;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     public void setTrainerRepository(TrainerRepository trainerRepository) {
@@ -51,6 +53,11 @@ public class TrainerService {
         this.trainingTypeRepository = trainingTypeRepository;
     }
 
+    @Autowired
+    public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
+
     @Transactional
     public CreatedTrainerResponse createProfile(CreateTrainerRequest request) {
         LOG.info("Creating trainer profile");
@@ -60,13 +67,13 @@ public class TrainerService {
         long userCount = userRepository.countByFirstNameAndLastName(request.firstName(), request.lastName());
         TrainingType trainingType = findTrainingTypeOrThrow(request.trainingTypeId());
         String username = Utils.usernameGenerator(request.firstName(), request.lastName(), userCount);
-        String password = Utils.generateRandomPassword();
+        String rawPassword = Utils.generateRandomPassword();
 
         User user = new User();
         user.setFirstName(request.firstName());
         user.setLastName(request.lastName());
         user.setUsername(username);
-        user.setPassword(password);
+        user.setPassword(passwordEncoder.encode(rawPassword));
         user.setActive(true);
 
         Trainer trainer = new Trainer();
@@ -77,7 +84,7 @@ public class TrainerService {
 
         LOG.info("Created trainer profile with id: {} and username: {}", savedTrainer.getTrainerId(), username);
 
-        return TrainerMapper.toCreatedResponse(savedTrainer);
+        return TrainerMapper.toCreatedResponse(savedTrainer, rawPassword);
     }
 
     @Transactional
@@ -136,7 +143,7 @@ public class TrainerService {
 
         Trainer fetchedTrainer = findTrainerByIdOrThrow(trainerId);
         checkOldPassword(fetchedTrainer.getUser(), request.oldPassword());
-        fetchedTrainer.getUser().setPassword(request.newPassword());
+        fetchedTrainer.getUser().setPassword(passwordEncoder.encode(request.newPassword()));
 
         return TrainerMapper.toResponse(fetchedTrainer);
     }
@@ -287,7 +294,7 @@ public class TrainerService {
         if (oldPassword == null || oldPassword.isBlank()) {
             throw new InvalidRequestException("Invalid old password");
         }
-        if (!Objects.equals(oldPassword, user.getPassword())) {
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
             throw new IncorrectPasswordException("Incorrect old password");
         }
     }

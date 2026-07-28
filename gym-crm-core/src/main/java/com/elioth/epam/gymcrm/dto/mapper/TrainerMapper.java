@@ -47,7 +47,7 @@ public class TrainerMapper {
         );
     }
 
-    public static CreatedTrainerResponse toCreatedResponse(Trainer trainer) {
+    public static CreatedTrainerResponse toCreatedResponse(Trainer trainer, String rawPassword) {
         if (trainer == null) {
             return null;
         }
@@ -60,7 +60,7 @@ public class TrainerMapper {
         return new CreatedTrainerResponse(
                 trainer.getTrainerId(),
                 user.getUsername(),
-                user.getPassword()
+                rawPassword
         );
     }
 

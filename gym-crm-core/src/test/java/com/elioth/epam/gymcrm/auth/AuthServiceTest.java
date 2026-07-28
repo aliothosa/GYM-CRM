@@ -14,6 +14,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
@@ -33,17 +35,20 @@ class AuthServiceTest {
     @InjectMocks
     private AuthService authService;
 
+    private final PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+
     @BeforeEach
     void setUp() {
         authService.setTraineeRepository(traineeRepository);
         authService.setTrainerRepository(trainerRepository);
+        authService.setPasswordEncoder(passwordEncoder);
     }
 
     @Test
     void shouldLoginTraineeWhenCredentialsAreValidAndUserIsActive() {
         Trainee trainee = buildActiveTrainee(1L, "Emily.Davis", "pass123");
 
-        when(traineeRepository.findByUserUsernameAndUserPassword("Emily.Davis", "pass123"))
+        when(traineeRepository.findByUserUsername("Emily.Davis"))
                 .thenReturn(Optional.of(trainee));
 
         AuthSession session = authService.loginTrainee("Emily.Davis", "pass123");
@@ -57,7 +62,7 @@ class AuthServiceTest {
     void shouldLoginTrainerWhenCredentialsAreValidAndUserIsActive() {
         Trainer trainer = buildActiveTrainer(2L, "John.Smith", "pass456");
 
-        when(trainerRepository.findByUserUsernameAndUserPassword("John.Smith", "pass456"))
+        when(trainerRepository.findByUserUsername("John.Smith"))
                 .thenReturn(Optional.of(trainer));
 
         AuthSession session = authService.loginTrainer("John.Smith", "pass456");
@@ -69,7 +74,7 @@ class AuthServiceTest {
 
     @Test
     void shouldThrowExceptionWhenTraineeCredentialsAreInvalid() {
-        when(traineeRepository.findByUserUsernameAndUserPassword("unknown", "wrong"))
+        when(traineeRepository.findByUserUsername("unknown"))
                 .thenReturn(Optional.empty());
 
         EntityNotFoundException exception = assertThrows(
@@ -82,7 +87,7 @@ class AuthServiceTest {
 
     @Test
     void shouldThrowExceptionWhenTrainerCredentialsAreInvalid() {
-        when(trainerRepository.findByUserUsernameAndUserPassword("unknown", "wrong"))
+        when(trainerRepository.findByUserUsername("unknown"))
                 .thenReturn(Optional.empty());
 
         EntityNotFoundException exception = assertThrows(
@@ -98,7 +103,7 @@ class AuthServiceTest {
         Trainee trainee = buildActiveTrainee(1L, "Emily.Davis", "pass123");
         trainee.getUser().setActive(false);
 
-        when(traineeRepository.findByUserUsernameAndUserPassword("Emily.Davis", "pass123"))
+        when(traineeRepository.findByUserUsername("Emily.Davis"))
                 .thenReturn(Optional.of(trainee));
 
         InvalidRequestException exception = assertThrows(
@@ -114,7 +119,7 @@ class AuthServiceTest {
         Trainer trainer = buildActiveTrainer(2L, "John.Smith", "pass456");
         trainer.getUser().setActive(false);
 
-        when(trainerRepository.findByUserUsernameAndUserPassword("John.Smith", "pass456"))
+        when(trainerRepository.findByUserUsername("John.Smith"))
                 .thenReturn(Optional.of(trainer));
 
         InvalidRequestException exception = assertThrows(
@@ -148,7 +153,7 @@ class AuthServiceTest {
     private Trainee buildActiveTrainee(Long traineeId, String username, String password) {
         User user = new User();
         user.setUsername(username);
-        user.setPassword(password);
+        user.setPassword(passwordEncoder.encode(password));
         user.setActive(true);
 
         Trainee trainee = new Trainee();
@@ -160,7 +165,7 @@ class AuthServiceTest {
     private Trainer buildActiveTrainer(Long trainerId, String username, String password) {
         User user = new User();
         user.setUsername(username);
-        user.setPassword(password);
+        user.setPassword(passwordEncoder.encode(password));
         user.setActive(true);
 
         Trainer trainer = new Trainer();

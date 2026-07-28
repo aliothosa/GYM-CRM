@@ -52,7 +52,7 @@ public class TraineeMapper {
         );
     }
 
-    public static CreatedTraineeResponse toCreatedResponse(Trainee trainee) {
+    public static CreatedTraineeResponse toCreatedResponse(Trainee trainee, String rawPassword) {
         if (trainee == null) {
             return null;
         }
@@ -65,7 +65,7 @@ public class TraineeMapper {
         return new CreatedTraineeResponse(
                 trainee.getTraineeId(),
                 user.getUsername(),
-                user.getPassword()
+                rawPassword
         );
     }
 

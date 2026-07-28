@@ -12,8 +12,6 @@ import java.util.Set;
 public interface TrainerRepository extends JpaRepository<Trainer, Long> {
     Optional<Trainer> findByUserUsername(String username);
 
-    Optional<Trainer> findByUserUsernameAndUserPassword(String username, String password);
-
     List<Trainer> findAllBySpecializationName(String trainingTypeName);
 
     @Query("""

@@ -8,6 +8,7 @@ import com.elioth.epam.gymcrm.dto.response.TrainerResponse;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -73,16 +74,17 @@ class TrainerMapperTest {
     void shouldMapTrainerToCreatedResponse() {
         User user = new User();
         user.setUsername("new.trainer");
-        user.setPassword("generatedPass");
+        user.setPassword("{bcrypt}storedHash");
         Trainer trainer = new Trainer();
         trainer.setTrainerId(7L);
         trainer.setUser(user);
 
-        CreatedTrainerResponse response = TrainerMapper.toCreatedResponse(trainer);
+        CreatedTrainerResponse response = TrainerMapper.toCreatedResponse(trainer, "generatedPass");
 
         assertEquals(7L, response.trainerId());
         assertEquals("new.trainer", response.username());
         assertEquals("generatedPass", response.password());
+        assertFalse(response.password().equals(user.getPassword()));
     }
 
     @Test
@@ -106,7 +108,7 @@ class TrainerMapperTest {
     @Test
     void shouldReturnNullWhenTrainerIsNull() {
         assertNull(TrainerMapper.toResponse(null));
-        assertNull(TrainerMapper.toCreatedResponse(null));
+        assertNull(TrainerMapper.toCreatedResponse(null, "rawPassword"));
     }
 
     @Test
@@ -115,6 +117,6 @@ class TrainerMapperTest {
         trainer.setTrainerId(1L);
 
         assertThrows(IllegalStateException.class, () -> TrainerMapper.toResponse(trainer));
-        assertThrows(IllegalStateException.class, () -> TrainerMapper.toCreatedResponse(trainer));
+        assertThrows(IllegalStateException.class, () -> TrainerMapper.toCreatedResponse(trainer, "rawPassword"));
     }
 }

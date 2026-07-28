@@ -51,22 +51,4 @@ class TraineeRepositoryTest {
         assertTrue(result.isEmpty());
     }
 
-    @Test
-    void findByUserUsernameAndUserPassword_shouldReturnTrainee_whenCredentialsMatch() {
-        Trainee persisted = persistTrainee("john.doe", "secret");
-
-        Optional<Trainee> result = traineeRepository.findByUserUsernameAndUserPassword("john.doe", "secret");
-
-        assertTrue(result.isPresent());
-        assertEquals(persisted.getTraineeId(), result.get().getTraineeId());
-    }
-
-    @Test
-    void findByUserUsernameAndUserPassword_shouldReturnEmpty_whenPasswordMismatch() {
-        persistTrainee("john.doe", "secret");
-
-        Optional<Trainee> result = traineeRepository.findByUserUsernameAndUserPassword("john.doe", "wrong");
-
-        assertTrue(result.isEmpty());
-    }
 }

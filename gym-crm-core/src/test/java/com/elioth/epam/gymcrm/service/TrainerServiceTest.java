@@ -22,6 +22,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
@@ -54,11 +56,14 @@ class TrainerServiceTest {
     @InjectMocks
     private TrainerService trainerService;
 
+    private final PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+
     @BeforeEach
     void setUp() {
         trainerService.setTrainerRepository(trainerRepository);
         trainerService.setUserRepository(userRepository);
         trainerService.setTrainingTypeRepository(trainingTypeRepository);
+        trainerService.setPasswordEncoder(passwordEncoder);
     }
 
 
@@ -89,6 +94,9 @@ class TrainerServiceTest {
         assertEquals("Doe", saved.getUser().getLastName());
         assertEquals("John.Doe", saved.getUser().getUsername());
         assertTrue(saved.getUser().getActive());
+        assertTrue(saved.getUser().getPassword().startsWith("{bcrypt}"));
+        assertFalse(response.password().equals(saved.getUser().getPassword()));
+        assertTrue(passwordEncoder.matches(response.password(), saved.getUser().getPassword()));
         assertEquals(trainingType, saved.getSpecialization());
     }
 
@@ -235,13 +243,13 @@ class TrainerServiceTest {
     void shouldChangePasswordWhenOldPasswordIsCorrect() {
         TrainingType trainingType = buildTrainingType(TRAINING_TYPE_ID, "YOGA");
         Trainer trainer = buildTrainer(TRAINER_ID, USERNAME, "John", "Doe", true, trainingType);
-        trainer.getUser().setPassword("oldPass");
+        trainer.getUser().setPassword(passwordEncoder.encode("oldPass"));
         ChangePasswordRequest request = new ChangePasswordRequest("oldPass", "newPass123");
         when(trainerRepository.findById(TRAINER_ID)).thenReturn(Optional.of(trainer));
 
         TrainerResponse response = trainerService.changePassword(TRAINER_ID, request);
 
-        assertEquals("newPass123", trainer.getUser().getPassword());
+        assertTrue(passwordEncoder.matches("newPass123", trainer.getUser().getPassword()));
         assertEquals(TRAINER_ID, response.trainerId());
     }
 
@@ -258,7 +266,7 @@ class TrainerServiceTest {
     void shouldThrowIncorrectPasswordExceptionWhenOldPasswordDoesNotMatch() {
         TrainingType trainingType = buildTrainingType(TRAINING_TYPE_ID, "YOGA");
         Trainer trainer = buildTrainer(TRAINER_ID, USERNAME, "John", "Doe", true, trainingType);
-        trainer.getUser().setPassword("oldPass");
+        trainer.getUser().setPassword(passwordEncoder.encode("oldPass"));
         ChangePasswordRequest request = new ChangePasswordRequest("wrongPass", "newPass123");
         when(trainerRepository.findById(TRAINER_ID)).thenReturn(Optional.of(trainer));
 

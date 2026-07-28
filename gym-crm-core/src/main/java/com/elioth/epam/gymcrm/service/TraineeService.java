@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -37,6 +38,7 @@ public class TraineeService {
     private TraineeRepository traineeRepository;
     private TrainerRepository trainerRepository;
     private UserRepository userRepository;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     public void setTraineeRepository(TraineeRepository traineeRepository) {
@@ -53,6 +55,11 @@ public class TraineeService {
         this.trainerRepository = trainerRepository;
     }
 
+    @Autowired
+    public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
+
     @Transactional
     public CreatedTraineeResponse createProfile(CreateTraineeRequest request) {
         LOG.info("Creating trainee profile");
@@ -61,13 +68,13 @@ public class TraineeService {
 
         long userCount = userRepository.countByFirstNameAndLastName(request.firstName(), request.lastName());
         String username = Utils.usernameGenerator(request.firstName(), request.lastName(), userCount);
-        String password = Utils.generateRandomPassword();
+        String rawPassword = Utils.generateRandomPassword();
 
         User user = new User();
         user.setFirstName(request.firstName());
         user.setLastName(request.lastName());
         user.setUsername(username);
-        user.setPassword(password);
+        user.setPassword(passwordEncoder.encode(rawPassword));
         user.setActive(true);
 
         Trainee trainee = new Trainee();
@@ -79,7 +86,7 @@ public class TraineeService {
 
         LOG.info("Created trainee profile with id: {} and username: {}", savedTrainee.getTraineeId(), username);
 
-        return TraineeMapper.toCreatedResponse(savedTrainee);
+        return TraineeMapper.toCreatedResponse(savedTrainee, rawPassword);
     }
 
     @Transactional
@@ -165,7 +172,7 @@ public class TraineeService {
 
         Trainee fetchedTrainee = findTraineeByIdOrThrow(traineeId);
         checkOldPassword(fetchedTrainee.getUser(), request.oldPassword());
-        fetchedTrainee.getUser().setPassword(request.newPassword());
+        fetchedTrainee.getUser().setPassword(passwordEncoder.encode(request.newPassword()));
 
         return TraineeMapper.toResponse(fetchedTrainee);
     }
@@ -319,7 +326,7 @@ public class TraineeService {
         if (oldPassword == null || oldPassword.isBlank()) {
             throw new InvalidRequestException("Invalid old password");
         }
-        if (!Objects.equals(oldPassword, user.getPassword())) {
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
             throw new IncorrectPasswordException("Incorrect old password");
         }
     }

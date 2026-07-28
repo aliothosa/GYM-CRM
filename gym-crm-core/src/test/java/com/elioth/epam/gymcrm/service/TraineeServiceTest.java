@@ -24,6 +24,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -58,11 +60,14 @@ class TraineeServiceTest {
     @InjectMocks
     private TraineeService traineeService;
 
+    private final PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+
     @BeforeEach
     void setUp() {
         traineeService.setTraineeRepository(traineeRepository);
         traineeService.setTrainerRepository(trainerRepository);
         traineeService.setUserRepository(userRepository);
+        traineeService.setPasswordEncoder(passwordEncoder);
     }
 
 
@@ -91,6 +96,9 @@ class TraineeServiceTest {
         assertEquals("Doe", saved.getUser().getLastName());
         assertEquals("John.Doe", saved.getUser().getUsername());
         assertTrue(saved.getUser().getActive());
+        assertTrue(saved.getUser().getPassword().startsWith("{bcrypt}"));
+        assertFalse(response.password().equals(saved.getUser().getPassword()));
+        assertTrue(passwordEncoder.matches(response.password(), saved.getUser().getPassword()));
         assertEquals(request.birthDate(), saved.getBirthDate());
         assertEquals(request.address(), saved.getAddress());
     }
@@ -243,13 +251,13 @@ class TraineeServiceTest {
     @Test
     void shouldChangePasswordWhenOldPasswordIsCorrect() {
         Trainee trainee = buildTrainee(TRAINEE_ID, USERNAME, "John", "Doe", true);
-        trainee.getUser().setPassword("oldPass");
+        trainee.getUser().setPassword(passwordEncoder.encode("oldPass"));
         ChangePasswordRequest request = new ChangePasswordRequest("oldPass", "newPass123");
         when(traineeRepository.findById(TRAINEE_ID)).thenReturn(Optional.of(trainee));
 
         TraineeResponse response = traineeService.changePassword(TRAINEE_ID, request);
 
-        assertEquals("newPass123", trainee.getUser().getPassword());
+        assertTrue(passwordEncoder.matches("newPass123", trainee.getUser().getPassword()));
         assertEquals(TRAINEE_ID, response.traineeId());
     }
 
@@ -265,7 +273,7 @@ class TraineeServiceTest {
     @Test
     void shouldThrowIncorrectPasswordExceptionWhenOldPasswordDoesNotMatch() {
         Trainee trainee = buildTrainee(TRAINEE_ID, USERNAME, "John", "Doe", true);
-        trainee.getUser().setPassword("oldPass");
+        trainee.getUser().setPassword(passwordEncoder.encode("oldPass"));
         ChangePasswordRequest request = new ChangePasswordRequest("wrongPass", "newPass123");
         when(traineeRepository.findById(TRAINEE_ID)).thenReturn(Optional.of(trainee));
 

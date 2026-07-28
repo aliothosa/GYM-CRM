@@ -19,15 +19,15 @@ INSERT INTO training_types (id, name) VALUES
 
 -- 2) Users (user_id 1-3 and 6-7 -> trainers, 4-5 and 8-9 -> trainees)
 INSERT INTO users (user_id, first_name, last_name, username, password, active) VALUES
-    (1, 'John', 'Doe', 'John.Doe', 'pass123', true),
-    (2, 'Jane', 'Smith', 'Jane.Smith', 'pass123', true),
-    (3, 'Mike', 'Brown', 'Mike.Brown', 'pass123', true),
-    (4, 'Emily', 'Davis', 'Emily.Davis', 'pass123', true),
-    (5, 'Carlos', 'Lopez', 'Carlos.Lopez', 'pass123', true),
-    (6, 'Sofia', 'Martinez', 'Sofia.Martinez', 'pass123', true),
-    (7, 'Daniel', 'Wilson', 'Daniel.Wilson', 'pass123', true),
-    (8, 'Lucia', 'Hernandez', 'Lucia.Hernandez', 'pass123', true),
-    (9, 'Andre', 'Gomez', 'Andre.Gomez', 'pass123', false);
+    (1, 'John', 'Doe', 'John.Doe', '{bcrypt}$2b$12$1xiiDnjVBDqHF8qqAkDE2e8dSa24JjU3vT1Deb2slCaCHn27w57Ry', true),
+    (2, 'Jane', 'Smith', 'Jane.Smith', '{bcrypt}$2b$12$1xiiDnjVBDqHF8qqAkDE2e8dSa24JjU3vT1Deb2slCaCHn27w57Ry', true),
+    (3, 'Mike', 'Brown', 'Mike.Brown', '{bcrypt}$2b$12$1xiiDnjVBDqHF8qqAkDE2e8dSa24JjU3vT1Deb2slCaCHn27w57Ry', true),
+    (4, 'Emily', 'Davis', 'Emily.Davis', '{bcrypt}$2b$12$1xiiDnjVBDqHF8qqAkDE2e8dSa24JjU3vT1Deb2slCaCHn27w57Ry', true),
+    (5, 'Carlos', 'Lopez', 'Carlos.Lopez', '{bcrypt}$2b$12$1xiiDnjVBDqHF8qqAkDE2e8dSa24JjU3vT1Deb2slCaCHn27w57Ry', true),
+    (6, 'Sofia', 'Martinez', 'Sofia.Martinez', '{bcrypt}$2b$12$1xiiDnjVBDqHF8qqAkDE2e8dSa24JjU3vT1Deb2slCaCHn27w57Ry', true),
+    (7, 'Daniel', 'Wilson', 'Daniel.Wilson', '{bcrypt}$2b$12$1xiiDnjVBDqHF8qqAkDE2e8dSa24JjU3vT1Deb2slCaCHn27w57Ry', true),
+    (8, 'Lucia', 'Hernandez', 'Lucia.Hernandez', '{bcrypt}$2b$12$1xiiDnjVBDqHF8qqAkDE2e8dSa24JjU3vT1Deb2slCaCHn27w57Ry', true),
+    (9, 'Andre', 'Gomez', 'Andre.Gomez', '{bcrypt}$2b$12$1xiiDnjVBDqHF8qqAkDE2e8dSa24JjU3vT1Deb2slCaCHn27w57Ry', false);
 
 -- 3) Trainers
 INSERT INTO trainers (trainer_id, user_id, training_type_id) VALUES

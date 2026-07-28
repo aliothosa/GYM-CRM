@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -22,6 +23,7 @@ public class AuthService {
 
     private TraineeRepository traineeRepository;
     private TrainerRepository trainerRepository;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     public void setTraineeRepository(TraineeRepository traineeRepository) {
@@ -33,15 +35,21 @@ public class AuthService {
         this.trainerRepository = trainerRepository;
     }
 
+    @Autowired
+    public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
+
     @Transactional(readOnly = true)
     public AuthSession loginTrainee(String username, String password) {
         validateCredentials(username, password);
         LOG.info("Logging in trainee with username: {}", username);
 
-        Trainee trainee = traineeRepository.findByUserUsernameAndUserPassword(username, password)
+        Trainee trainee = traineeRepository.findByUserUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException("Username or password incorrect"));
 
         User user = trainee.getUser();
+        ensurePasswordMatches(password, user);
         ensureActive(user, "Trainee account is not active");
 
         return new AuthSession(trainee.getTraineeId(), user.getUsername(), Role.TRAINEE);
@@ -52,10 +60,11 @@ public class AuthService {
         validateCredentials(username, password);
         LOG.info("Logging in trainer with username: {}", username);
 
-        Trainer trainer = trainerRepository.findByUserUsernameAndUserPassword(username, password)
+        Trainer trainer = trainerRepository.findByUserUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException("Username or password incorrect"));
 
         User user = trainer.getUser();
+        ensurePasswordMatches(password, user);
         ensureActive(user, "Trainer account is not active");
 
         return new AuthSession(trainer.getTrainerId(), user.getUsername(), Role.TRAINER);
@@ -73,6 +82,12 @@ public class AuthService {
     private void ensureActive(User user, String message) {
         if (!Boolean.TRUE.equals(user.getActive())) {
             throw new InvalidRequestException(message);
+        }
+    }
+
+    private void ensurePasswordMatches(String rawPassword, User user) {
+        if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
+            throw new EntityNotFoundException("Username or password incorrect");
         }
     }
 }

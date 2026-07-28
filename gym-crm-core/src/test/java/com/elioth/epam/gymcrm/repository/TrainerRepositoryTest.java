@@ -115,25 +115,6 @@ class TrainerRepositoryTest {
     }
 
     @Test
-    void findByUserUsernameAndUserPassword_shouldReturnTrainer_whenCredentialsMatch() {
-        Trainer persisted = persistTrainer("jane.trainer", "secret", "Yoga");
-
-        Optional<Trainer> result = trainerRepository.findByUserUsernameAndUserPassword("jane.trainer", "secret");
-
-        assertTrue(result.isPresent());
-        assertEquals(persisted.getTrainerId(), result.get().getTrainerId());
-    }
-
-    @Test
-    void findByUserUsernameAndUserPassword_shouldReturnEmpty_whenPasswordMismatch() {
-        persistTrainer("jane.trainer", "secret", "Yoga");
-
-        Optional<Trainer> result = trainerRepository.findByUserUsernameAndUserPassword("jane.trainer", "wrong");
-
-        assertTrue(result.isEmpty());
-    }
-
-    @Test
     void findAllBySpecializationName_shouldReturnTrainers_whenSpecializationMatches() {
         TrainingType yoga = persistTrainingType("Yoga");
         TrainingType cardio = persistTrainingType("Cardio");

@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -80,22 +81,23 @@ class TraineeMapperTest {
     void shouldMapTraineeToCreatedResponse() {
         User user = new User();
         user.setUsername("new.trainee");
-        user.setPassword("generatedPass");
+        user.setPassword("{bcrypt}storedHash");
         Trainee trainee = new Trainee();
         trainee.setTraineeId(5L);
         trainee.setUser(user);
 
-        CreatedTraineeResponse response = TraineeMapper.toCreatedResponse(trainee);
+        CreatedTraineeResponse response = TraineeMapper.toCreatedResponse(trainee, "generatedPass");
 
         assertEquals(5L, response.traineeId());
         assertEquals("new.trainee", response.username());
         assertEquals("generatedPass", response.password());
+        assertFalse(response.password().equals(user.getPassword()));
     }
 
     @Test
     void shouldReturnNullWhenTraineeIsNull() {
         assertNull(TraineeMapper.toResponse(null));
-        assertNull(TraineeMapper.toCreatedResponse(null));
+        assertNull(TraineeMapper.toCreatedResponse(null, "rawPassword"));
     }
 
     @Test
@@ -104,6 +106,6 @@ class TraineeMapperTest {
         trainee.setTraineeId(1L);
 
         assertThrows(IllegalStateException.class, () -> TraineeMapper.toResponse(trainee));
-        assertThrows(IllegalStateException.class, () -> TraineeMapper.toCreatedResponse(trainee));
+        assertThrows(IllegalStateException.class, () -> TraineeMapper.toCreatedResponse(trainee, "rawPassword"));
     }
 }
