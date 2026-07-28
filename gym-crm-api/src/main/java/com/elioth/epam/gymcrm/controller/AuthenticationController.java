@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -43,6 +44,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
+    @SecurityRequirements
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
         if (loginAttemptService.isBlocked(request.username())) {
             return ResponseEntity.status(HttpStatus.LOCKED).build();

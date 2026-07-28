@@ -108,3 +108,13 @@
 2026-07-27 22:07:50.712 [main] INFO  [USER_ACTIVITY] REST call: method=POST, endpoint=/trainees/register, request={}, response=400 Bad Request
 2026-07-27 22:07:50.874 [main] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/v3/api-docs, request={}, response=200 OK
 2026-07-27 22:07:50.899 [main] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/swagger-ui/index.html, request={}, response=200 OK
+2026-07-27 22:11:13.330 [main] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/v3/api-docs, request={}, response=200 OK
+2026-07-27 22:11:13.737 [main] INFO  [USER_ACTIVITY] REST call: method=POST, endpoint=/auth/login, request={}, response=401 Unauthorized
+2026-07-27 22:11:13.749 [main] INFO  [USER_ACTIVITY] REST call: method=POST, endpoint=/trainees/register, request={}, response=400 Bad Request
+2026-07-27 22:11:13.889 [main] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/v3/api-docs, request={}, response=200 OK
+2026-07-27 22:11:13.912 [main] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/swagger-ui/index.html, request={}, response=200 OK
+2026-07-27 22:16:07.448 [main] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/v3/api-docs, request={}, response=200 OK
+2026-07-27 22:16:07.840 [main] INFO  [USER_ACTIVITY] REST call: method=POST, endpoint=/auth/login, request={}, response=401 Unauthorized
+2026-07-27 22:16:07.852 [main] INFO  [USER_ACTIVITY] REST call: method=POST, endpoint=/trainees/register, request={}, response=400 Bad Request
+2026-07-27 22:16:08.010 [main] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/v3/api-docs, request={}, response=200 OK
+2026-07-27 22:16:08.036 [main] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/swagger-ui/index.html, request={}, response=200 OK

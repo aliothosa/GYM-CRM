@@ -20,6 +20,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +64,7 @@ public class TraineeController {
             @ApiResponse(responseCode = "400", description = "Invalid trainee information")
     })
     @PostMapping(value = "/register")
+    @SecurityRequirements
     public ResponseEntity<CreatedTraineeResponse> addTrainee(
             @Parameter(description = "Information required to register a trainee", required = true)
             @RequestBody CreateTraineeRequest createTraineeRequest

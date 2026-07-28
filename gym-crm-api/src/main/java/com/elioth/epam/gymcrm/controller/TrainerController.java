@@ -20,6 +20,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +61,7 @@ public class TrainerController {
             )
     })
     @PostMapping(value = "/register")
+    @SecurityRequirements
     public ResponseEntity<CreatedTrainerResponse> createTrainer(
             @Parameter(description = "Information required to register a trainer", required = true)
             @RequestBody CreateTrainerRequest createTrainerRequest
