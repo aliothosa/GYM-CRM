@@ -2828,3 +2828,121 @@ java.lang.IllegalStateException: ApplicationContext failure threshold (1) exceed
 2026-07-27 18:52:33.223 [SpringApplicationShutdownHook] INFO  [o.s.o.j.LocalContainerEntityManagerFactoryBean] Closing JPA EntityManagerFactory for persistence unit 'default'
 2026-07-27 18:52:33.380 [SpringApplicationShutdownHook] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Shutdown initiated...
 2026-07-27 18:52:33.382 [SpringApplicationShutdownHook] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Shutdown completed.
+2026-07-27 22:06:51.378 [background-preinit] INFO  [o.h.validator.internal.util.Version] HV000001: Hibernate Validator 9.0.1.Final
+2026-07-27 22:06:51.430 [main] INFO  [c.e.e.g.c.JwtSecurityIntegrationTest] Starting JwtSecurityIntegrationTest using Java 21.0.12 with PID 65426 (started by aliothosa in /home/aliothosa/IdeaProjects/GYM-CRM/gym-crm-api)
+2026-07-27 22:06:51.430 [main] INFO  [c.e.e.g.c.JwtSecurityIntegrationTest] The following 1 profile is active: "test"
+2026-07-27 22:06:52.986 [main] INFO  [o.s.d.r.c.RepositoryConfigurationDelegate] Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-07-27 22:06:53.070 [main] INFO  [o.s.d.r.c.RepositoryConfigurationDelegate] Finished Spring Data repository scanning in 70 ms. Found 5 JPA repository interfaces.
+2026-07-27 22:06:53.882 [main] INFO  [org.hibernate.orm.jpa] HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-07-27 22:06:53.957 [main] INFO  [org.hibernate.orm.core] HHH000001: Hibernate ORM core version 7.2.12.Final
+2026-07-27 22:06:54.605 [main] INFO  [o.s.o.j.p.SpringPersistenceUnitInfo] No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-07-27 22:06:54.649 [main] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Starting...
+2026-07-27 22:06:54.979 [main] INFO  [com.zaxxer.hikari.pool.HikariPool] HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:gymcrm-test user=SA
+2026-07-27 22:06:54.981 [main] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Start completed.
+2026-07-27 22:06:55.023 [main] WARN  [org.hibernate.orm.deprecation] HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-07-27 22:06:55.061 [main] INFO  [o.hibernate.orm.connections.pooling] HHH10001005: Database info:
+	Database JDBC URL [jdbc:h2:mem:gymcrm-test]
+	Database driver: H2 JDBC Driver
+	Database dialect: H2Dialect
+	Database version: 2.4.240
+	Default catalog/schema: GYMCRM-TEST/PUBLIC
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: 100
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-07-27 22:06:56.447 [main] INFO  [org.hibernate.orm.core] HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-07-27 22:06:56.539 [main] INFO  [o.s.o.j.LocalContainerEntityManagerFactoryBean] Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-07-27 22:06:56.654 [main] INFO  [o.s.d.j.r.q.QueryEnhancerFactories] Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-07-27 22:06:57.573 [main] INFO  [o.s.s.c.a.a.c.InitializeAuthenticationProviderBeanManagerConfigurer$InitializeAuthenticationProviderManagerConfigurer] Global AuthenticationManager configured with AuthenticationProvider bean with name daoAuthenticationProvider
+2026-07-27 22:06:57.573 [main] WARN  [o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer] Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2026-07-27 22:06:58.677 [main] WARN  [o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration] spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-07-27 22:06:59.809 [main] INFO  [o.s.b.a.e.web.EndpointLinksResolver] Exposing 2 endpoints beneath base path '/actuator'
+2026-07-27 22:06:59.889 [main] INFO  [c.e.e.g.c.JwtSecurityIntegrationTest] Started JwtSecurityIntegrationTest in 9.028 seconds (process running for 11.275)
+2026-07-27 22:07:00.382 [main] INFO  [o.s.b.t.m.w.SpringBootMockServletContext] Initializing Spring TestDispatcherServlet ''
+2026-07-27 22:07:00.382 [main] INFO  [o.s.t.w.s.TestDispatcherServlet] Initializing Servlet ''
+2026-07-27 22:07:00.384 [main] INFO  [o.s.t.w.s.TestDispatcherServlet] Completed initialization in 2 ms
+2026-07-27 22:07:01.095 [main] INFO  [o.s.api.AbstractOpenApiResource] Init duration for springdoc-openapi is: 619 ms
+2026-07-27 22:07:01.169 [main] INFO  [o.s.b.t.m.w.SpringBootMockServletContext] Initializing Spring TestDispatcherServlet ''
+2026-07-27 22:07:01.169 [main] INFO  [o.s.t.w.s.TestDispatcherServlet] Initializing Servlet ''
+2026-07-27 22:07:01.170 [main] INFO  [o.s.t.w.s.TestDispatcherServlet] Completed initialization in 1 ms
+2026-07-27 22:07:01.572 [main] INFO  [c.e.e.g.controller.TraineeController] addTrainee request: CreateTraineeRequest[firstName=null, lastName=null, birthDate=null, address=null]
+2026-07-27 22:07:01.574 [main] INFO  [c.e.e.gymcrm.service.TraineeService] Creating trainee profile
+2026-07-27 22:07:01.581 [main] INFO  [o.s.b.t.m.w.SpringBootMockServletContext] Initializing Spring TestDispatcherServlet ''
+2026-07-27 22:07:01.581 [main] INFO  [o.s.t.w.s.TestDispatcherServlet] Initializing Servlet ''
+2026-07-27 22:07:01.582 [main] INFO  [o.s.t.w.s.TestDispatcherServlet] Completed initialization in 1 ms
+2026-07-27 22:07:01.632 [main] INFO  [c.e.e.gymcrm.service.TrainingService] Getting all training types
+2026-07-27 22:07:01.675 [main] INFO  [o.s.b.t.m.w.SpringBootMockServletContext] Initializing Spring TestDispatcherServlet ''
+2026-07-27 22:07:01.675 [main] INFO  [o.s.t.w.s.TestDispatcherServlet] Initializing Servlet ''
+2026-07-27 22:07:01.676 [main] INFO  [o.s.t.w.s.TestDispatcherServlet] Completed initialization in 1 ms
+2026-07-27 22:07:01.690 [main] INFO  [c.e.e.gymcrm.service.TrainingService] Getting all training types
+2026-07-27 22:07:01.733 [SpringApplicationShutdownHook] INFO  [o.s.o.j.LocalContainerEntityManagerFactoryBean] Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-07-27 22:07:01.879 [SpringApplicationShutdownHook] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Shutdown initiated...
+2026-07-27 22:07:01.882 [SpringApplicationShutdownHook] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Shutdown completed.
+2026-07-27 22:07:41.014 [background-preinit] INFO  [o.h.validator.internal.util.Version] HV000001: Hibernate Validator 9.0.1.Final
+2026-07-27 22:07:41.097 [main] INFO  [c.e.e.g.c.JwtSecurityIntegrationTest] Starting JwtSecurityIntegrationTest using Java 21.0.12 with PID 65849 (started by aliothosa in /home/aliothosa/IdeaProjects/GYM-CRM/gym-crm-api)
+2026-07-27 22:07:41.098 [main] INFO  [c.e.e.g.c.JwtSecurityIntegrationTest] The following 1 profile is active: "test"
+2026-07-27 22:07:42.657 [main] INFO  [o.s.d.r.c.RepositoryConfigurationDelegate] Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-07-27 22:07:42.720 [main] INFO  [o.s.d.r.c.RepositoryConfigurationDelegate] Finished Spring Data repository scanning in 50 ms. Found 5 JPA repository interfaces.
+2026-07-27 22:07:43.537 [main] INFO  [org.hibernate.orm.jpa] HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-07-27 22:07:43.612 [main] INFO  [org.hibernate.orm.core] HHH000001: Hibernate ORM core version 7.2.12.Final
+2026-07-27 22:07:43.976 [main] INFO  [o.s.o.j.p.SpringPersistenceUnitInfo] No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-07-27 22:07:44.018 [main] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Starting...
+2026-07-27 22:07:44.391 [main] INFO  [com.zaxxer.hikari.pool.HikariPool] HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:gymcrm-test user=SA
+2026-07-27 22:07:44.394 [main] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Start completed.
+2026-07-27 22:07:44.429 [main] WARN  [org.hibernate.orm.deprecation] HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-07-27 22:07:44.465 [main] INFO  [o.hibernate.orm.connections.pooling] HHH10001005: Database info:
+	Database JDBC URL [jdbc:h2:mem:gymcrm-test]
+	Database driver: H2 JDBC Driver
+	Database dialect: H2Dialect
+	Database version: 2.4.240
+	Default catalog/schema: GYMCRM-TEST/PUBLIC
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: 100
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-07-27 22:07:45.713 [main] INFO  [org.hibernate.orm.core] HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-07-27 22:07:45.814 [main] INFO  [o.s.o.j.LocalContainerEntityManagerFactoryBean] Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-07-27 22:07:45.958 [main] INFO  [o.s.d.j.r.q.QueryEnhancerFactories] Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-07-27 22:07:47.020 [main] INFO  [o.s.s.c.a.a.c.InitializeAuthenticationProviderBeanManagerConfigurer$InitializeAuthenticationProviderManagerConfigurer] Global AuthenticationManager configured with AuthenticationProvider bean with name daoAuthenticationProvider
+2026-07-27 22:07:47.021 [main] WARN  [o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer] Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2026-07-27 22:07:48.151 [main] WARN  [o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration] spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-07-27 22:07:49.310 [main] INFO  [o.s.b.a.e.web.EndpointLinksResolver] Exposing 2 endpoints beneath base path '/actuator'
+2026-07-27 22:07:49.383 [main] INFO  [c.e.e.g.c.JwtSecurityIntegrationTest] Started JwtSecurityIntegrationTest in 9.021 seconds (process running for 13.951)
+2026-07-27 22:07:49.509 [main] INFO  [o.s.b.t.m.w.SpringBootMockServletContext] Initializing Spring TestDispatcherServlet ''
+2026-07-27 22:07:49.509 [main] INFO  [o.s.t.w.s.TestDispatcherServlet] Initializing Servlet ''
+2026-07-27 22:07:49.510 [main] INFO  [o.s.t.w.s.TestDispatcherServlet] Completed initialization in 1 ms
+2026-07-27 22:07:50.234 [main] INFO  [o.s.api.AbstractOpenApiResource] Init duration for springdoc-openapi is: 640 ms
+2026-07-27 22:07:50.312 [main] INFO  [o.s.b.t.m.w.SpringBootMockServletContext] Initializing Spring TestDispatcherServlet ''
+2026-07-27 22:07:50.312 [main] INFO  [o.s.t.w.s.TestDispatcherServlet] Initializing Servlet ''
+2026-07-27 22:07:50.313 [main] INFO  [o.s.t.w.s.TestDispatcherServlet] Completed initialization in 1 ms
+2026-07-27 22:07:50.708 [main] INFO  [c.e.e.g.controller.TraineeController] addTrainee request: CreateTraineeRequest[firstName=null, lastName=null, birthDate=null, address=null]
+2026-07-27 22:07:50.711 [main] INFO  [c.e.e.gymcrm.service.TraineeService] Creating trainee profile
+2026-07-27 22:07:50.719 [main] INFO  [o.s.b.t.m.w.SpringBootMockServletContext] Initializing Spring TestDispatcherServlet ''
+2026-07-27 22:07:50.719 [main] INFO  [o.s.t.w.s.TestDispatcherServlet] Initializing Servlet ''
+2026-07-27 22:07:50.720 [main] INFO  [o.s.t.w.s.TestDispatcherServlet] Completed initialization in 1 ms
+2026-07-27 22:07:50.774 [main] INFO  [c.e.e.gymcrm.service.TrainingService] Getting all training types
+2026-07-27 22:07:50.823 [main] INFO  [o.s.b.t.m.w.SpringBootMockServletContext] Initializing Spring TestDispatcherServlet ''
+2026-07-27 22:07:50.824 [main] INFO  [o.s.t.w.s.TestDispatcherServlet] Initializing Servlet ''
+2026-07-27 22:07:50.825 [main] INFO  [o.s.t.w.s.TestDispatcherServlet] Completed initialization in 1 ms
+2026-07-27 22:07:50.841 [main] INFO  [c.e.e.gymcrm.service.TrainingService] Getting all training types
+2026-07-27 22:07:50.853 [main] INFO  [o.s.t.c.s.AnnotationConfigContextLoaderUtils] Could not detect default configuration classes for test class [com.elioth.epam.gymcrm.config.SwaggerAccessTest]: SwaggerAccessTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-07-27 22:07:50.855 [main] INFO  [o.s.b.t.c.SpringBootTestContextBootstrapper] Found @SpringBootConfiguration com.elioth.epam.gymcrm.GymCrmApiApplication for test class com.elioth.epam.gymcrm.config.SwaggerAccessTest
+2026-07-27 22:07:50.856 [main] INFO  [o.s.t.c.s.AnnotationConfigContextLoaderUtils] Could not detect default configuration classes for test class [com.elioth.epam.gymcrm.config.SwaggerAccessTest]: SwaggerAccessTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-07-27 22:07:50.858 [main] INFO  [o.s.b.t.c.SpringBootTestContextBootstrapper] Found @SpringBootConfiguration com.elioth.epam.gymcrm.GymCrmApiApplication for test class com.elioth.epam.gymcrm.config.SwaggerAccessTest
+2026-07-27 22:07:50.864 [main] INFO  [o.s.b.t.m.w.SpringBootMockServletContext] Initializing Spring TestDispatcherServlet ''
+2026-07-27 22:07:50.864 [main] INFO  [o.s.t.w.s.TestDispatcherServlet] Initializing Servlet ''
+2026-07-27 22:07:50.865 [main] INFO  [o.s.t.w.s.TestDispatcherServlet] Completed initialization in 1 ms
+2026-07-27 22:07:50.881 [main] INFO  [o.s.b.t.m.w.SpringBootMockServletContext] Initializing Spring TestDispatcherServlet ''
+2026-07-27 22:07:50.881 [main] INFO  [o.s.t.w.s.TestDispatcherServlet] Initializing Servlet ''
+2026-07-27 22:07:50.882 [main] INFO  [o.s.t.w.s.TestDispatcherServlet] Completed initialization in 1 ms
+2026-07-27 22:07:50.905 [main] INFO  [o.s.t.c.s.AnnotationConfigContextLoaderUtils] Could not detect default configuration classes for test class [com.elioth.epam.gymcrm.GymCrmApiApplicationTests]: GymCrmApiApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-07-27 22:07:50.910 [main] INFO  [o.s.b.t.c.SpringBootTestContextBootstrapper] Found @SpringBootConfiguration com.elioth.epam.gymcrm.GymCrmApiApplication for test class com.elioth.epam.gymcrm.GymCrmApiApplicationTests
+2026-07-27 22:07:50.912 [main] INFO  [o.s.t.c.s.AnnotationConfigContextLoaderUtils] Could not detect default configuration classes for test class [com.elioth.epam.gymcrm.GymCrmApiApplicationTests]: GymCrmApiApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-07-27 22:07:50.913 [main] INFO  [o.s.b.t.c.SpringBootTestContextBootstrapper] Found @SpringBootConfiguration com.elioth.epam.gymcrm.GymCrmApiApplication for test class com.elioth.epam.gymcrm.GymCrmApiApplicationTests
+2026-07-27 22:07:50.937 [SpringApplicationShutdownHook] INFO  [o.s.o.j.LocalContainerEntityManagerFactoryBean] Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-07-27 22:07:51.100 [SpringApplicationShutdownHook] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Shutdown initiated...
+2026-07-27 22:07:51.103 [SpringApplicationShutdownHook] INFO  [com.zaxxer.hikari.HikariDataSource] HikariPool-1 - Shutdown completed.

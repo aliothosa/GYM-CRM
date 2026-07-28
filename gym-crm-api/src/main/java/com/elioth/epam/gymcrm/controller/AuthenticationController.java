@@ -2,6 +2,8 @@ package com.elioth.epam.gymcrm.controller;
 
 import com.elioth.epam.gymcrm.dto.LoginRequest;
 import com.elioth.epam.gymcrm.dto.LoginResponse;
+import com.elioth.epam.gymcrm.security.LoginAttemptService;
+import com.elioth.epam.gymcrm.security.TokenRevocationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -11,6 +13,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,14 +31,22 @@ public class AuthenticationController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtEncoder jwtEncoder;
+    private final LoginAttemptService loginAttemptService;
+    private final TokenRevocationService tokenRevocationService;
 
-    public AuthenticationController(AuthenticationManager authenticationManager, JwtEncoder jwtEncoder) {
+    public AuthenticationController(AuthenticationManager authenticationManager, JwtEncoder jwtEncoder,
+                                    LoginAttemptService loginAttemptService, TokenRevocationService tokenRevocationService) {
         this.authenticationManager = authenticationManager;
         this.jwtEncoder = jwtEncoder;
+        this.loginAttemptService = loginAttemptService;
+        this.tokenRevocationService = tokenRevocationService;
     }
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+        if (loginAttemptService.isBlocked(request.username())) {
+            return ResponseEntity.status(HttpStatus.LOCKED).build();
+        }
         try {
             Authentication authentication = authenticationManager.authenticate(
                     UsernamePasswordAuthenticationToken.unauthenticated(request.username(), request.password()));
@@ -52,9 +63,18 @@ public class AuthenticationController {
                     .id(UUID.randomUUID().toString())
                     .build();
             String token = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+            loginAttemptService.reset(request.username());
             return ResponseEntity.ok(new LoginResponse(token, "Bearer", EXPIRES_IN_SECONDS));
         } catch (AuthenticationException | IllegalArgumentException exception) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(loginAttemptService.recordFailure(request.username())
+                    ? HttpStatus.LOCKED : HttpStatus.UNAUTHORIZED).build();
         }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(Authentication authentication) {
+        JwtAuthenticationToken jwtAuthentication = (JwtAuthenticationToken) authentication;
+        tokenRevocationService.revoke(jwtAuthentication.getToken().getId(), jwtAuthentication.getToken().getExpiresAt());
+        return ResponseEntity.noContent().build();
     }
 }

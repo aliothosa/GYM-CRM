@@ -14,6 +14,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.time.Instant;
+import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -65,10 +66,25 @@ class JwtSecurityIntegrationTest {
         mockMvc.perform(get("/v3/api-docs")).andExpect(status().isOk());
     }
 
+    @Test
+    void logoutRevokesOnlyTheCurrentToken() throws Exception {
+        String loggedOutToken = token();
+        String independentToken = token();
+
+        mockMvc.perform(post("/auth/logout"))
+                .andExpect(status().isUnauthorized());
+        mockMvc.perform(post("/auth/logout").header("Authorization", "Bearer " + loggedOutToken))
+                .andExpect(status().isNoContent());
+        mockMvc.perform(get("/trainings/training-types").header("Authorization", "Bearer " + loggedOutToken))
+                .andExpect(status().isUnauthorized());
+        mockMvc.perform(get("/trainings/training-types").header("Authorization", "Bearer " + independentToken))
+                .andExpect(status().isOk());
+    }
+
     private String token() {
         Instant now = Instant.now();
         JwtClaimsSet claims = JwtClaimsSet.builder().subject("Emily.Davis").claim("role", "TRAINEE")
-                .issuedAt(now).expiresAt(now.plusSeconds(1200)).id("test-jti").build();
+                .issuedAt(now).expiresAt(now.plusSeconds(1200)).id(UUID.randomUUID().toString()).build();
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
     }
 }

@@ -20,10 +20,21 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.time.Clock;
+import org.springframework.security.oauth2.core.OAuth2Error;
+import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
+import org.springframework.security.oauth2.jwt.JwtValidators;
+import com.elioth.epam.gymcrm.security.TokenRevocationService;
 
 /** Configures stateless JWT authentication for the REST API. */
 @Configuration
 public class ApiSecurityConfig {
+
+    @Bean
+    public Clock clock() {
+        return Clock.systemUTC();
+    }
 
     @Bean
     public DaoAuthenticationProvider daoAuthenticationProvider(
@@ -44,8 +55,14 @@ public class ApiSecurityConfig {
     }
 
     @Bean
-    public JwtDecoder jwtDecoder(@Value("${gymcrm.jwt.secret}") String secret) {
-        return NimbusJwtDecoder.withSecretKey(hmacKey(secret)).macAlgorithm(MacAlgorithm.HS256).build();
+    public JwtDecoder jwtDecoder(@Value("${gymcrm.jwt.secret}") String secret, TokenRevocationService tokenRevocationService) {
+        NimbusJwtDecoder decoder = NimbusJwtDecoder.withSecretKey(hmacKey(secret)).macAlgorithm(MacAlgorithm.HS256).build();
+        var revokedTokenValidator = (org.springframework.security.oauth2.core.OAuth2TokenValidator<org.springframework.security.oauth2.jwt.Jwt>) jwt ->
+                tokenRevocationService.isRevoked(jwt.getId())
+                        ? OAuth2TokenValidatorResult.failure(new OAuth2Error("invalid_token", "Token has been revoked", null))
+                        : OAuth2TokenValidatorResult.success();
+        decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(JwtValidators.createDefault(), revokedTokenValidator));
+        return decoder;
     }
 
     @Bean
