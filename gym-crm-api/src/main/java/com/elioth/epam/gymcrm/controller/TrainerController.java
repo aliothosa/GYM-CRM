@@ -1,6 +1,5 @@
 package com.elioth.epam.gymcrm.controller;
 
-import com.elioth.epam.gymcrm.auth.AuthSession;
 import com.elioth.epam.gymcrm.domain.Trainer;
 import com.elioth.epam.gymcrm.dto.request.CreateTrainerRequest;
 import com.elioth.epam.gymcrm.dto.request.UpdateTrainerRequest;
@@ -26,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -90,10 +90,9 @@ public class TrainerController {
             @Parameter(description = "Trainer username", required = true)
             @PathVariable String username,
             @Parameter(hidden = true)
-            @SessionAttribute("AUTH_SESSION")
-                AuthSession authSession
+            Authentication authentication
     ){
-        userLogger.log(authSession.username(),"Attempting to get trainer by username: {}", username);
+        userLogger.log(authentication.getName(),"Attempting to get trainer by username: {}", username);
 
         try{
             TrainerResponse response = trainerService.getProfileByUsername(username);
@@ -124,10 +123,9 @@ public class TrainerController {
             @Parameter(description = "Updated trainer profile information", required = true)
             @RequestBody UpdateTrainerRequest updateTrainerRequest,
             @Parameter(hidden = true)
-            @SessionAttribute("AUTH_SESSION")
-                AuthSession authSession
+            Authentication authentication
     ){
-        userLogger.log(authSession.username(),"Attempting to update trainer by username: {}", username);
+        userLogger.log(authentication.getName(),"Attempting to update trainer by username: {}", username);
 
         try{
             TrainerResponse response = trainerService.updateProfile(username, updateTrainerRequest);
@@ -159,10 +157,9 @@ public class TrainerController {
             @Parameter(description = "Trainee username", required = true)
             @PathVariable String username,
             @Parameter(hidden = true)
-            @SessionAttribute("AUTH_SESSION")
-                AuthSession authSession
+            Authentication authentication
     ){
-        userLogger.log(authSession.username(), "Attempting to get trainers not assigned to trainee by username: {}", username);
+        userLogger.log(authentication.getName(), "Attempting to get trainers not assigned to trainee by username: {}", username);
 
         try{
             List<EmbeddedTrainerResponse> embeddedTrainerList = trainerService.getTrainersNotAssignedToTraineeEmbedded(username);
@@ -188,10 +185,9 @@ public class TrainerController {
             @Parameter(description = "New active status", required = true)
             @RequestParam Boolean status,
             @Parameter(hidden = true)
-            @SessionAttribute("AUTH_SESSION")
-            AuthSession authSession
+            Authentication authentication
     ){
-        userLogger.log(authSession.username(), "Attempting to set trainee with username {} status to: {}", username, status);
+        userLogger.log(authentication.getName(), "Attempting to set trainee with username {} status to: {}", username, status);
 
         try{
             trainerService.setStatus(username, status);

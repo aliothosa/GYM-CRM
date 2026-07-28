@@ -87,3 +87,16 @@
 2026-07-27 18:40:34.783 [main] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/swagger-ui/index.html, request={}, response=200 OK
 2026-07-27 18:41:57.973 [main] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/v3/api-docs, request={}, response=200 OK
 2026-07-27 18:41:58.015 [main] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/swagger-ui/index.html, request={}, response=200 OK
+2026-07-27 18:50:09.274 [main] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/v3/api-docs, request={}, response=200 OK
+2026-07-27 18:50:09.664 [main] INFO  [USER_ACTIVITY] REST call: method=POST, endpoint=/auth/login, request={}, response=401 Unauthorized
+2026-07-27 18:50:09.677 [main] INFO  [USER_ACTIVITY] REST call: method=POST, endpoint=/trainees/register, request={}, response=400 Bad Request
+2026-07-27 18:50:09.825 [main] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/v3/api-docs, request={}, response=200 OK
+2026-07-27 18:50:09.853 [main] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/swagger-ui/index.html, request={}, response=200 OK
+2026-07-27 18:52:04.456 [main] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/v3/api-docs, request={}, response=200 OK
+2026-07-27 18:52:04.849 [main] INFO  [USER_ACTIVITY] REST call: method=POST, endpoint=/auth/login, request={}, response=401 Unauthorized
+2026-07-27 18:52:04.863 [main] INFO  [USER_ACTIVITY] REST call: method=POST, endpoint=/trainees/register, request={}, response=400 Bad Request
+2026-07-27 18:52:05.006 [main] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/v3/api-docs, request={}, response=200 OK
+2026-07-27 18:52:05.041 [main] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/swagger-ui/index.html, request={}, response=200 OK
+2026-07-27 18:52:32.621 [main] INFO  [USER_ACTIVITY] REST call: method=GET, endpoint=/v3/api-docs, request={}, response=200 OK
+2026-07-27 18:52:33.039 [main] INFO  [USER_ACTIVITY] REST call: method=POST, endpoint=/auth/login, request={}, response=401 Unauthorized
+2026-07-27 18:52:33.051 [main] INFO  [USER_ACTIVITY] REST call: method=POST, endpoint=/trainees/register, request={}, response=400 Bad Request

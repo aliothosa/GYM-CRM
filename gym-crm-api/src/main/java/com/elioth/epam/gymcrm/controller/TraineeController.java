@@ -1,6 +1,5 @@
 package com.elioth.epam.gymcrm.controller;
 
-import com.elioth.epam.gymcrm.auth.AuthSession;
 import com.elioth.epam.gymcrm.domain.Trainee;
 import com.elioth.epam.gymcrm.dto.request.CreateTraineeRequest;
 import com.elioth.epam.gymcrm.dto.request.UpdateTraineeRequest;
@@ -26,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -94,10 +94,7 @@ public class TraineeController {
     @PostMapping(value = "/{username}")
     public ResponseEntity<TraineeResponse> getTraineeProfile(
             @Parameter(description = "Trainee username", required = true)
-            @PathVariable String username,
-            @Parameter(hidden = true)
-            @SessionAttribute("AUTH_SESSION")
-                AuthSession session
+            @PathVariable String username
     ){
         userLogger.log(username, "Requested information for trainee with username: {}", username);
 
@@ -134,10 +131,9 @@ public class TraineeController {
             @Parameter(description = "Updated trainee profile information", required = true)
             @RequestBody UpdateTraineeRequest updateTraineeRequest,
             @Parameter(hidden = true)
-            @SessionAttribute("AUTH_SESSION")
-                AuthSession authSession
+            Authentication authentication
     ){
-        userLogger.log(authSession.username(), "Attempting to update trainee profile with username: {}", authSession.username());
+        userLogger.log(authentication.getName(), "Attempting to update trainee profile with username: {}", authentication.getName());
 
         try{
             TraineeResponse response = traineeService.updateProfile(username, updateTraineeRequest);
@@ -166,10 +162,9 @@ public class TraineeController {
             @Parameter(description = "Trainee username", required = true)
             @PathVariable String username,
             @Parameter(hidden = true)
-            @SessionAttribute("AUTH_SESSION")
-                AuthSession authSession
+            Authentication authentication
     ){
-        userLogger.log(authSession.username(), "Attempting to delete trainee profile with username: {}", username);
+        userLogger.log(authentication.getName(), "Attempting to delete trainee profile with username: {}", username);
 
         try{
             traineeService.deleteProfile(username);
@@ -203,10 +198,9 @@ public class TraineeController {
             @Parameter(description = "Usernames of trainers to assign", required = true)
             @RequestParam Set<String> trainerUsernames,
             @Parameter(hidden = true)
-            @SessionAttribute("AUTH_SESSION")
-            AuthSession authSession
+            Authentication authentication
     ){
-        userLogger.log(authSession.username(), "Attempting to update trainee list with username: {}", username);
+        userLogger.log(authentication.getName(), "Attempting to update trainee list with username: {}", username);
         try{
             Set<EmbeddedTrainerResponse> response = traineeService.updateTrainersToTrainee(username, trainerUsernames);
             return new ResponseEntity<>(response, HttpStatus.OK);
@@ -232,10 +226,9 @@ public class TraineeController {
             @Parameter(description = "New active status", required = true)
             @RequestParam Boolean status,
             @Parameter(hidden = true)
-            @SessionAttribute("AUTH_SESSION")
-                AuthSession authSession
+            Authentication authentication
     ){
-        userLogger.log(authSession.username(), "Attempting to set trainee with username {} status to: {}", username, status);
+        userLogger.log(authentication.getName(), "Attempting to set trainee with username {} status to: {}", username, status);
 
         try{
             traineeService.setStatus(username, status);

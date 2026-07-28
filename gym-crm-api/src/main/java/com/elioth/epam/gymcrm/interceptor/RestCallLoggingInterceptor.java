@@ -1,14 +1,14 @@
 package com.elioth.epam.gymcrm.interceptor;
 
-import com.elioth.epam.gymcrm.auth.AuthSession;
 import com.elioth.epam.gymcrm.logging.UserLogger;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.util.Arrays;
@@ -19,7 +19,6 @@ import java.util.TreeMap;
 @Component
 public class RestCallLoggingInterceptor implements HandlerInterceptor {
 
-    private static final String AUTH_SESSION = "AUTH_SESSION";
     private static final String ANONYMOUS = "anonymous";
 
     private final UserLogger userLogger;
@@ -35,19 +34,18 @@ public class RestCallLoggingInterceptor implements HandlerInterceptor {
             @NonNull Object handler,
             @Nullable Exception exception
     ) {
-        String username = resolveUsername(request);
+        String username = resolveUsername();
         String message = buildMessage(request, response, exception);
         userLogger.log(username, message);
     }
 
-    private String resolveUsername(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        if (session != null && session.getAttribute(AUTH_SESSION) instanceof AuthSession authSession) {
-            return authSession.username();
+    private String resolveUsername() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()
+                && !"anonymousUser".equals(authentication.getName())) {
+            return authentication.getName();
         }
-
-        String username = request.getParameter("username");
-        return username == null || username.isBlank() ? ANONYMOUS : username;
+        return ANONYMOUS;
     }
 
     private String buildMessage(

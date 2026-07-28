@@ -1,7 +1,5 @@
 package com.elioth.epam.gymcrm.interceptor;
 
-import com.elioth.epam.gymcrm.auth.AuthSession;
-import com.elioth.epam.gymcrm.auth.Role;
 import com.elioth.epam.gymcrm.logging.UserLogger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,7 +10,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.mock.web.MockHttpSession;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -38,9 +37,8 @@ class RestCallLoggingInterceptorTest {
     @Test
     void shouldLogAuthenticatedRequestWithOkResponse() {
         MockHttpServletRequest request = request("PUT", "/trainees/user1");
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("AUTH_SESSION", new AuthSession(1L, "user1", Role.TRAINEE));
-        request.setSession(session);
+        SecurityContextHolder.getContext().setAuthentication(
+                UsernamePasswordAuthenticationToken.authenticated("user1", null, java.util.List.of()));
         request.addParameter("status", "true");
         MockHttpServletResponse response = response(HttpStatus.OK);
 
@@ -53,14 +51,14 @@ class RestCallLoggingInterceptorTest {
     }
 
     @Test
-    void shouldUseUsernameParameterWhenSessionIsMissing() {
+    void shouldUseAnonymousForUnauthenticatedLoginRequest() {
         MockHttpServletRequest request = request("POST", "/auth/login");
         request.addParameter("username", "login.user");
         MockHttpServletResponse response = response(HttpStatus.OK);
 
         complete(request, response, null);
 
-        assertTrue(loggedMessage("login.user").contains("request={username=login.user}"));
+        assertTrue(loggedMessage("anonymous").contains("request={username=login.user}"));
     }
 
     @Test
@@ -78,11 +76,8 @@ class RestCallLoggingInterceptorTest {
     }
 
     @Test
-    void shouldUseAnonymousForBlankUsernameAndNonAuthenticationSessionAttribute() {
+    void shouldUseAnonymousForBlankUsername() {
         MockHttpServletRequest request = request("GET", "/trainees");
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("AUTH_SESSION", "not-an-auth-session");
-        request.setSession(session);
         request.addParameter("username", "   ");
 
         complete(request, response(HttpStatus.OK), null);
@@ -111,7 +106,7 @@ class RestCallLoggingInterceptorTest {
 
         complete(request, response, null);
 
-        String message = loggedMessage("safe.user");
+        String message = loggedMessage("anonymous");
         assertFalse(message.toLowerCase().contains("password"));
         assertFalse(message.contains("secret1"));
         assertFalse(message.contains("secret2"));
@@ -177,7 +172,11 @@ class RestCallLoggingInterceptorTest {
             MockHttpServletResponse response,
             Exception exception
     ) {
-        interceptor.afterCompletion(request, response, new Object(), exception);
+        try {
+            interceptor.afterCompletion(request, response, new Object(), exception);
+        } finally {
+            SecurityContextHolder.clearContext();
+        }
     }
 
     private String loggedMessage(String username) {

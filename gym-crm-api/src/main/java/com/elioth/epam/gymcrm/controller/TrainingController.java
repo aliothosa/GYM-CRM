@@ -1,6 +1,5 @@
 package com.elioth.epam.gymcrm.controller;
 
-import com.elioth.epam.gymcrm.auth.AuthSession;
 import com.elioth.epam.gymcrm.dto.request.CreateTrainingRestRequest;
 import com.elioth.epam.gymcrm.dto.request.GetTraineeTrainingsRestRequest;
 import com.elioth.epam.gymcrm.dto.request.GetTrainerTrainingsRestRequest;
@@ -22,6 +21,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -57,10 +57,9 @@ public class TrainingController {
             @Parameter(description = "Information required to create a training", required = true)
             @RequestBody CreateTrainingRestRequest createTrainingRequest,
             @Parameter(hidden = true)
-            @SessionAttribute("AUTH_SESSION")
-                AuthSession authSession
+            Authentication authentication
     ) {
-       userLogger.log(authSession.username(), "Creating a new training for Trainee: {} with Trainer: {}", createTrainingRequest.traineeUsername(), createTrainingRequest.trainerUsername());
+       userLogger.log(authentication.getName(), "Creating a new training for Trainee: {} with Trainer: {}", createTrainingRequest.traineeUsername(), createTrainingRequest.trainerUsername());
 
        try{
            trainingService.createTraining(createTrainingRequest);
@@ -91,10 +90,9 @@ public class TrainingController {
     @GetMapping(value = "/trainings/training-types")
     public ResponseEntity<List<String>> getAllTrainingTypes(
             @Parameter(hidden = true)
-            @SessionAttribute("AUTH_SESSION")
-            AuthSession authSession
+            Authentication authentication
     ) {
-        userLogger.log(authSession.username(), "getting all training types");
+        userLogger.log(authentication.getName(), "getting all training types");
 
         List<String> names = trainingService.getTrainingTypeNames();
 
@@ -124,10 +122,9 @@ public class TrainingController {
             @Parameter(description = "Criteria used to filter trainee trainings", required = true)
             @RequestBody GetTraineeTrainingsRestRequest request,
             @Parameter(hidden = true)
-            @SessionAttribute("AUTH_SESSION")
-                AuthSession authSession
+            Authentication authentication
     ){
-        userLogger.log(authSession.username(), "getting all training for user: {}", username);
+        userLogger.log(authentication.getName(), "getting all training for user: {}", username);
 
         try{
             List<TraineeTrainingResponse> trainings = trainingService.getTrainingsByTraineeUsernameAndCriteria(username, request);
@@ -159,10 +156,9 @@ public class TrainingController {
             @Parameter(description = "Criteria used to filter trainer trainings", required = true)
             @RequestBody GetTrainerTrainingsRestRequest request,
             @Parameter(hidden = true)
-            @SessionAttribute("AUTH_SESSION")
-                AuthSession authSession
+            Authentication authentication
     ){
-        userLogger.log(authSession.username(), "getting training of trainer: {}", username);
+        userLogger.log(authentication.getName(), "getting training of trainer: {}", username);
 
         try{
             List<TrainerTrainingResponse> trainings = trainingService.getTrainingsByTrainerUsernameAndCriteria(username, request);
