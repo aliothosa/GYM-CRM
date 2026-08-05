@@ -3,17 +3,23 @@ package com.elioth.epam.workload.exception;
 import com.elioth.epam.workload.dto.response.ApiErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 
 import java.time.Instant;
 
 @RestControllerAdvice
 public class WorkloadExceptionHandler {
+
+    private static final Logger LOG =
+            LoggerFactory.getLogger(WorkloadExceptionHandler.class);
 
     @ExceptionHandler(TrainerWorkloadNotFoundException.class)
     public ResponseEntity<ApiErrorResponse> handleNotFound(
@@ -23,17 +29,25 @@ public class WorkloadExceptionHandler {
         return buildResponse(HttpStatus.NOT_FOUND, exception.getMessage(), request);
     }
 
+    @ExceptionHandler(InvalidWorkloadException.class)
+    public ResponseEntity<ApiErrorResponse> handleInvalidWorkload(
+            InvalidWorkloadException exception,
+            HttpServletRequest request
+    ) {
+        return buildResponse(HttpStatus.BAD_REQUEST, exception.getMessage(), request);
+    }
+
     @ExceptionHandler({
-            InvalidWorkloadException.class,
             MethodArgumentNotValidException.class,
             ConstraintViolationException.class,
+            HttpMessageNotReadableException.class,
             ArithmeticException.class
     })
     public ResponseEntity<ApiErrorResponse> handleBadRequest(
             Exception exception,
             HttpServletRequest request
     ) {
-        return buildResponse(HttpStatus.BAD_REQUEST, exception.getMessage(), request);
+        return buildResponse(HttpStatus.BAD_REQUEST, "Invalid workload request", request);
     }
 
     @ExceptionHandler(Exception.class)
@@ -41,11 +55,12 @@ public class WorkloadExceptionHandler {
             Exception exception,
             HttpServletRequest request
     ) {
-        return buildResponse(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "Unexpected workload service error:" +   exception.getMessage(),
-                request
+        LOG.error(
+                "operation=WORKLOAD_ERROR path={} result=UNEXPECTED exceptionType={}",
+                request.getRequestURI(),
+                exception.getClass().getSimpleName()
         );
+        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected workload service error", request);
     }
 
     private ResponseEntity<ApiErrorResponse> buildResponse(

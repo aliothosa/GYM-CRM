@@ -20,6 +20,7 @@ import com.elioth.epam.gymcrm.repository.TraineeRepository;
 import com.elioth.epam.gymcrm.repository.TrainerRepository;
 import com.elioth.epam.gymcrm.repository.TrainingRepository;
 import com.elioth.epam.gymcrm.repository.TrainingTypeRepository;
+import org.springframework.context.ApplicationEventPublisher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -61,6 +62,9 @@ class TrainingServiceTest {
     @Mock
     private TrainingTypeRepository trainingTypeRepository;
 
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
+
     @InjectMocks
     private TrainingService trainingService;
 
@@ -70,6 +74,7 @@ class TrainingServiceTest {
         trainingService.setTrainerRepository(trainerRepository);
         trainingService.setTrainingRepository(trainingRepository);
         trainingService.setTrainingTypeRepository(trainingTypeRepository);
+        trainingService.setApplicationEventPublisher(eventPublisher);
     }
 
 
@@ -105,6 +110,7 @@ class TrainingServiceTest {
         assertEquals("Morning Yoga", saved.getName());
         assertEquals(request.trainingDate(), saved.getDate());
         assertEquals(60L, saved.getDurationInMinutes());
+        verify(eventPublisher).publishEvent(any(Object.class));
     }
 
     @Test
@@ -239,6 +245,7 @@ class TrainingServiceTest {
         trainingService.deleteTraining(TRAINER_ID, TRAINING_ID);
 
         verify(trainingRepository).delete(training);
+        verify(eventPublisher).publishEvent(any(Object.class));
     }
 
     @Test

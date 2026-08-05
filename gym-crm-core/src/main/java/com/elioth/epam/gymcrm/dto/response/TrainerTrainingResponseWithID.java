@@ -1,6 +1,6 @@
 package com.elioth.epam.gymcrm.dto.response;
 
-public record TrainerResponseWithID(
+public record TrainerTrainingResponseWithID(
         Long id,
         TrainerTrainingResponse embeddedResponse
 ) {

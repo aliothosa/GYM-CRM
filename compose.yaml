@@ -1,0 +1,129 @@
+name: gym-crm
+
+services:
+
+  postgres:
+    image: docker.io/postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-gymcrm}
+      POSTGRES_USER: ${POSTGRES_USER:-gymcrm_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+
+    volumes:
+      - gymcrm_postgres_data:/var/lib/postgresql/data:Z
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+    restart: unless-stopped
+
+    networks:
+      - gymcrm-network
+
+
+  discovery-server:
+    build:
+      context: .
+      dockerfile: discovery-server/Dockerfile
+
+    environment:
+      SERVER_PORT: 8761
+
+      EUREKA_CLIENT_REGISTER_WITH_EUREKA: "false"
+      EUREKA_CLIENT_FETCH_REGISTRY: "false"
+
+    ports:
+      - "8761:8761"
+
+    restart: unless-stopped
+
+    networks:
+      - gymcrm-network
+
+
+  trainer-workload-service:
+    build:
+      context: .
+      dockerfile: trainer-workload-service/Dockerfile
+
+    environment:
+      SERVER_PORT: 8081
+
+      EUREKA_URL: http://discovery-server:8761/eureka/
+
+      GYMCRM_JWT_SECRET: ${GYMCRM_JWT_SECRET:?GYMCRM_JWT_SECRET is required}
+
+    ports:
+      - "8081:8081"
+
+    depends_on:
+      discovery-server:
+        condition: service_started
+
+    restart: unless-stopped
+
+    networks:
+      - gymcrm-network
+
+
+  gym-crm-api:
+    build:
+      context: .
+      dockerfile: gym-crm-api/Dockerfile
+
+    environment:
+      SERVER_PORT: 8080
+
+      SPRING_DATASOURCE_URL: >
+        jdbc:postgresql://postgres:5432/${POSTGRES_DB:-gymcrm}
+
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-gymcrm_user}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+
+      EUREKA_URL: http://discovery-server:8761/eureka/
+
+      GYMCRM_JWT_SECRET: ${GYMCRM_JWT_SECRET:?GYMCRM_JWT_SECRET is required}
+
+      # Swagger UI is loaded by the host browser, so localhost is correct here.
+      WORKLOAD_OPENAPI_URL: >
+        http://localhost:8081/v3/api-docs
+
+    ports:
+      - "8080:8080"
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+      discovery-server:
+        condition: service_started
+
+      trainer-workload-service:
+        condition: service_started
+
+    restart: unless-stopped
+
+    networks:
+      - gymcrm-network
+
+
+volumes:
+  gymcrm_postgres_data:
+    name: gymcrm_postgres_data
+
+
+networks:
+  gymcrm-network:
+    name: gymcrm-network
+    driver: bridge

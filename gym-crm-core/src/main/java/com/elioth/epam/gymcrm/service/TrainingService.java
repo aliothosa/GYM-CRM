@@ -1,14 +1,14 @@
 package com.elioth.epam.gymcrm.service;
 
-import com.elioth.epam.gymcrm.domain.Trainee;
-import com.elioth.epam.gymcrm.domain.Trainer;
-import com.elioth.epam.gymcrm.domain.Training;
-import com.elioth.epam.gymcrm.domain.TrainingType;
+import com.elioth.epam.gymcrm.domain.*;
 import com.elioth.epam.gymcrm.dto.mapper.TrainingMapper;
 import com.elioth.epam.gymcrm.dto.request.*;
 import com.elioth.epam.gymcrm.dto.response.TraineeTrainingResponse;
+import com.elioth.epam.gymcrm.dto.response.TrainerTrainingResponseWithID;
 import com.elioth.epam.gymcrm.dto.response.TrainerTrainingResponse;
 import com.elioth.epam.gymcrm.dto.response.TrainingResponse;
+import com.elioth.epam.gymcrm.event.TrainingWorkloadChangedEvent;
+import com.elioth.epam.gymcrm.event.WorkloadAction;
 import com.elioth.epam.gymcrm.exception.EntityNotFoundException;
 import com.elioth.epam.gymcrm.exception.InvalidEntityException;
 import com.elioth.epam.gymcrm.exception.InvalidRequestException;
@@ -19,12 +19,12 @@ import com.elioth.epam.gymcrm.repository.TrainingTypeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.function.Function;
 
 @Service
 public class TrainingService {
@@ -35,6 +35,15 @@ public class TrainingService {
     private TrainerRepository trainerRepository;
     private TrainingRepository trainingRepository;
     private TrainingTypeRepository trainingTypeRepository;
+
+
+    // Publishing CREATE and DELETE events
+    private ApplicationEventPublisher eventPublisher;
+
+    @Autowired
+    public void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
+    }
 
     @Autowired
     public void setTrainingRepository(TrainingRepository trainingRepository) {
@@ -56,6 +65,24 @@ public class TrainingService {
         this.trainingTypeRepository = trainingTypeRepository;
     }
 
+
+    // helper for publisher
+    private void publishWorkloadEvent(Training training, WorkloadAction action) {
+        User trainerUser = training.getTrainer().getUser();
+
+        eventPublisher.publishEvent(
+                new TrainingWorkloadChangedEvent(
+                        trainerUser.getUsername(),
+                        trainerUser.getFirstName(),
+                        trainerUser.getLastName(),
+                        trainerUser.getActive().equals(Boolean.TRUE),
+                        training.getDate(),
+                        training.getDurationInMinutes(),
+                        action
+                )
+        );
+    }
+
     @Transactional
     public TrainingResponse createTraining(Long trainerId, CreateTrainingRequest request) {
         LOG.info("Creating training for trainer id: {}", trainerId);
@@ -72,6 +99,9 @@ public class TrainingService {
 
         Training training = TrainingMapper.toEntity(request, fetchedTrainee, fetchedTrainer, fetchedTrainingType);
         Training savedTraining = trainingRepository.save(training);
+
+        // Publishing create event
+        publishWorkloadEvent(training, WorkloadAction.ADD);
 
         LOG.info("Created training with id: {}", savedTraining.getTrainingId());
 
@@ -98,6 +128,9 @@ public class TrainingService {
 
         Training savedTraining = trainingRepository.save(training);
 
+        // Publishing create event
+        publishWorkloadEvent(training, WorkloadAction.ADD);
+
     }
 
     @Transactional
@@ -109,7 +142,9 @@ public class TrainingService {
         Training fetchedTraining = findTrainingByIdOrThrow(trainingId);
         assertTrainingOwnedByTrainer(fetchedTraining, trainerId);
 
-        TrainingMapper.updateEntity(fetchedTraining, request);
+        fetchedTraining.setName(request.name());
+        fetchedTraining.setDate(request.date());
+        fetchedTraining.setDurationInMinutes(request.duration());
 
         return TrainingMapper.toResponse(fetchedTraining);
     }
@@ -119,9 +154,39 @@ public class TrainingService {
         LOG.info("Deleting training with id: {} for trainer id: {}", trainingId, trainerId);
 
         Training fetchedTraining = findTrainingByIdOrThrow(trainingId);
+
         assertTrainingOwnedByTrainer(fetchedTraining, trainerId);
 
+        //publish delete event
+        publishWorkloadEvent(fetchedTraining, WorkloadAction.DELETE);
+
         trainingRepository.delete(fetchedTraining);
+    }
+
+    @Transactional
+    public void deleteTraining(String username, Long trainingId) {
+        LOG.info("Deleting training with id: {}", trainingId);
+
+        Training fetchedTraining = findTrainingByIdOrThrow(trainingId);
+        Trainer trainer =  findTrainerByUsernameOrThrow(username);
+
+        assertTrainingOwnedByTrainer(fetchedTraining, trainer);
+
+        //publish delete event
+        publishWorkloadEvent(fetchedTraining, WorkloadAction.DELETE);
+
+        trainingRepository.delete(fetchedTraining);
+    }
+
+    @Transactional
+    public List<TrainerTrainingResponseWithID> getTrainingsForTrainer(String trainerUsername){
+        LOG.info("Retrieving training for trainer with username: {}", trainerUsername);
+
+        List<Training> trainings = trainingRepository.findAllByTrainerUserUsernameOrTraineeUserUsername(trainerUsername, trainerUsername);
+
+        return trainings.stream()
+                .map(TrainingMapper::toResponseWithID)
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -253,6 +318,11 @@ public class TrainingService {
         if (!trainerId.equals(training.getTrainer().getTrainerId())) {
             throw new InvalidRequestException("Trainer cannot access this training");
         }
+    }
+
+    private void assertTrainingOwnedByTrainer(Training training, Trainer trainer) {
+        if (!trainer.equals(training.getTrainer()))
+            throw new InvalidRequestException("Trainer cannot access this training");
     }
 
     private void validateCreateRequest(CreateTrainingRequest request) {

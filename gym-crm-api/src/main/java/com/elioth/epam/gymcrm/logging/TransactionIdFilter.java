@@ -1,4 +1,4 @@
-package com.elioth.epam.gymcrm.client.workload.logging;
+package com.elioth.epam.gymcrm.logging;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

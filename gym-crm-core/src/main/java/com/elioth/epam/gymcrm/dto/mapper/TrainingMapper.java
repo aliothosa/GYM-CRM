@@ -4,6 +4,7 @@ import com.elioth.epam.gymcrm.domain.*;
 import com.elioth.epam.gymcrm.dto.request.CreateTrainingRequest;
 import com.elioth.epam.gymcrm.dto.request.UpdateTrainingRequest;
 import com.elioth.epam.gymcrm.dto.response.TraineeTrainingResponse;
+import com.elioth.epam.gymcrm.dto.response.TrainerTrainingResponseWithID;
 import com.elioth.epam.gymcrm.dto.response.TrainerTrainingResponse;
 import com.elioth.epam.gymcrm.dto.response.TrainingResponse;
 import org.springframework.stereotype.Component;
@@ -73,7 +74,7 @@ public class TrainingMapper {
 
     public static TraineeTrainingResponse toTraineeTrainingResponse(Training training) {
         if (training == null) {
-            throw new IllegalStateException("Training must have trainee");
+            throw new IllegalStateException("Training must not be null");
         }
 
         User trainer = training.getTrainer().getUser();
@@ -86,6 +87,17 @@ public class TrainingMapper {
                 formatUserData(trainer)
         );
 
+    }
+
+    public static TrainerTrainingResponseWithID toResponseWithID(Training training) {
+        if (training == null) {
+            throw new IllegalStateException("Training must not be null");
+        }
+
+        return new TrainerTrainingResponseWithID(
+                training.getTrainingId(),
+                toTrainerTrainingResponse(training)
+        );
     }
 
     public static TrainerTrainingResponse toTrainerTrainingResponse(Training training) {

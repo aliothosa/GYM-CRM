@@ -28,7 +28,7 @@ class ApiErrorControllerTest {
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertEquals(404, response.getBody().get("status"));
         assertEquals("Not Found", response.getBody().get("error"));
-        assertEquals("Resource not found", response.getBody().get("message"));
+        assertEquals("Not Found", response.getBody().get("message"));
         assertEquals("/missing", response.getBody().get("path"));
         assertFalse(response.getBody().containsKey("trace"));
         assertFalse(response.getBody().containsKey("exception"));

@@ -108,7 +108,12 @@ find_training_id() {
     expect_status 200 "Listing trainer trainings"
     local id
     id="$(jq -r --arg name "$training_name" --arg date "$DATE" --arg trainee "$TRAINEE_USERNAME" --argjson duration "$duration" '
-      .[] | select(.embeddedResponse.name == $name and .embeddedResponse.date == $date and .embeddedResponse.traineeName == $trainee and .embeddedResponse.duration == $duration) | .id' <<<"$HTTP_BODY" | head -n 1)"
+      .[] | select(
+        .embeddedResponse.name == $name
+        and .embeddedResponse.date == $date
+        and (.embeddedResponse.traineeName | contains($trainee))
+        and .embeddedResponse.duration == $duration
+      ) | .id' <<<"$HTTP_BODY" | head -n 1)"
     if [[ "$id" =~ ^[0-9]+$ ]]; then printf '%s' "$id"; return 0; fi
     sleep 1
   done

@@ -30,10 +30,7 @@ public class ApiErrorController implements ErrorController {
             status = HttpStatus.INTERNAL_SERVER_ERROR;
         }
 
-        Object messageAttribute = request.getAttribute(RequestDispatcher.ERROR_MESSAGE);
-        String message = messageAttribute == null || messageAttribute.toString().isBlank()
-                ? status.getReasonPhrase()
-                : messageAttribute.toString();
+        String message = status.getReasonPhrase();
 
         Object pathAttribute = request.getAttribute(RequestDispatcher.ERROR_REQUEST_URI);
 

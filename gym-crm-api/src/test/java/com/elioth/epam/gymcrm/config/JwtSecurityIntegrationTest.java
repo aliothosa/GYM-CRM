@@ -1,5 +1,8 @@
 package com.elioth.epam.gymcrm.config;
 
+import com.elioth.epam.gymcrm.domain.Trainee;
+import com.elioth.epam.gymcrm.domain.User;
+import com.elioth.epam.gymcrm.repository.TraineeRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.test.context.ActiveProfiles;
@@ -20,6 +24,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
 @SpringBootTest
@@ -31,6 +36,10 @@ class JwtSecurityIntegrationTest {
     private MockMvc mockMvc;
     @Autowired
     private JwtEncoder jwtEncoder;
+    @Autowired
+    private TraineeRepository traineeRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @BeforeEach
     void setUp() {
@@ -48,6 +57,33 @@ class JwtSecurityIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{}"))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void loginAuthenticatesRawPasswordAgainstStoredBcryptHash() throws Exception {
+        String username = "bcrypt." + UUID.randomUUID();
+        String rawPassword = "CorrectHorseBatteryStaple";
+        Trainee trainee = new Trainee();
+        User user = new User();
+        user.setFirstName("Bcrypt");
+        user.setLastName("User");
+        user.setUsername(username);
+        user.setPassword(passwordEncoder.encode(rawPassword));
+        user.setActive(true);
+        trainee.setUser(user);
+        traineeRepository.saveAndFlush(trainee);
+
+        mockMvc.perform(post("/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"" + username + "\",\"password\":\"" + rawPassword + "\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").isNotEmpty())
+                .andExpect(jsonPath("$.tokenType").value("Bearer"));
+
+        mockMvc.perform(post("/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"" + username + "\",\"password\":\"wrong-password\"}"))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test

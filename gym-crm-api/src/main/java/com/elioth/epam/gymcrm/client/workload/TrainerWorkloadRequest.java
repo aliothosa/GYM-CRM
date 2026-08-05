@@ -1,4 +1,4 @@
-package com.elioth.epam.gymcrm.dto;
+package com.elioth.epam.gymcrm.client.workload;
 
 import java.time.LocalDate;
 

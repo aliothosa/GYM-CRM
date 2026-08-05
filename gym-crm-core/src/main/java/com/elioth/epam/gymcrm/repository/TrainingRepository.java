@@ -19,6 +19,7 @@ public interface TrainingRepository extends JpaRepository<Training, Long> {
 
     List<Training> findAllByTrainerUserUsernameOrTraineeUserUsername(String trainerUsername, String traineeUsername);
 
+
     @Query("""
             select training
             from Training training

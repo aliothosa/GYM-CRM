@@ -1,0 +1,32 @@
+# Version control
+.git
+.gitignore
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+
+# Maven output
+target/
+**/target/
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+.classpath
+.project
+.settings/
+
+# Logs
+logs/
+**/logs/
+*.log
+
+# Operating system
+.DS_Store
+Thumbs.db
+
+# Documentation and miscellaneous
+README.md

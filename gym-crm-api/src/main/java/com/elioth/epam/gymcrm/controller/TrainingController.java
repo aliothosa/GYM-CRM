@@ -4,6 +4,7 @@ import com.elioth.epam.gymcrm.dto.request.CreateTrainingRestRequest;
 import com.elioth.epam.gymcrm.dto.request.GetTraineeTrainingsRestRequest;
 import com.elioth.epam.gymcrm.dto.request.GetTrainerTrainingsRestRequest;
 import com.elioth.epam.gymcrm.dto.response.TraineeTrainingResponse;
+import com.elioth.epam.gymcrm.dto.response.TrainerTrainingResponseWithID;
 import com.elioth.epam.gymcrm.dto.response.TrainerTrainingResponse;
 import com.elioth.epam.gymcrm.exception.EntityNotFoundException;
 import com.elioth.epam.gymcrm.exception.InvalidRequestException;
@@ -20,6 +21,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -167,6 +169,155 @@ public class TrainingController {
             return ResponseEntity.badRequest().build();
         }
 
+    }
+
+    @GetMapping(
+            value = "/trainers/{username}/trainings-simple",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    @Operation(
+            operationId = "getTrainerTrainingsSimple",
+            summary = "Get a trainer's trainings",
+            description = """
+                Retrieves a simplified list of the training sessions assigned to the
+                specified trainer. Each item includes the training ID, which can be
+                used to delete a specific training session.
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Training sessions retrieved successfully",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            array = @ArraySchema(
+                                    schema = @Schema(
+                                            implementation = TrainerTrainingResponseWithID.class
+                                    )
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "The trainer username is invalid",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication is required",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "The authenticated user is not authorized to access this resource",
+                    content = @Content
+            )
+    })
+    public ResponseEntity<List<TrainerTrainingResponseWithID>> getTrainerTrainings(
+            @Parameter(
+                    description = "Unique username of the trainer whose trainings will be retrieved",
+                    required = true,
+                    example = "john.doe"
+            )
+            @PathVariable String username,
+
+            @Parameter(hidden = true)
+            Authentication authentication
+    ) {
+        userLogger.log(
+                authentication.getName(),
+                "Getting trainings for trainer: {}",
+                username
+        );
+
+        try {
+            List<TrainerTrainingResponseWithID> trainings =
+                    trainingService.getTrainingsForTrainer(username);
+
+            return ResponseEntity.ok(trainings);
+        } catch (InvalidRequestException exception) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @DeleteMapping("/trainers/{username}/trainings/{trainingId}")
+    @Operation(
+            operationId = "deleteTrainerTraining",
+            summary = "Delete a trainer's training",
+            description = """
+                Deletes a specific training session assigned to the specified trainer.
+                The training ID can be obtained from the trainer trainings endpoint.
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Training session deleted successfully",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "The trainer username or training ID is invalid",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication is required",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "The authenticated user is not authorized to delete this training",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "The trainer or training session was not found",
+                    content = @Content
+            )
+    })
+    public ResponseEntity<Void> deleteTrainerTraining(
+            @Parameter(
+                    description = "Unique username of the trainer associated with the training",
+                    required = true,
+                    example = "john.doe"
+            )
+            @PathVariable String username,
+
+            @Parameter(
+                    description = """
+                        Unique ID of the training session to delete. The ID can be obtained
+                        from GET /trainers/{username}/trainings-simple.
+                        """,
+                    required = true,
+                    example = "42",
+                    schema = @Schema(
+                            type = "integer",
+                            format = "int64",
+                            minimum = "1"
+                    )
+            )
+            @PathVariable Long trainingId,
+
+            @Parameter(hidden = true)
+            Authentication authentication
+    ) {
+        userLogger.log(
+                authentication.getName(),
+                "Deleting training {} for trainer: {}",
+                trainingId,
+                username
+        );
+
+        try {
+            trainingService.deleteTraining(username, trainingId);
+
+            return ResponseEntity.noContent().build();
+        } catch (InvalidRequestException exception) {
+            return ResponseEntity.badRequest().build();
+        } catch (EntityNotFoundException exception) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
 

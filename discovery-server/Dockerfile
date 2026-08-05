@@ -3,7 +3,7 @@
 # ============================================================
 # Build stage
 # ============================================================
-FROM eclipse-temurin:21-jdk-jammy AS build
+FROM docker.io/eclipse-temurin:21-jdk-jammy AS build
 
 WORKDIR /workspace
 

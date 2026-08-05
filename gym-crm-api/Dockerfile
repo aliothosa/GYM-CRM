@@ -3,7 +3,7 @@
 # ============================================================
 # Build stage
 # ============================================================
-FROM eclipse-temurin:21-jdk-jammy AS build
+FROM docker.io/eclipse-temurin:21-jdk-jammy AS build
 
 WORKDIR /workspace
 
@@ -31,7 +31,7 @@ RUN chmod +x mvnw \
 # ============================================================
 # Runtime stage
 # ============================================================
-FROM eclipse-temurin:21-jre-jammy
+FROM docker.io/eclipse-temurin:21-jre-jammy
 
 RUN groupadd --system gymcrm \
     && useradd \

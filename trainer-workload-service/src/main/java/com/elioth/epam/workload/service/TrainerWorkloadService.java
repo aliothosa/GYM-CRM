@@ -42,7 +42,7 @@ public class TrainerWorkloadService {
         );
 
         TrainerMonthlyWorkload workload = repository
-                .findForUpdateByUsernameAndWorkloadYearAndWorkloadMonth(request.trainerUsername(), year, month)
+                .findForUpdateByTrainerUsernameAndWorkloadYearAndWorkloadMonth(request.trainerUsername(), year, month)
                 .orElseGet(() -> createEmptyWorkload(request, year, month));
 
         long currentDuration = workload.getTrainingDurationMinutes();

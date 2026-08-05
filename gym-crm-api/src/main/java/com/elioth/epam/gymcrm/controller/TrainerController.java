@@ -180,7 +180,7 @@ public class TrainerController {
             @ApiResponse(responseCode = "403", description = "Authentication required"),
             @ApiResponse(responseCode = "404", description = "Trainer not found")
     })
-    @PatchMapping(value = "/{username}/satus")
+    @PatchMapping(value = "/{username}/status")
     public ResponseEntity<Void> setStatus(
             @Parameter(description = "Trainer username", required = true)
             @PathVariable String username,
