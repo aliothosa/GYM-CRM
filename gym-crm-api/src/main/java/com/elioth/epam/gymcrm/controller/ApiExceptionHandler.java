@@ -1,7 +1,5 @@
 package com.elioth.epam.gymcrm.controller;
 
-import com.elioth.epam.gymcrm.client.workload.WorkloadServiceTimeoutException;
-import com.elioth.epam.gymcrm.client.workload.WorkloadServiceUnavailableException;
 import com.elioth.epam.gymcrm.dto.ApiErrorResponse;
 import com.elioth.epam.gymcrm.exception.EntityNotFoundException;
 import com.elioth.epam.gymcrm.exception.InvalidEntityException;
@@ -47,16 +45,6 @@ public class ApiExceptionHandler {
     @ExceptionHandler(AccessDeniedException.class)
     ResponseEntity<ApiErrorResponse> forbidden(AccessDeniedException exception, HttpServletRequest request) {
         return response(HttpStatus.FORBIDDEN, "Access is denied", request);
-    }
-
-    @ExceptionHandler(WorkloadServiceTimeoutException.class)
-    ResponseEntity<ApiErrorResponse> workloadTimeout(WorkloadServiceTimeoutException exception, HttpServletRequest request) {
-        return response(HttpStatus.GATEWAY_TIMEOUT, "Trainer workload service timed out", request);
-    }
-
-    @ExceptionHandler(WorkloadServiceUnavailableException.class)
-    ResponseEntity<ApiErrorResponse> workloadUnavailable(WorkloadServiceUnavailableException exception, HttpServletRequest request) {
-        return response(HttpStatus.SERVICE_UNAVAILABLE, "Trainer workload service is unavailable", request);
     }
 
     @ExceptionHandler(Exception.class)

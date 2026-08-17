@@ -1,7 +1,8 @@
 package com.elioth.epam.gymcrm.event;
 
-import com.elioth.epam.gymcrm.client.workload.TrainerWorkloadClient;
-import com.elioth.epam.gymcrm.client.workload.TrainerWorkloadRequest;
+import org.springframework.beans.factory.annotation.Value;
+import com.elioth.epam.gymcrm.messaging.TrainerWorkloadMessage;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -9,17 +10,22 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @Component
 public class TrainingWorkloadEventListener {
 
-    private final TrainerWorkloadClient workloadClient;
+    private final JmsTemplate jmsTemplate;
+    private final String queueName;
 
-    public TrainingWorkloadEventListener(TrainerWorkloadClient workloadClient) {
-        this.workloadClient = workloadClient;
+    public TrainingWorkloadEventListener(
+            JmsTemplate jmsTemplate,
+            @Value("${gymcrm.messaging.trainer-workload.queue}") String queueName
+    ) {
+        this.jmsTemplate = jmsTemplate;
+        this.queueName = queueName;
     }
 
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void onTrainingWorkloadChanged(
             TrainingWorkloadChangedEvent event
     ) {
-        TrainerWorkloadRequest request = new TrainerWorkloadRequest(
+        jmsTemplate.convertAndSend(queueName, new TrainerWorkloadMessage(
                 event.trainerUsername(),
                 event.trainerFirstName(),
                 event.trainerLastName(),
@@ -27,8 +33,6 @@ public class TrainingWorkloadEventListener {
                 event.trainingDate(),
                 event.trainingDurationMinutes(),
                 event.action().name()
-        );
-
-        workloadClient.updateWorkload(request);
+        ));
     }
 }

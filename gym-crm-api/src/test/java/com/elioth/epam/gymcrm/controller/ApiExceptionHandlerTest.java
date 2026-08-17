@@ -1,7 +1,5 @@
 package com.elioth.epam.gymcrm.controller;
 
-import com.elioth.epam.gymcrm.client.workload.WorkloadServiceTimeoutException;
-import com.elioth.epam.gymcrm.client.workload.WorkloadServiceUnavailableException;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 
@@ -12,19 +10,6 @@ class ApiExceptionHandlerTest {
 
     private final ApiExceptionHandler handler = new ApiExceptionHandler();
     private final MockHttpServletRequest request = new MockHttpServletRequest("POST", "/trainings");
-
-    @Test
-    void mapsTimeoutAndUnavailableWorkloadFailuresWithoutLeakingTheirCause() {
-        var timeout = handler.workloadTimeout(
-                new WorkloadServiceTimeoutException(new IllegalStateException("internal endpoint")), request);
-        var unavailable = handler.workloadUnavailable(
-                new WorkloadServiceUnavailableException(new IllegalStateException("internal endpoint")), request);
-
-        assertEquals(504, timeout.getStatusCode().value());
-        assertEquals("Trainer workload service timed out", timeout.getBody().message());
-        assertEquals(503, unavailable.getStatusCode().value());
-        assertFalse(unavailable.getBody().message().contains("internal endpoint"));
-    }
 
     @Test
     void hidesUnexpectedExceptionDetails() {

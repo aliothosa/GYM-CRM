@@ -52,6 +52,23 @@ services:
       - gymcrm-network
 
 
+  activemq:
+    image: docker.io/apache/activemq-classic:6.1.7
+
+    environment:
+      ACTIVEMQ_ADMIN_LOGIN: ${ACTIVEMQ_USER:-admin}
+      ACTIVEMQ_ADMIN_PASSWORD: ${ACTIVEMQ_PASSWORD:-admin}
+
+    ports:
+      - "${ACTIVEMQ_PORT:-61616}:61616"
+      - "${ACTIVEMQ_WEB_PORT:-8161}:8161"
+
+    restart: unless-stopped
+
+    networks:
+      - gymcrm-network
+
+
   trainer-workload-service:
     build:
       context: .
@@ -62,6 +79,10 @@ services:
 
       EUREKA_URL: http://discovery-server:8761/eureka/
 
+      ACTIVEMQ_BROKER_URL: tcp://activemq:61616
+      ACTIVEMQ_USER: ${ACTIVEMQ_USER:-admin}
+      ACTIVEMQ_PASSWORD: ${ACTIVEMQ_PASSWORD:-admin}
+
       GYMCRM_JWT_SECRET: ${GYMCRM_JWT_SECRET:?GYMCRM_JWT_SECRET is required}
 
     ports:
@@ -69,6 +90,9 @@ services:
 
     depends_on:
       discovery-server:
+        condition: service_started
+
+      activemq:
         condition: service_started
 
     restart: unless-stopped
@@ -93,6 +117,10 @@ services:
 
       EUREKA_URL: http://discovery-server:8761/eureka/
 
+      ACTIVEMQ_BROKER_URL: tcp://activemq:61616
+      ACTIVEMQ_USER: ${ACTIVEMQ_USER:-admin}
+      ACTIVEMQ_PASSWORD: ${ACTIVEMQ_PASSWORD:-admin}
+
       GYMCRM_JWT_SECRET: ${GYMCRM_JWT_SECRET:?GYMCRM_JWT_SECRET is required}
 
       # Swagger UI is loaded by the host browser, so localhost is correct here.
@@ -110,6 +138,9 @@ services:
         condition: service_started
 
       trainer-workload-service:
+        condition: service_started
+
+      activemq:
         condition: service_started
 
     restart: unless-stopped
