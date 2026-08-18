@@ -68,11 +68,15 @@ public class TransactionIdFilter extends OncePerRequestFilter {
     private String resolveTransactionId(HttpServletRequest request) {
         String supplied = request.getHeader(HEADER_NAME);
 
-        if (supplied != null
-                && SAFE_TRANSACTION_ID.matcher(supplied).matches()) {
+        if (isSafeTransactionId(supplied)) {
             return supplied;
         }
 
         return UUID.randomUUID().toString();
+    }
+
+    public static boolean isSafeTransactionId(String transactionId) {
+        return transactionId != null
+                && SAFE_TRANSACTION_ID.matcher(transactionId).matches();
     }
 }

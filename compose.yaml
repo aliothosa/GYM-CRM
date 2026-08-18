@@ -69,6 +69,28 @@ services:
       - gymcrm-network
 
 
+  mongodb:
+    image: docker.io/mongo:8
+
+    ports:
+      - "${MONGODB_PORT:-27017}:27017"
+
+    volumes:
+      - gymcrm_mongodb_data:/data/db:Z
+
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+    restart: unless-stopped
+
+    networks:
+      - gymcrm-network
+
+
   trainer-workload-service:
     build:
       context: .
@@ -83,6 +105,8 @@ services:
       ACTIVEMQ_USER: ${ACTIVEMQ_USER:-admin}
       ACTIVEMQ_PASSWORD: ${ACTIVEMQ_PASSWORD:-admin}
 
+      MONGODB_URI: mongodb://mongodb:27017/trainer_workload
+
       GYMCRM_JWT_SECRET: ${GYMCRM_JWT_SECRET:?GYMCRM_JWT_SECRET is required}
 
     ports:
@@ -94,6 +118,9 @@ services:
 
       activemq:
         condition: service_started
+
+      mongodb:
+        condition: service_healthy
 
     restart: unless-stopped
 
@@ -152,6 +179,8 @@ services:
 volumes:
   gymcrm_postgres_data:
     name: gymcrm_postgres_data
+  gymcrm_mongodb_data:
+    name: gymcrm_mongodb_data
 
 
 networks:

@@ -8,7 +8,9 @@ import org.springframework.boot.test.context.SpringBootTest;
         classes = TrainerWorkloadServiceApplication.class,
         properties = {
                 "gymcrm.jwt.secret=test-only-jwt-secret-with-at-least-32-characters",
-                "eureka.client.enabled=false"
+                "eureka.client.enabled=false",
+                "spring.data.mongodb.auto-index-creation=false",
+                "spring.jms.listener.auto-startup=false"
         }
 )
 class TrainerWorkloadServiceApplicationTests {
