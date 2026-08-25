@@ -13,7 +13,7 @@ services:
       - "${POSTGRES_PORT:-5432}:5432"
 
     volumes:
-      - gymcrm_postgres_data:/var/lib/postgresql/data:Z
+      - gymcrm_postgres_data:/var/lib/postgresql/data
 
     healthcheck:
       test:
@@ -76,7 +76,7 @@ services:
       - "${MONGODB_PORT:-27017}:27017"
 
     volumes:
-      - gymcrm_mongodb_data:/data/db:Z
+      - gymcrm_mongodb_data:/data/db
 
     healthcheck:
       test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]

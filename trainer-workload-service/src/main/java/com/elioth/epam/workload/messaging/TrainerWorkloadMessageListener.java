@@ -59,8 +59,12 @@ public class TrainerWorkloadMessageListener {
             LOG.info("transaction=END operation=JMS_WORKLOAD_MESSAGE result=SUCCESS");
         } catch (RuntimeException exception) {
             LOG.error(
-                    "transaction=END operation=JMS_WORKLOAD_MESSAGE result=FAILED exceptionType={}",
-                    exception.getClass().getSimpleName()
+                    "transaction=END operation=JMS_WORKLOAD_MESSAGE result=FAILED trainerUsername={} action={} trainingDate={} durationMinutes={}",
+                    event.trainerUsername(),
+                    event.action(),
+                    event.trainingDate(),
+                    event.trainingDurationMinutes(),
+                    exception
             );
             throw exception;
         } finally {
