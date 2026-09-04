@@ -72,6 +72,11 @@ services:
   mongodb:
     image: docker.io/mongo:8
 
+    # Incompatible kernel fix Linux 6.19 until 7.2.2, Comment if your kernel is
+    # I read fix is coming in mongo 8.3.9, until released this should be in mind
+    environment:
+      GLIBC_TUNABLES: "glibc.pthread.rseq=1"
+
     ports:
       - "${MONGODB_PORT:-27017}:27017"
 
@@ -89,7 +94,6 @@ services:
 
     networks:
       - gymcrm-network
-
 
   trainer-workload-service:
     build:
@@ -150,7 +154,6 @@ services:
 
       GYMCRM_JWT_SECRET: ${GYMCRM_JWT_SECRET:?GYMCRM_JWT_SECRET is required}
 
-      # Swagger UI is loaded by the host browser, so localhost is correct here.
       WORKLOAD_OPENAPI_URL: >
         http://localhost:8081/v3/api-docs
 
